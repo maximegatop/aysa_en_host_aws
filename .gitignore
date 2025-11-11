@@ -1,0 +1,38 @@
+# Archivos de logs
+*.log
+logs/
+log/
+tmp/
+
+# Archivos de caché y compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.env/
+.env
+
+# Archivos de configuración local
+*.sqlite3
+*.db
+.DS_Store
+
+# Archivos o carpetas estáticos (ajustá según tu estructura)
+static/
+media/
+staticfiles/
+build/
+dist/
+
+# Archivos de pruebas o backups
+*.bak
+*.old
+
+run/
+myvenv/
+Log1
+QorderWebLog/
+
