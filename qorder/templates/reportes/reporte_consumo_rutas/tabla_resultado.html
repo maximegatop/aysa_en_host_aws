@@ -1,0 +1,135 @@
+  {% load i18n %} 
+
+  <div class="col-md-12">
+
+
+    <table id="resultado" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+      <thead>
+        <tr>
+          <th>{% trans "Ruta" %}</th>
+          <th>{% trans "Rango" %}</th>
+          <th>{% trans "Hasta" %}</th>
+          <th>{% trans "Cantidad" %}</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in result %}
+        <tr>
+          <td>{{s.Ruta|default_if_none:''}}</td>
+          <td>{{s.Rango|default_if_none:''}}</td>
+          <td>{{s.Hasta|default_if_none:''}}</td>
+          <td>{{s.Cantidad|default_if_none:''}}</td>
+        </tr> 
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+
+
+
+  function showOrder(e){
+
+  $.ajax(
+  {
+    url: "{% url 'qorder:consulta_orden_detallada' %}",
+    type: 'post',
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    datatype: 'json',
+    data: 
+        {
+          numos:e
+        },
+    statusCode: {
+                  200: function(data)
+                  {
+                    //reemplazar contenido y abrir modal
+                    //console.log(data)
+                    $("#contenido").html(data);
+                    $('#myModal').modal();
+                  } ,
+
+                  301: function() 
+                  { 
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                  },
+                  
+                  500: function() 
+                  {
+                    toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                  }
+                }
+}
+);
+}
+
+   function adjust(controlname)
+   {
+    controlname.columns.adjust();
+  }
+  var fechadesde=$("#fecha_desde").data('datepicker').getFormattedDate('ddmmyyyy');
+  var fechahasta=$("#fecha_hasta").data('datepicker').getFormattedDate('ddmmyyyy');
+  var table_resultado = $('#resultado').DataTable({
+    language: datetable_languaje,    
+    scrollX:true,
+
+    dom: 'Bfrtip',
+    buttons: [
+            {
+            extend: 'excel',
+            text: 'Excel',
+            title: 'Reporte consumo de la ruta - desde '+ fechadesde +' hasta ' + fechahasta
+            },
+            {
+            extend:'copy',
+            text:'Copiar',
+          },
+        ],
+        language: {
+              info:"Visualizando _START_ a _END_ de _TOTAL_ ",
+              search:"Buscar",
+              lengthMenu: " ",
+              zeroRecords: "No se encontraron resultados",
+              infoEmpty: "Visualizando 0 a _END_ de _TOTAL_  ",
+              infoFiltered:'',
+              emptyTable:"No hay resultados ",
+              paginate:{
+                previous:"Anterior.",
+                next:"Siguiente.",
+              },
+            buttons: {
+                copyTitle:'Registros copiados al portapapeles',
+                copyKeys: 'Presione <i>ctrl</i> ou <i>\u2318</i> + <i>C</i> para copiar los datos de la tabla al portapapeles. <br> <br> Para cancelar, haga clic en este mensaje o presione Esc. ',
+                copySuccess: {
+                    _: '%d Lineas copiadas',
+                    1: '1 linea copiada'
+                },
+            },
+        },
+    
+    preDrawCallback: function (settings) 
+    {
+      var api = new $.fn.dataTable.Api(settings);
+      var pagination = $(this)
+        .closest('.dataTables_wrapper')
+        .find('.dataTables_paginate');
+
+
+      if (api.page.info().pages <= 1) 
+      {
+        pagination.hide();
+      }
+      else 
+      {
+        pagination.show();
+      }
+      setTimeout(function() { adjust(table_resultado); }, 100);
+
+    }
+  });
+
+
+
+</script>

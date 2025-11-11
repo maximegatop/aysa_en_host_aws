@@ -1,0 +1,84 @@
+{% load i18n %}
+
+
+<table id="table_configuraciones" class="table table-striped table-bordered table-condensed" cellspacing="0"
+       width="100%">
+    <thead>
+    <tr>
+
+        <th>{% trans "Código" %}</th>
+        <th>{% trans "Descripción" %}</th>
+        <th>{% trans "Activo" %}</th>
+        <th>{% trans "Fecha vigencia" %}</th>
+        <th>{% trans "Editar" %}</th>
+        <th>{% trans "Eliminar" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for t in configuraciones %}
+    <tr>
+        <td>{{t.codigo|default_if_none:'--'}}</td>
+        <td>{{t.descripcion|default_if_none:'--'}}</td>
+        <td>{{t.activo}}</td>
+        <td>{{t.fecha_vigencia|default_if_none:'--'}}</td>
+        <td><i style="text-align: center;cursor: pointer" class="glyphicon glyphicon-pencil"
+               onclick="editConfig('{{t.codigo }}' );"></i></td>
+
+        <td><i style="text-align: center;color: red; cursor: pointer" class="fa fa-times"
+               onclick="confirmDeleteConfig('{{t.codigo }}' );"></i></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+
+
+<script>
+    $("#btnNuevaAccion").prop('disabled', true);
+    var table_configs = $('#table_configuraciones').DataTable({
+        language: datetable_languaje,
+        autoWidth: true,
+        info: false,
+        scrollY: 125,
+        paging: false,
+        scrollX: false,
+        select: {
+            style: 'single',
+            selector: 'td:nth-child(4),td:nth-child(3),td:nth-child(2),td:nth-child(1)'
+        },
+        preDrawCallback: function (settings) {
+            var api = new $.fn.dataTable.Api(settings);
+            var pagination = $(this)
+                    .closest('.dataTables_wrapper')
+                    .find('.dataTables_paginate');
+
+            if (api.page.info().pages <= 1) {
+                pagination.hide();
+            }
+            else {
+                pagination.show();
+            }
+            // setTimeout(function () {
+            //     adjust(table_configs);
+            // }, 100);
+
+
+        }
+    }).columns.adjust();
+    //adjust(table_configs);
+    //SELECCIONAR CODIGO DE CFG
+    table_configs.on('select', function (e, dt, type, indexes) {
+        //var _config_activa = 'No';
+        $("#btnNuevaAccion").prop('disabled', false);
+        
+        var m_id_to = $.map(table_configs.rows('.selected').data(), function (item) {
+            //_config_activa = item[2];
+            _codigo = item[0];
+        });
+    });
+    table_configs.on('deselect', function (e, dt, type, indexes) {
+        _codigo = "";
+        $("#btnNuevaAccion").prop('disabled', true);
+    });
+</script>

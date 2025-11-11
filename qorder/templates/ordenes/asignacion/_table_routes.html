@@ -1,0 +1,105 @@
+   {% load i18n %} 
+
+
+                        <table id="table_routes" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>{% trans "lblOficina" %}</th>
+                                <th>{% trans "lblCiclo" %}</th>
+                                <th>{% trans "lblRuta" %}</th>
+                                
+                                <th>{% trans "lblItinerario" %}</th>
+                                <th>{% trans "Semana" %}</th>
+                                <th>{% trans "Fecha Prevista" %}</th>
+                                <th>{% trans "Total / Pendiente" %}</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in rutas %}
+                            <tr>
+                                <td>{{t.oficina|default_if_none:'--'}}</td>
+                                <td>{{t.ciclo|default_if_none:'--'}}</td>
+                                <td>{{t.ruta}}</td>
+                                <td>{{t.itinerario|default_if_none:'--'}}</td>
+                                <td>{{t.anio|default_if_none:''}}</td>
+                                <td>{{t.fecha_estimada_resolucion|date:"d/m/Y"}}</td>
+                                <td>{{t.cantidad|default_if_none:'--'}} / {{t.cantidad_leido|default_if_none:'--'}}</td>
+                                <td>{{t.idruta|default_if_none:'--'}}</td>
+
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+                  <!--  <a onclick="dividir();">Dividir rutas</a> -->
+                    <script> 
+
+
+
+   /*
+        function dividir()
+        {
+          getPage('{% url 'qorder:dividir' %}');
+
+        }
+
+        }
+        table_routes.on( 'select', function ( e, dt, type, indexes ) {
+        var id_to = '';
+        console.log('table_routes');
+        var m_id_to= $.map(table_routes.rows('.selected').data(), function (item) {
+        if (item[4]=='')
+           {
+              var filtros = {};
+              filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+              filtros.id_ruta = item[6];
+                
+              console.log(filtros);
+
+              $.ajax({
+                type: "post",
+                url: "{% url 'qorder:dividir' %}",
+                data: filtros,
+                statusCode: {
+                    500: function() {
+                    toastr.error('Error en el servidor, contacte al administrador.', {timeOut: 2000});
+                }
+              },
+                success: function( strData ){
+                  $( "#container" ).html( strData );
+                 
+                   //toastr.success('Datos grabados correctamente', ' ', {timeOut: 2000})
+                }
+              });
+          }
+        else
+          {
+              var filtros = {};
+              filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+              filtros.id_ruta = item[6];
+                
+              console.log(filtros)
+
+              $.ajax({
+                type: "post",
+                url: "{% url 'qorder:quitardivision' %}",
+                data: filtros,
+                statusCode: {
+                    500: function() {
+                   toastr.error('Error en el servidor, contacte al administrador.', {timeOut: 2000});
+                  }
+                },
+                success: function( strData ){
+                   $("#_table_routes").html(strData);
+                 
+                   //toastr.success('Datos grabados correctamente', ' ', {timeOut: 2000})
+                }
+              });          
+    
+          }
+      });
+       });  
+       */
+                    </script>

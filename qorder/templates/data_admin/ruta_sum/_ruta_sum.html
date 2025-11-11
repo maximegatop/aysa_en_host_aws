@@ -1,0 +1,515 @@
+    {% load qorder_tags %}
+    {% load i18n %} 
+
+<div class="col-md-12">
+  <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">{% trans "Asignación Suministro por Ruta" %}</h2>
+        </div>
+        <div class="input-field col-xs-6 text-right">
+          <div class="form-inline">
+            <label>{% trans "lblOffice" %}</label>
+            <select class="select form-control" id="id_oficina"
+            name="oficina" onchange="searchRutasum()">
+            {% if not user.work_units.all|length_is:'1' %}
+            <option value="">{% trans "lblOffice" %}</option>
+            {% endif %}
+            {% for ct in user.work_units.all %}
+            <option value="{{ct.id_workunit}}">{{ct}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class="panel-body">
+      <div class="row"></div>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Rutas</a>
+            </h4>
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+              <div class="row">
+             
+                <div id="_tabla_rutasum" class="col-xs-12">
+               
+                </div>
+
+
+          
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-default">
+
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#report_collapsible">
+                Suministros</a>
+                </h4>
+              </div>
+              <div id="suministros_collapsible" class="panel-collapse collapse">
+        <row>
+       <div class="col-md-12">
+        
+        
+       <div class="panel-body">
+        <h3 class="col-xs-6 text-left">Suministros Asignados</h3>
+        <h3 class="col-xs-6 text-left">Suministros Disponibles</h3> 
+       
+        <div class="input-field col-xs-12 text-right">
+
+            <div class="form-inline" >
+
+             <label>{% trans "Localidad" %}</label>
+               <select class="select form-control" id="id_localidad" name="localidad"  onchange="searchLocalidad()">
+
+                <option value="localidad">{% trans "Localidad" %}</option>
+
+                {% for ct in localidad.all %}
+
+                <option value="{{ct.id_localidad}}">{{ct.id_localidad}} - {{ct.localidad}}</option>
+                {% endfor %}
+              </select> 
+             </div>
+           </div>
+          
+
+          <div class="panel-body">
+            <div id='_tabla_suministro'>
+
+            {% include 'data_admin/ruta_sum/tabla_suministros.html'  with feedback_form=feedback_form  %}
+             </div>
+           </div>
+        </div>
+        </div>
+            <div class="row col-md-12" >
+            <div align="center">
+            <button class="btn btn-default"  id="btnTransferir"> Renumerar</button>
+            </div>
+            <div align="center">
+            <button class="btn btn-default"  id="btnDelete"> Guardar</button>
+              </div>
+            </div>
+
+  <div class="col-md-12">
+ 
+         </div>
+</row>
+</div> 
+</div>
+
+<div id="new" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+
+  {% include 'data_admin/ruta_sum/edit_rutasum.html'  with feedback_form=feedback_form  %}
+
+</div>
+<div id="modal1" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h1 class="modal-title">Atención!</h1>
+      </div>
+      <div class="modal-body" >
+
+       <h3>¿Desea Eliminar la Siguiente Ruta?</h3>
+     </div>
+     <div class="modal-footer">
+      <button id="btnCancelar" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+      <button id="btnEliminar1" type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+    </div>
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div>
+ 
+ <script>
+  var id_tp='';
+  var ids_sec='';
+  var valor=0;
+
+    $("#btnAddRutasum").prop("disabled",true);
+    {% if user.work_units.all|length_is:'1' %}
+
+    searchRutasum();
+    {% endif %}
+
+    function searchRutasum(){
+
+      var centro = $('#id_oficina').val();
+      
+        if (centro=="")
+  {
+      $("#tabla_rutasum").html("");
+      $("#btnAddRutasum").prop("disabled",true);
+      return;
+  }
+      $('#id_oficinah').val(centro);
+      $.ajax({
+        url: "{% url 'qorder:obtener_rutas' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {id_oficina:centro},
+        statusCode: {
+          200: function(data) {
+        
+            $("#_tabla_rutasum").html(data);
+            $("#btnAddRutasum").prop("disabled",false);
+            $('#suministros_collapsible').collapse('hide');
+            $('#filter_collapsible').collapse('show');
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+
+    function searchLocalidad(){
+
+      var ruta=id_tp
+      var centro = $('#id_oficina').val();
+      var localidad = $('#id_localidad').val();
+      
+      
+      
+      if (centro=='')
+      {
+        toastr.error("Seleccione una Oficina", ' ', {timeOut: 2000});
+        return;
+      }   
+      if(id_tp=='')
+      {
+        toastr.error("Seleccione una Ruta", ' ', {timeOut: 2000});
+        return;        
+      }
+        if (localidad=="")
+  {
+      $("#tabla_sum_asignar").html("");
+      return;
+  }
+      $('#id_oficinah').val(centro);
+    
+      var aver = $('#id_oficinah').val();
+      
+     
+      $.ajax({
+        url: "{% url 'qorder:tabla_suministros_sin_ruta' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {id_localidad:localidad,id_oficina:centro,id_ruta:id_tp},
+        statusCode: {
+          200: function(data) {
+        
+            $("#remplazar").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+           
+           rutas='';
+
+
+             
+
+
+          function rutasum_new(){
+              var modal = $("new");
+             var id_centro= $('#id_oficina').val();
+              if (id_centro=='')
+              {
+              toastr.error("Seleccione una Oficina", ' ', {timeOut: 2000});
+
+              return;
+              }
+             $.ajax({
+              url: "{% url 'qorder:rutasum_new' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id_centro:id_centro,form:'None'},
+              context: document.body
+            }).done(function(response) 
+            {
+             
+              $('#new').html(response);
+              $('#new').modal('toggle');
+            });
+           }
+
+
+      function btnSaveOnClick(id)
+          {
+
+            var modal = $("new");
+            
+            var data = $('#formnew').serialize();
+         
+            $.ajax({
+              url: "{% url 'qorder:rutasum_save' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: data,
+              statusCode: {
+                200: function(data) {
+                    toastr.success('Creada Correctamente', ' ', {timeOut: 2000});
+                    $('#filter_collapsible').collapse('show');
+                    $('#suministros_collapsible').collapse('hide');
+
+
+                },
+                300: function() {
+                  
+                   toastr.error('La ruta ya existe', ' ', {timeOut: 2000});
+                },                
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('Complete los campos obligatorios', ' ', {timeOut: 2000});
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                   $("#_tabla_rutasum" ).html(xhr);   
+                   $('#new').modal('hide');
+                 }
+               }
+             });
+
+          }
+
+
+$("#btnDelete").on("click",function(){
+  var id_centro = $('#id_oficina').val();
+          if (id_centro=='')
+          {
+            toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+            return;
+          }
+
+          if(id_tp=='')
+          { 
+            toastr.error('Seleccione una Ruta', ' ', {timeOut: 2000})
+            return;
+          }
+
+
+});
+$("#filter_collapse").on("click",function(){
+
+  $('#suministros_collapsible').collapse('hide');
+  var id_centro = $('#id_oficina').val();
+          if (id_centro=='')
+          {
+            toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+            return;
+          }
+
+});
+
+
+
+
+
+
+
+
+function UpdateSuministros(){
+
+      var idrutasum=id_tp
+      
+      $.ajax({
+        url: "{% url 'qorder:suministro_tabla' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {idrutasum:idrutasum},
+        statusCode: {
+          200: function(data) {
+        
+            $("#_tabla_suministro").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+function UpdateSumSinRutas (){
+
+
+      var id_centro=$('#id_oficina').val();
+      var id_localidad= $('#id_localidad').val();
+      
+      $.ajax({
+        url: "{% url 'qorder:tabla_suministros_sin_ruta' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {id_oficina:id_centro,id_localidad:id_localidad},
+        statusCode: {
+          200: function(data) {
+        
+            $("#_tabla_sum_asignar").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+var suministros='[';
+$("#btnTransferir").on("click",function(){
+  suministros='[';
+  
+  $("#btnTransferir").html('Renumerando...');
+           var value = 10;
+           //$('#loading').show();
+           table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                  var d = this.data();
+                  d[0] = value.toString();
+                  value=value+10;
+                  suministros += d[0]+"|"+d[1]+",";
+             } );
+            table_datosum
+             .rows(  )
+             .invalidate('data')
+             .draw();
+              //$('#loading').hide();
+                $("#btnTransferir").html('Renumerar');
+                toastr.success('Suministros Renumerados Correctamente', ' ', {timeOut: 2000});
+             suministros+="]";
+             
+     $("#btnDelete").prop("disabled",false);
+
+});
+
+$("#btnDelete").on("click",function(){     
+        var id_centro = $('#id_oficina').val();
+        var localidad=$('#id_localidad').val();
+         var filtros = {};        
+       filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+       filtros.id_suministros=suministros;
+       filtros.id_centro=id_centro;
+       filtros.id_rutasum=id_tp;
+       filtros.id_localidad=localidad;
+       
+       $.ajax({
+           url: "{% url 'qorder:trasferir_suministro' %}",
+           type: 'post',
+           datatype: 'json',
+           data: filtros,
+           statusCode: {
+               200: function(data) { 
+                              
+                     $("#_tabla_sum_asignar").html(data);
+                      $("#btnDelete").prop("disabled",true);
+                      $("#btnTransferir").prop("disabled",true);
+                      toastr.success('Se Guardaron Suministros Correctamente', ' ', {timeOut: 2000});
+                             },
+               301: function() {
+                   //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+               },
+               500: function() {
+                  
+                  // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+   }
+  });
+ 
+});
+
+
+function deleteruta(data){
+  rutas=data;
+
+  $('#modal1').modal('show');
+
+
+}
+
+$("#btnEliminar1").on("click",function(){
+              
+             var centro = $('#id_oficina').val();
+             
+             
+             $.ajax({
+              url: "{% url 'qorder:rutasum_delete' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id_rutasum:rutas,id_oficina:centro},
+              statusCode: {
+                200: function(data) {
+                  
+                  $('#_tabla_rutasum').html(data);
+                  $('#filter_collapsible').collapse('show');
+                  $('#suministros_collapsible').collapse('hide');
+                  toastr.success('Ruta eliminada Correctamente', ' ', {timeOut: 2000});
+                  
+                },
+                300: function() {
+
+
+                },                
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                   toastr.error("No se puede eliminar, Ya se Generaron Ordenes de Trabajo para esta Ruta", {timeOut: 2000});
+                    $('#filter_collapsible').collapse('show');
+                    $('#suministros_collapsible').collapse('hide')
+
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              }
+            }); 
+
+          });  
+</script>

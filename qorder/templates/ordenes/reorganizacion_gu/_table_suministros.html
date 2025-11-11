@@ -1,0 +1,242 @@
+{% load i18n %}
+<style>
+.datatable-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+</style>
+<div class="col-md-6">
+
+  <table id="tabla_suministro" class="table table-striped table-bordered" cellspacing="0" width="100%" style="font-size:11px" >
+    <thead>
+      <tr>
+
+        <th>{% trans "Secuencia" %}</th>
+        <th>{% trans "Ruta" %}</th>
+        <th>{% trans "Suministro" %}</th>
+        <th>{%trans  "Itinerario"%}</th>
+        <th>{%trans  "Dirección"%}</th>
+        <th>{%trans  "Numero Puerta"%}</th>
+        <th>{%trans  "Porcion Original"%}</th>
+        <th>{%trans  "Sec Original"%}</th>
+        <th>{%trans  "Unidad Original"%}</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for s in suministros %}
+      <tr>
+        <td style="white-space:nowrap;">{% widthratio forloop.counter 1 1 %}</td>
+        <td style="white-space:nowrap;">{{s.Ruta|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.Suministro|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.itinerario|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.Direccion|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.Numero_Calle|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.porcion_original|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.sec_original|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.unidad_original|default_if_none:'--'}}</td>
+                            
+      </tr> 
+
+      {%endfor%}     
+    </tbody>
+  </table>
+  <div id="textFilas"></div> 
+</div>
+
+
+
+<div class="col-md-6"><div id="remplazar">
+  {% include 'ordenes/reorganizacion_gu/_table_change.html'  with feedback_form=feedback_form  %}
+</div>
+               <script>
+
+
+var table_datosum = $('#tabla_suministro').DataTable( {
+            language:{
+              info:"Visualizando _START_ a _END_ de _TOTAL_ Suministros",
+              search:"Buscar",
+              lengthMenu: " ",
+              zeroRecords: "No se encontraron resultados",
+              infoEmpty: "Visualizando 0 a _END_ de _TOTAL_ Suministros ",
+              infoFiltered:'',
+              emptyTable:"No hay resultados ",
+              paginate:{
+                previous:"Anterior.",
+                next:"Siguiente.",
+              }
+            },
+             select: {
+                style:'multi',
+                info:false,
+                
+            },
+            scrollY: 600,
+            autoWidth: false,
+            scrollX: true,
+            pageLength:20,             
+   
+
+
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+
+              if (api.page.info().pages <= 1) {
+
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+
+              }
+
+            }
+
+            
+          });
+
+
+function adjust(controlname)
+    {
+        controlname.columns.adjust();
+
+    }
+
+
+                table_datosum.on( 'dblclick', 'td', function () {
+              
+              var id_suministros='[';
+              var sumin_corregir='';
+              var datas='';
+              datas=table_datosum.row( $(this).parents('tr') ).data();
+              sumin_corregir=datas[2];
+
+            var rowIdx = table_datosum.cell( this ).index().row;
+            //  var addRow = table_techs_cuadrilla.rows( rowIdx ).data()
+            
+            var rowNew = [table_datosum.cell({row:rowIdx,column:0}).data(),table_datosum.cell({row:rowIdx,column:1}).data(),table_datosum.cell({row:rowIdx,column:2}).data(),table_datosum.cell({row:rowIdx,column:3}).data(),table_datosum.cell({row:rowIdx,column:4}).data(),table_datosum.cell({row:rowIdx,column:5}).data(),table_datosum.cell({row:rowIdx,column:6}).data(),table_datosum.cell({row:rowIdx,column:7}).data(),table_datosum.cell({row:rowIdx,column:8}).data()];
+
+            table_datosum.rows(rowIdx).remove().draw();                          
+            var row = table_sum.row.add(rowNew).draw();
+            $("#btnTransferir").prop("disabled",false);
+            $("selected", table_datosum).remove();
+            $("#btnDelete").prop("disabled",true);
+
+            var value = 1;
+            //$('#loading').show();
+            table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                   var d = this.data();
+                   d[0] = value.toString();
+                   value=value+1;
+                   id_suministros += d[0]+"|"+d[2]+",";
+              } );
+             
+             table_datosum
+              .rows(  )
+              .invalidate('data')
+              .draw();
+             id_suministros+="]";
+
+
+            var ruta=$('#id_ruta').val();
+            
+           
+            var id_centro = $('#id_oficina').val();
+            var semana = $('#semana').val();
+            if (id_centro=='')
+            {
+              toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+              return;
+            }
+        
+            if(semana=='')
+            { 
+              toastr.error('Seleccione una Ruta', ' ', {timeOut: 2000})
+              return;
+            }
+            $.ajax({
+              url: "{% url 'qorder:insertar_suministro' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id_oficina:id_centro,id_orden:sumin_corregir,ruta:ruta,suministro:id_suministros,semana:semana},
+              statusCode: {
+                200: function(data) {
+                  $("#_tabla_suministro").html(data);
+                  
+                },
+                301: function() {
+                                //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red')  ;
+                              },
+                              500: function() {
+                                toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                              }
+                            }
+                          });
+        
+         });
+
+/*        
+
+            table_datosum.on( 'select', function ( e, dt, type, indexes ) {
+           var ids_sec ="";
+           if (table_datosum.rows('.selected').data().count()>0)
+            {
+               var m_ids_ordenes = $.map(table_datosum.rows('.selected').data(), function (item) {
+               
+               alert(rowIdx)
+               ids_sec=item[0];
+               valor=parseInt(ids_sec) + 5;
+                });
+
+            }
+           else
+           {
+             toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+             return;
+           }
+            console.log(ids_sec);
+
+     });
+ */  
+
+$("#btnDelete").prop("disabled",true);
+
+            table_datosum.on( 'click', 'td', function () {
+
+              valor=0;
+              var rowIdx = table_datosum.cell( this ).index().row; 
+              var valorsig = -1;             
+              var valor1=parseInt(table_datosum.cell({row:rowIdx,column:0}).data());
+         
+            table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+               var data = this.data()[0];
+               var data2 = parseInt(data);
+               if (valorsig==-1 && data2>valor1 )
+               {
+                 valorsig = parseInt(data2);
+               }
+             } );
+             
+
+
+               if (valorsig>-1)
+               {
+                valor=parseInt((valorsig + valor1)/2);
+               }
+            
+            else
+            {
+                valor=valor1 + 5;
+            } 
+            
+
+
+            }); 
+
+
+</script>

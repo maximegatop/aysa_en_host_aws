@@ -1,0 +1,51 @@
+{% load crispy_forms_tags %}
+{% load i18n %} 
+<div id="edit1" class="modal-dialog">
+     <div id="edit2" class="modal-content">
+     
+       <form  id="formparam" class="form-horizontal" action="" method="post">
+              <input type="hidden" name="id" id="id" value="{{ parametro.parametro }}">
+              {% if parametro.parametro %}
+                 <input type="hidden" name="accion" id="accion" value="edit">
+              {% else %}
+                 <input type="hidden" name="accion" id="accion" value="new">
+             {% endif %}            
+               <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">×</button>
+                     {% if parametro.parametro %}
+                        <h3>{% trans "Editar párametro" %} </h3>
+                      {% else %}
+
+                           <h3>{% trans "Nuevo párametro" %} </h3>
+
+                      {% endif %}  
+               </div>
+               
+               <div id="form-modal-body" class="modal-body" style="padding-left:10px;">
+                             <div class='row'>
+            <!-- keep the col class by itself -->
+            <div class='col-md-4'>
+                    {% csrf_token %}
+                      
+                    {% crispy form %}
+            </div>
+                             </div>
+               </div>
+             
+               <div class="modal-footer">
+          
+                   <button id="btnSave" style="width:210px" class="btn btn-primary" type="button" onclick="btnSaveOnClick('{{ parametro.parametro }}')">
+                    Grabar
+                  </button>
+
+                   <button id="btnSave" name="cancel" style="width:210px" class="btn btn-default" type="button" data-dismiss="modal">
+                    Cancelar
+                  </button>
+
+                   
+               </div>
+
+        </form>
+
+      </div>
+</div>

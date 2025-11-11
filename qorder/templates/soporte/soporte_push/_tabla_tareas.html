@@ -1,0 +1,99 @@
+{% load qorder_tags %}
+{% load i18n %} 
+<div class="col-md-12">
+    <div class = "row" id="find_terminales">
+        <div  class="col s7 ">
+            <table id="table_tareas" class="table table-striped table-bordered table-condensed" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Valor</th>
+                        <th>Tarea</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tareas %}
+                    <tr>
+                        <th>{{t.valor}}</th>
+                        <td>{{t.tarea}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+    </div> 
+</div>
+
+<script>
+
+    var table_tareas = $('#table_tareas').DataTable( {
+        language: datetable_languaje,
+        autoWidth: true,
+        info: false,
+        scrollY: 180,
+        pageLength:200,
+        order: [[ 1, "asc" ]],
+        "columnDefs": [
+        {
+            "targets": [0],
+            "visible": false,
+            "searchable": false
+        }
+        ],
+        select: 'single',
+        preDrawCallback: function (settings) {
+          var api = new $.fn.dataTable.Api(settings);
+          var pagination = $(this)
+          .closest('.dataTables_wrapper')
+          .find('.dataTables_paginate');
+  
+          if (api.page.info().pages <= 1) {
+            pagination.hide();
+          }
+          else {
+            pagination.show();
+          }
+  
+        }
+      });
+
+
+      table_tareas.on( 'select', function ( e, dt, type, indexes ) {
+          console.log("selecionado")
+          var data = '';
+        if ( type === 'row' ) {
+            var fila= $.map(table_tareas.rows('.selected').data(), function (item) {
+                data = item[0]
+              });
+            //var data = table_tareas.rows( indexes ).data().pluck( 'Valor' );
+
+            clearfields(data);
+     
+            // do something with the ID of the selected items
+        }
+    } );
+
+    table_tareas.on( 'deselect', function ( e, dt, type, indexes ) {
+        clearfields('');
+    } );
+
+
+
+      /*
+     var table_tps = $('#table_tps').DataTable( {
+        autoWidth: false,
+        lengthChange: false,
+        language: datetable_languaje,
+        "columnDefs": [
+            {
+                "targets": [ 0,5 ],
+                "visible": false,
+                "searchable": false
+            }
+        ],
+        order: [ 1, 'asc' ],
+        select: 'single'
+    });*/
+
+</script>

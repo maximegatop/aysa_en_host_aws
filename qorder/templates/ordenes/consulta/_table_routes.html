@@ -1,0 +1,143 @@
+{% load i18n %} 
+                        <table id="table_routes" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>{% trans "lblOficina" %}</th>
+                                <th>{% trans "lblCiclo" %}</th>
+                                <th>{% trans "lblRuta" %}</th>
+                                
+                                <th>{% trans "lblItinerario" %}</th>
+                                <th>{% trans "lblAño" %}</th>
+                                <th>{% trans "lblCantidad" %}</th>
+                                <th>{% trans "Revisión" %}</th>
+                                <th>{% trans "lblId" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in rutas %}
+                            <tr>
+                                <td>{{t.oficina|default_if_none:'--'}}</td>
+                                <td>{{t.ciclo|default_if_none:'--'}}</td>
+                                <td>{{t.ruta}}</td>
+                                <td>{{t.itinerario|default_if_none:'--'}}</td>
+                                <td>{{t.anio|default_if_none:'--'}}</td>
+                                <td>{{t.cantidad|default_if_none:'--'}}</td>
+                                <td><i class="fa fa-eye fa-fw" onclick="revision_rutas('{{t.idruta}}');"></i></td>
+                                <td>{{t.idruta|default_if_none:'--'}}</td>
+  
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+
+
+<div id="myModal" class="modal  modal-wide fade" tabindex="-1" role="dialog" aria-hidden="true" >
+                      <div class="modal-dialog" >
+                        <div class="modal-content" style='float:left' align="center">
+
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" id="myModalLabel">Evento de la ruta</h4>
+                          </div>
+                          <div class="modal-body" >
+                            <div class="row">
+                              <div class="col-md-12">
+                               <div id='tabla_logruta'></div>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>                    
+
+
+                    <script> 
+
+
+
+
+
+
+
+    $("input[name='todos']").change(function() {
+   
+       refresh();
+   
+    });
+
+    function refresh()
+    {
+      $("#_datos_suministro").html(' ');
+           var todas = 2;
+      
+      $('input[name="todos"]:checked').each(function() {
+          todas = this.value; 
+       });
+   
+        var id_to = '';
+        
+        var m_id_to= $.map(table_routes.rows('.selected').data(), function (item) {
+            id_tp = item[7]
+        });
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_ruta=id_tp;
+        filtros.todas = todas;
+        
+        $.ajax({
+            url: "{% url 'qorder:lista_suministros' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                   
+                    $("#_table_ordenes").html(data);
+                 
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+        });
+    }
+
+
+    function revision_rutas(data){
+                   
+      $.ajax({
+        url: "{% url 'qorder:estado_ruta' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {rutas:data},
+        statusCode: {
+          200: function(data) {
+               $("#tabla_logruta").html(data); 
+               $("#myModal").modal('show');           
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+                
+    }
+
+
+
+
+
+                    </script>

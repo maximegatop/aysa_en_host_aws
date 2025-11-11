@@ -1,0 +1,422 @@
+{% load qorder_tags %}
+{% load i18n %}
+<row>
+    <div class="col-md-12">
+        <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+                    <div class="col-xs-6">
+                        <h2 class="panel-title">{% trans "Soporte" %}</h2>
+                    </div>
+                    <div class="input-field col-xs-6 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "lblOffice" %}</label>
+                            <select class="select form-control" id="id_oficina"
+                                    name="oficina" onchange="searchRoutesConsulta()">
+                                {% if not user.work_units.all|length_is:'1' %}
+                                <option value="">{% trans "lblOffice" %}</option>
+                                {% endif %}
+                                {% for ct in user.work_units.all %}
+                                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <span><i class="fa fa-calculator"></i></span> {% trans "Dispositivos" %}</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div id="tabla_terminales">
+                                    {% include 'soporte/soporte_push/_tabla_dispositivos.html' with feedback_form=feedback_form %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <span><i class="fa fa-tasks"></i></span> {% trans "Tareas" %}</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div id="tabla_tareas">
+                                    {% include 'soporte/soporte_push/_tabla_tareas.html' with feedback_form=feedback_form %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            <div class="row">
+                <div class="col-md-7">
+                </div>
+
+                <div class="col-md-5">
+                    <div class="row" id="div_comando" style="padding: 0 15px">
+
+                    <div class="col-md-12">
+                        <div class="input-field" >
+                            <div class="form-group">
+                                <label for="comando">Comando:</label>
+                                <textarea class="form-control" id="comando" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+
+                    <div class="row" id="div_alerta" style="padding: 0 15px">
+
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="titulo">Título</label>
+                                <input type="text" class="form-control" id="titulo">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4" style="margin-top:32px">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="vibrar">
+                                <label class="form-check-label" for="vibrar">Vibrar</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="mensaje">Mensaje:</label>
+                                <textarea class="form-control" id="mensaje" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div id="sinparametros" class="input-field col s9"> </div>
+                        <input value="" id="id_mensaje" type="hidden"/>
+
+                    </div>
+
+                    <div class="row" style="padding: 0 15px">
+                        <div class="col-md-12">
+                            <div class="pull-right">
+                                <button  class="btn btn-success" style="margin-right:10px" id="btnEnviar" onClick="btnOnClick()">Ejecutar taréa</button>
+                                <button  class="btn btn-primary" id="btnLeer" onClick="btnLeerClick()">Ver resultado</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+                    <div class="col-xs-6">
+                        <h2 class="panel-title">{% trans "Resultado Soporte" %}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body collapse" id="panelBodyResultado">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-12">
+                            <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+                                <div class="panel-heading">
+                                    <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+                                        <h4 class="panel-title">
+                                            <span><i class="fa-solid fa-square-poll-horizontal"></i></span> {% trans "Resultado" %}</h4>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="resultado">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+    
+    <div class="row">
+        <!--<div class="input-field col  s2">
+            <select id="sel_method" onchange="clearfields()">
+                <option value="alert">Alerta</option>        
+                <option value="get_log">Pedir log</option>
+                <option value="get_db3">Pedir db3</option>
+                <option value="get_all">Pedir todo</option>
+                <option value="commandSql">Comando sql</option>
+                <option value="sql">Consulta sql</option>
+                <option value="get_variable">Get variable</option>
+                <option value="set_variable">Set variable</option>
+                <option value="get_gps">Estado GPS</option>
+                <option value="get_status" selected>Estado general</option>
+            </select>
+            <label>Tareas</label>
+       </div>
+        <span id="icono"></span>
+          
+        <div id="div_comando" class="input-field col s9" >
+                <div >
+                    <input value="" id="comando" type="text" class="validate">
+                    <label class="active" for="comando">Comando</label>
+                </div>
+
+        </div>
+        <div id="div_alerta" class="col s9">
+                <div class="input-field col s2">
+                    <input value="" id="titulo" type="text" class="validate">
+                    <label class="active" for="titulo">Título</label>
+                </div>
+                 <div class="input-field col s9">
+                    <input value="" id="mensaje" type="text" class="validate">
+                    <label class="active" for="mensaje">Mensaje</label>
+                </div>
+                 <div class="input-field col s1">
+                    <input value="" id="vibrar" type="checkbox" class="validate">
+                    <label class="active" for="vibrar">Vibrar</label>
+                </div>
+            </div>
+        <div id="sinparametros" class="input-field col s9"> </div>
+        <input value="" id="id_mensaje" type="hidden"/>
+    </div>
+    <div class="row">
+        <div class="right-align">
+                <button  class="btn green" id="btnEnviar" onClick="btnOnClick()">Ejecutar taréa</button>
+                <button  class="btn blue" id="btnLeer" onClick="btnLeerClick()">Ver resultado</button>
+        </div>
+    </div>-->
+    
+<script>
+ //$('select').material_select();
+
+$( document ).ready(function() {
+    //searchRoutesConsulta();
+});
+
+$('#div_alerta').hide();
+$('#div_comando').hide();
+
+$("#title_bc").html("Soporte");
+
+
+function searchRoutesConsulta()
+{
+
+    let oficina = $("#id_oficina").val();
+
+    if (oficina == 0)
+    {
+        toastr.error('Seleccione una oficina');
+        return;
+    }
+
+    let filtros = {};
+
+    filtros.oficina = oficina;
+
+    filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+
+    $.ajax({
+        async: true,
+        type: "post",
+        url: "{% url 'qorder:soporte_get_terminales' %}",
+        data: filtros,
+        statusCode: {
+           200: function(data){
+                $('#tabla_terminales').html(data);
+                $("#btnEnviar").prop('disabled', false);
+            },
+           500: function() {
+               toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).', 2000);
+           }
+        }
+   });
+
+}
+
+
+function clearfields(valor){
+
+    $('#icono').html('');
+    if (valor=='alert')
+    {
+        $('#div_comando').hide();
+        $('#div_alerta').show();
+    }
+    else
+    {
+
+        $('#div_alerta').hide();
+        if (valor=='set_variable' || valor=='get_variable' || valor=='sql' || valor=='commandSql' || valor=='get_log')
+            $('#div_comando').show();
+        else
+        {
+            $('#div_comando').hide();
+            $('#sinparametros').show();
+        }
+    }
+}
+
+function btnLeerClick() {
+    var filtros = {};
+    filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+    filtros.message_id =  $('#id_mensaje').val( );
+    $.ajax({
+         async: true,
+         type: "post",
+         url: "{% url 'qorder:get_soporte' %}",
+         data: filtros,
+         statusCode: {
+            200: function(data){
+                 $('#resultado').html(data);
+                 $("#btnEnviar").prop('disabled', false);
+             },
+            500: function() {
+                $('#resultado').html('Error leyendo respuesta');
+                toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).', 2000);
+                $("#btnEnviar").prop('disabled', false);
+            }
+         }
+    });
+}
+
+
+function btnOnClick() {
+    console.log("boton seleccionar")
+
+
+    let oficina = $("#id_oficina").val();
+
+    if (oficina == 0)
+    {
+        toastr.warning('Seleccione una oficina');
+        return;
+    }
+    let seleccion_tabla = '';
+    let fila= $.map(table_tareas.rows('.selected').data(), function (item) {
+        seleccion_tabla = item[0]
+    });
+
+    if (seleccion_tabla=='')
+    {
+        toastr.error('Seleccione una Tarea.');
+        return;
+    }
+
+    let filtros = {};
+     $('#icono').html('');
+    
+    filtros.method = seleccion_tabla;
+    filtros.command = $('#comando').val();
+    
+    
+    filtros.mensaje = $('#mensaje').val();
+    filtros.vibrar = $('#vibrar').is(":checked");
+    console.log(filtros.id);
+    if (filtros.method=='sql' || filtros.method=='commandSql' || filtros.method=='get_variable'|| filtros.method=='set_variable')
+    {
+        if (filtros.command=='')
+        {
+            toastr.warning('Ingrese un comando.');
+           return;
+        }
+    }
+    else if(filtros.method=='get_log')
+    {
+        if (filtros.command=='')
+        {
+            filtros.command='1';
+        }
+    } 
+
+    else
+    {
+        filtros.command = '';
+    }
+    if (filtros.method=='alert' && (filtros.titulo=='' || filtros.mensaje==''))
+    {
+        toastr.warning('Ingrese titulo y mensaje para alerta.');
+        return;
+    }
+    let alias = '';
+    let id_tp = '';
+    let m_id_tp= $.map(table_dispositivos.rows('.selected').data(), function (item) {
+        alias = item[0]
+        id_tp = item[5]
+    });
+    if (id_tp=='')
+    {
+        toastr.error('Seleccione un dispositivo.');
+        return;
+    }
+    filtros.id =  alias;
+    filtros.id_terminal =  alias;
+    filtros.token = id_tp;
+    filtros.titulo = $('#titulo').val();
+    $('#resultado').html('');
+    filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+    $("#btnEnviar").prop('disabled', true);
+    $.ajax({
+        async: true,
+        type: "post",
+        url: "{% url 'qorder:ejecutar_soporte' %}",
+        data: filtros,
+        statusCode: {
+            200: function(data)
+            {
+
+            if (data.response.success==1)
+                $('#icono').html('<i class="fa fa-check fa-4x green-text"></i>');
+            window.setTimeout(function(){
+                      $('#id_mensaje').val( data.message_id);
+                      var filtros = {};
+                      filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+                      filtros.message_id = data.message_id;
+                      $.ajax({
+                           async: true,
+                           type: "post",
+                           url: "{% url 'qorder:get_soporte' %}",
+                           data: filtros,
+                           statusCode: {
+                              200: function(data){
+                                 $('#resultado').html(data);
+                                 $('#panelBodyResultado').removeClass('collapse');
+                                 $("#btnEnviar").prop('disabled', false);
+                               },
+                              500: function() {
+                                  $('#resultado').html('Error leyendo respuesta');
+                                  toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).');
+                                 $("#btnEnviar").prop('disabled', false);
+                              }
+                           }
+                      });
+          },1000);
+
+            },
+                              500: function() {
+                              $('#resultado').html('Error leyendo respuesta');
+                                toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).');
+                              $("#btnEnviar").prop('disabled', false);
+                              }
+            },
+        success: function( strData ){
+
+        }
+    });
+}
+
+</script>

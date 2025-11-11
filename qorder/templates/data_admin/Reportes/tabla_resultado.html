@@ -1,0 +1,69 @@
+  {% load i18n %} 
+
+<div class="col-md-12">
+
+
+                        <table id="_tabla_resultado" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+                        <thead>
+                            <tr>
+
+                                <th>{% trans "Punto de Suministro" %}</th>
+                                <th>{% trans "Nic" %}</th>
+                                <th>{%trans "Dirección"%}</th>
+                                <th>{%trans "Número de Puerta"%}</th>     
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                
+                                <td>{{s.punto_suministro|default_if_none:'--'}}</td>
+                                <td>{{s.cliente.codigo|default_if_none:'--'}}</td>
+                                <td>{{s.calle|default_if_none:'--'}}</td>
+                                <td>{{s.numero_puerta|default_if_none:'--'}}</td>
+
+
+
+                          </tr> 
+    
+                        </tbody>
+                        </table>
+                      </div>
+
+               <script>
+
+ var table_resultado = $('#_tabla_resultado').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+            pageLength:7,
+            
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+
+              if (api.page.info().pages <= 1) {
+
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+
+              }
+              setTimeout(function() { adjust(table_datosum); }, 100);
+
+            }
+
+            
+          });
+
+     function adjust(controlname)
+    {
+        controlname.columns.adjust();
+
+    }
+
+
+    </script>

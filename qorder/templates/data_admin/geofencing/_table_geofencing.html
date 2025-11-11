@@ -1,0 +1,303 @@
+   {% load i18n %} 
+<div class="col-md-12">
+                        <table id="table_geof" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>{% trans "lblDescripcion" %}</th>
+                                <th>{% trans "lblEnableDisable" %}</th>
+                                <th>{% trans "lblEdit" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in geof %}
+                            <tr>
+                                <td>{{t.descripcion|default_if_none:'--'}}</td>
+
+                                 
+                                 {% if t.activo == 1 %}
+                                      <td><p id="disable" data-placement="top" data-toggle="tooltip" title={% trans "lblDisable" %}><span class="glyphicon glyphicon-ok" style="color:green"></span></p>
+                                      </td>
+
+                                {% else %}
+                                       <td><p id="enable" data-placement="top" data-toggle="tooltip" title={% trans "lblEnable" %}><span class="glyphicon glyphicon-remove" style="color:red"></span></p></td>
+                                {% endif %}
+
+                                 <td>
+                                    <p data-placement="top" data-toggle="tooltip" title={% trans "lblEdit" %}>
+
+                                      <button class="btn btn-primary btn-xs" data-title="Editar" id="btnEditar" 
+                                      >
+                                          <span class="glyphicon glyphicon-pencil"></span>
+                                      </button>
+                                 
+                                    </p>
+                                  </td>
+                                  <td>{{t.id}}</td>
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+                    </div>
+                  <div class="col-md-6">
+                  <br>
+             <button class="btn btn-primary btn-md" data-title="Editar" id="btnSave" 
+               onclick="geof_new();" style="float:left">
+               <span class="glyphicon glyphicon-plus"></span> {% trans "AgregarArea" %}
+             </button>
+                  </div>  
+                    
+                    <script> 
+
+          var table_geof = $('#table_geof').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+
+            "columnDefs": [
+            {
+              "targets": [ 1 ,2],
+              "visible": true,
+              "sorting" : false,
+              "searchable": false
+            },
+            {
+              "targets": [ 3],
+              "visible": false,
+              "sorting" : false,
+              "searchable": false
+
+            }], 
+            pageLength:8,
+
+            select: 'single',
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+            
+
+
+      $('#table_geof tbody').on( 'click', 'td', function () {
+
+    var rowIdx = table_geof.cell( this ).index().row;
+    var colIdx = table_geof.cell(this).index().column;
+    var codigo = table_geof.rows( rowIdx ).data()[0][3] ;
+    if (colIdx==1)
+    {
+       var cell = table_geof.cell(rowIdx,1).data();
+        
+       if (cell.search('id="enable"')>0)
+       {
+            
+            enable(codigo,1,rowIdx);
+        }
+        else
+        {
+            
+           enable(codigo,0,rowIdx);
+       }
+    }
+    else if (colIdx==2)
+    {
+             var centro = $('#id_oficina').val();
+             $('#id_oficinah').val(centro);
+             
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_geofencing=codigo;
+        filtros.id_oficina= centro;
+        
+        $.ajax({
+            url: "{% url 'qorder:geofencing_edit' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                    
+              $('#new').html(data);
+              $('#new').modal('toggle');
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+        });
+
+    }
+    else
+    {
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_geofencing=codigo;
+        filtros.id_oficina= $('#id_oficina').val();
+        $.ajax({
+            url: "{% url 'qorder:geofencing_detail' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                    
+                    $("#_detail_geofencing").html(data);
+                    $('#filter_collapsible').collapse('hide');
+                    $('#map_collapsible').collapse('show');
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+        });
+    }
+
+  
+} );  
+
+
+
+ // ---------------------------------------------------------- Generic Confirm  
+
+    function confirm(heading, question, cancelButtonTxt, okButtonTxt, callback) {
+
+    var confirmModal = 
+      $('<div class="modal fade">' +        
+          '<div class="modal-dialog">' +
+          '<div class="modal-content">' +
+          '<div class="modal-header">' +
+            '<a class="close" data-dismiss="modal" >&times;</a>' +
+            '<h3>' + heading +'</h3>' +
+          '</div>' +
+
+          '<div class="modal-body">' +
+            '<p>' + question + '</p>' +
+          '</div>' +
+
+          '<div class="modal-footer">' +
+            '<a href="#!" class="btn" data-dismiss="modal">' + 
+              cancelButtonTxt + 
+            '</a>' +
+            '<a href="#!" id="okButton" class="btn btn-primary">' + 
+              okButtonTxt + 
+            '</a>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+        '</div>');
+
+    confirmModal.find('#okButton').click(function(event) {
+      callback();
+      confirmModal.modal('hide');
+    }); 
+
+    confirmModal.modal('show');    
+  };  
+
+  
+  function enable(id,accion,rowid) {
+    // get txn id from current table row
+    //var id = $(this).data('id');
+    
+    var heading = ''; 
+    var question ='{% trans "lblConfirmEnableOn" %} ' + id + '.'; 
+    var cancelButtonTxt = '{% trans "btnCancel" %}'; 
+    var okButtonTxt = '{% trans "btnConfirm" %}'; 
+
+   if (accion==1)
+   {
+      heading = '{% trans "lblEnable" %}';
+      question = '{% trans "lblConfirmEnable" %} ' + id + '.';
+   }
+   else
+    {
+      heading = '{% trans "lblDisable" %}';
+      question = '{% trans "lblConfirmDisable" %} ' + id + '.';
+    }
+    var callback = function() {
+            var filtros = {};
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.id = id;
+            filtros.name = 'enable';
+            filtros.action = accion;
+               
+            $.ajax({
+              url: "{% url 'qorder:geofencing_cflags' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: filtros,
+              statusCode: {
+                200: function(data) {
+                   var cell = table_geof.cell(rowid,1);
+                    
+                  
+                   if (data.activo ==1)
+                   {
+                  
+                     table_geof.cell(rowid,1).data('<p id="disable" data-placement="top" data-toggle="tooltip" title={% trans "lblDisable" %}><span class="glyphicon glyphicon-ok" style="color:green"></span></p>').draw();
+                    
+                
+                   }
+                   else
+                   {
+                   
+                     table_geof.cell(rowid,1).data('<p id="enable" data-placement="top" data-toggle="tooltip" title={% trans "lblEnable" %}><span class="glyphicon glyphicon-remove" style="color:red"></span></p>').draw();
+                   
+                    }
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('{% trans "lblCompleteMandatoryField" %}', ' ', {timeOut: 2000})
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                 //  $("#container" ).html(xhr);   
+                   //$(modal).modal('toggle');
+                   //$('body').removeClass('modal-open');
+                  // $('.modal-backdrop').remove();
+                   
+
+                   
+                    //table_anomalias.row(rowid).invalidate().draw();
+                 }
+               }
+             });
+
+    
+    };
+    confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
+  }
+
+
+                    </script>

@@ -1,0 +1,116 @@
+{% load qorder_tags %} {% load i18n %}
+
+<div class="col-md-12">
+  <div
+    class="panel panel-default"
+    style="box-shadow: 0px 2px 25px rgba(0, 0, 0, 0.25)"
+  >
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-md-11">
+          <h2 class="panel-title" id="pntitle">Segmentación de Rutas</h2>
+        </div>
+        <div class="col-md-1">
+          <button
+            id="btnBackCancelar"
+            class="btn btn-default hide"
+            onclick="isReturn(true);"
+          >
+            Regresar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="col-md-12">
+        <div role="tabpanel">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            
+            <li class="nav-item active" role="presentation">
+              <a
+                class="nav-link active"
+                id="config-tab"
+                data-toggle="tab"
+                href="#configuracion"
+                role="tab"
+                aria-controls="simple"
+                aria-selected="true"
+                onclick="cambiarTab(this)"
+                >Asignación Mapa</a
+              >
+            </li>
+
+            <li class="nav-item" role="presentation">
+              <a
+                class="nav-link"
+                id="asignacion-tab"
+                data-toggle="tab"
+                href="#"
+                role="tab"
+                aria-controls="masiva"
+                aria-selected="false"
+                onclick="cambiarTab(this)"
+                >Asignación Lista</a
+              >
+            </li>
+
+          </ul>
+
+          <div class="tab-content" id="myTabContent">
+            <!-- TAB1 -->
+            <div
+              class="tab-pane show active"
+              id="configuracion"
+              role="tabpanel"
+              aria-labelledby="simple-tab"
+            >
+              {% include 'ordenes/asignacion_segmentos/_asignacion_mapa.html' %}
+            </div>
+            <!-- END TAB1 -->
+
+            <!-- TAB2 -->
+            <div
+              class="tab-pane fade"
+              id="asignacion"
+              role="tabpanel"
+              aria-labelledby="masiva-tab"
+            ></div>
+            <!-- END TAB2 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // var estado_mapa2=false
+  function cambiarTab(elemento) {
+    // $(".tab-pane").addClass("fade");
+    // $(".tab-pane").removeClass("show");
+    // $(".tab-pane").css("display", "none");
+
+    // $(elemento.hash).removeClass("fade");
+    // $(elemento.hash).addClass("show");
+    // $(elemento.hash).css("display", "");
+    
+
+    if (elemento.id === "asignacion-tab") {//segundo tab
+      $('#_table_routes_sincoor').css({'position': '','left': '','top': ''});
+      $('#_table_routes').css({'position': 'absolute','left': '-9000px','top': '-9000px'});
+      $("#_table_routes_sincoor_footer").show()
+      $('#_table_routes_footer').hide();
+      // $('#_table_routes').hide()
+      //LimpiarTodo()
+    }else{ 
+
+      $('#_table_routes').css({'position': '','left': '','top': ''});
+      $('#_table_routes_sincoor').css({'position': 'absolute','left': '-9000px','top': '-9000px'});
+      $('#_table_routes_sincoor_footer').hide();
+      $('#_table_routes_footer').show();
+      // $('#_table_routes').show();
+      
+    }
+
+  }
+</script>

@@ -1,0 +1,454 @@
+{% load core_tags %}
+{% load qorder_tags %}
+{% load i18n %}
+
+{% if user.username|if_page_by_user:'ordenes_segmentacion_rutas' %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <!--segundo tab-->
+        <div class="panel panel-default" modal="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+                    <div class="col-xs-6">
+                        <h2 class="panel-title">
+                            {% trans "tituloAsignacion" %}
+                        </h2>
+                    </div>
+                    <div class="input-field col-xs-3 ">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input style="width: 70%;" class="select form-control" list="semanas_seg" id="semana_seg" value="{{semana}}" name="semana_seg"  autocomplete="off">
+                            <datalist id="semanas_seg" name="semanas_seg" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="input-field col-xs-3 text-right" >
+                        <div class="form-inline">
+                            <label>{% trans "Contratista" %}</label>
+                            <select class="select form-control" id="id_oficina_seg" name="oficina_seg" onchange="searchSeg()">
+                                {% if not user.work_units.all|length_is:'1' %}
+                                <option value="">{% trans "Contratista" %}</option>
+                                {% endif %}
+                                {% for ct in user.work_units.all %}
+                                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <row>
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><h4 class="panel-title">Segmentos</h4></div>
+                            <div class="panel-body">
+                                <div id='_table_seg'>
+                                    {% include 'ordenes/asignacion/segmentos/_table_seg.html'  with feedback_form=feedback_form  %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><h4 class="panel-title">Lecturistas</h4></div>
+                            <div class="panel-body">
+                                <div id='_table_techs_seg'>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                </row>
+
+                <row>
+
+                <button id="btnSave_seg" style="width:210px" class="btn btn-primary pull-right" type="button" onclick="btnSaveOnClickSeg('{{ problema.id_problema }}')">
+                    Asignar
+                </button>
+                
+                </row>
+
+                <row>
+
+
+                    <div class="col-md-12"><br>
+                    
+                        <div class="panel panel-default">
+                            <div class="panel-heading"><h4 class="panel-title">Segmentos asignados</h4></div>
+                            <div class="panel-body">
+                                <div>
+                                <input type="checkbox" id="chkMostrarGuardadosSeg" name="Incluir rutas guardadas" style="float:left"> Ver segmentos guardados
+                                </div>
+                                <div id="_table_asignados_seg">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </row>
+
+                <row>
+
+                <button id="btnGuardarAsignacionSeg" style="width:210px" class="btn btn-primary pull-right" type="button">
+                    Guardar Asignaciones
+                </button>
+
+                </row>
+
+            </div>
+        </div>
+        <!--end segundo tab-->
+    </div>
+</div>
+{% endif %}
+
+<script>
+
+    function searchSeg()
+    {
+        $('#chkMostrarGuardadosSeg').prop('checked', false);
+
+        if ($('#id_oficina_seg').val()!='')
+        {
+        searchSegmentos();
+        searchTechniciansSeg();
+        searchAsignacionesSeg();
+        }
+    }
+
+
+    function searchSegmentos(){
+        console.log("entro a funcion searchSegmentos()")
+        var centro = $('#id_oficina_seg').val();
+        var semana = $('#semana_seg').val();
+    
+        $.ajax({
+          url: "{% url 'qorder:asignacion_segmento_table' %}",
+          type: 'post',
+          datatype: 'json',
+          data: {id_oficina:centro,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}'},
+          statusCode: {
+            200: function(data) {
+                $("#_table_seg").html(data);
+                actualizar_seg();
+            },
+            301: function() {
+                //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+            },
+            500: function() {
+                toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+            }
+          }
+        });
+    }
+
+
+    $('#semana_seg').on('input', function() {
+        if( $(this).val().length === 0 ) {
+            $('#semana_seg').val('');
+            toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+            $("#_table_seg").html('');
+            return false;
+        } else {
+            
+          if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+          {
+            var centro = $('#id_oficina_seg').val();
+            var semana = $('#semana_seg').val();
+              
+            if (centro==""||semana=="")
+            {
+              return;
+            }
+    
+            $.ajax({
+              url: "{% url 'qorder:asignacion_segmento_table' %}",
+              type: 'post',
+              datatype: 'json',
+              data: {id_oficina:centro,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}'},
+              statusCode: {
+                200: function(data) {
+                  $("#_table_seg").html(data);
+                  actualizar_seg();
+                },
+                301: function() {
+                  //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+    
+                  toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                }
+              }
+            });
+          }
+        }
+    
+    });
+
+
+    function searchTechniciansSeg()
+    {
+      var centro = $('#id_oficina_seg').val();
+      
+      $('#id_oficinah_seg').val(centro);
+      
+      var aver = $('#id_oficinah_seg').val();
+      
+      $.ajax({
+        url: "{% url 'qorder:asignacion_tech_seg' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: {id_oficina:centro},
+        statusCode: {
+          200: function(data) {
+            $("#_table_techs_seg").html(data);
+          },
+          301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+            },
+          500: function() {
+  
+              toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+            }
+          }
+        });
+    }
+
+
+    function searchAsignacionesSeg()
+    {
+        valuecheckSeg='';
+        
+        if($("#chkMostrarGuardadosSeg").is(':checked')) {
+              valuecheckSeg=1;
+        } else {
+              valuecheckSeg=0;
+        }
+  
+        var centro = $('#id_oficina_seg').val();
+        var semanas_seg=$("#semana_seg").val();
+  
+        $('#id_oficinah').val(centro);
+        if (centro==''){
+          toastr.error('Seleccione un contratista', ' ', {timeOut: 2000})
+          return;
+        }
+        if (semanas_seg==''){
+          toastr.error('Seleccione una semana', ' ', {timeOut: 2000})
+          return;
+        }
+  
+        //var aver = $('#id_oficinah').val();
+        
+        $.ajax({
+          url: "{% url 'qorder:asignacion_asignaciones_seg' %}",
+          type: 'post',
+          datatype: 'json',
+          data: {valuecheckSeg:valuecheckSeg,id_semana:semanas_seg,id_oficina:centro,csrfmiddlewaretoken : '{{csrf_token}}'},
+          statusCode: {
+                200: function(data) {
+                    $("#_table_asignados_seg").html(data);
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                    toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                }
+            }
+        });
+    }
+
+
+    function btnSaveOnClickSeg()
+    {
+        var ids_segmentos ="[";
+        if (table_seg.rows('.selected').data().count()>0)
+        {
+            var m_ids_segmentos = $.map(table_seg.rows('.selected').data(), function (item) {
+            return item[4];
+            });
+            m_ids_segmentos.forEach(function(entry) {
+            ids_segmentos += "'" + entry + "',";
+            });
+        
+            }
+        else
+        {
+            toastr.error("Seleccione al menos un segmento","Atención!!",1500);
+            return;
+        }
+        ids_segmentos +=  "]";
+        
+        
+        var id_tecnico_seg ="";
+        if (table_tecnico_seg.rows('.selected').data().count()>0)
+        {
+
+            var m_id_tecnico_seg = $.map(table_tecnico_seg.rows('.selected').data(), function (item) {
+            return item[3];
+            });
+            m_id_tecnico_seg.forEach(function(entry) {
+            id_tecnico_seg += "'" + entry + "'";
+            });
+        
+            }
+        else
+        {
+            toastr.error("Seleccione al menos un lecturista","Atención!!",1500);
+            return;
+        }
+        
+        
+
+        var filtros = {};
+        var centro = $('#id_oficina_seg').val();
+        var semanas_seg=$("#semana_seg").val();
+        
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.ids_segmentos = ids_segmentos;
+        filtros.id_tecnico = id_tecnico_seg;
+        filtros.id_semana=semanas_seg
+        filtros.id_centro=centro
+
+        $.ajax({
+        url: "{% url 'qorder:asignar_segmento' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+
+        data: filtros,
+        statusCode: {
+            200: function (data) {
+                toastr.success(data, ' ', 2000);
+
+                searchSegmentos();
+                searchAsignacionesSeg();
+            },
+            301: function (data) {
+                toastr.warning(data.responseText, ' ', 5000);
+            },
+            302: function() {
+                //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+            },
+            500: function() {
+                toastr.error('Server error, contact an administrator.', ' ', 2000);
+            }
+        },
+        });
+    }
+
+
+    $("#btnGuardarAsignacionSeg").on("click",function () { 
+        var filtros = {};
+          
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        $.ajax({
+            type: "post",
+            url: "{% url 'qorder:guardar_asignar_segmentos' %}",
+            data: filtros,
+            statusCode: {
+                200: function() {
+                    //searchTechnicians();
+                    searchSegmentos();
+                    searchAsignacionesSeg();
+                    
+                      //toastr.success('Asignación guardada correctamente.',' ', 2000);
+                },                
+                300: function() {
+                    toastr.error('Error al guardar las asignaciones.',' ', 2000);
+                },
+                301: function() {
+                  
+                    searchSegmentos();
+                    searchAsignacionesSeg();
+    
+                    toastr.error('No hay itinerarios para guardar.',' ', 2000);
+                    
+                },
+                302: function() {
+                    toastr.error('El técnico no tiene asignado un dispositivo',' ', 2000);
+                },
+                303: function() {
+                    toastr.error('Seleccione al menos una orden.',' ', 2000);
+                },
+                500: function() {
+                      toastr.error('Error en el servidor, contacte al administrador.',' ', 2000);
+                }
+            },
+            success: function( strData ){
+                toastr.success('Se guardaron correctamente '+strData+' asignaciones de órdenes.',' ', 2000);
+                searchTechniciansSeg();
+                searchSegmentos();
+                searchAsignacionesSeg();
+    
+            }
+        });
+    })
+
+
+    function actualizar_seg()
+    {
+        table_seg = $('#table_seg').DataTable( {
+        language: datetable_languaje,
+        autoWidth: true,
+        info: false,
+        scrollY: 180,
+        pageLength:180,
+        select: 'multi',
+        columnDefs: [
+            {
+                "targets": [4],
+                "visible": false,
+                "searchable": false
+            },
+        ]
+        ,dom: 'Bfrtip',
+        buttons: [
+            {
+                extend:'copy',
+                text:'Copiar',
+            },
+        ],
+        preDrawCallback: function (settings) {
+            var api = new $.fn.dataTable.Api(settings);
+            var pagination = $(this)
+            .closest('.dataTables_wrapper')
+            .find('.dataTables_paginate');
+
+            if (api.page.info().pages <= 1) {
+            pagination.hide();
+            }
+            else {
+            pagination.show();
+            }
+
+        }
+        });
+    }
+
+
+    $("#chkMostrarGuardadosSeg").click(function() {
+        valuecheckSeg='';
+        if($("#chkMostrarGuardadosSeg").is(':checked')) {
+            valuecheckSeg=1;
+        } else {
+            valuecheckSeg=0;
+        }
+        searchAsignacionesSeg();
+
+    });
+  
+
+
+
+
+</script>

@@ -1,0 +1,170 @@
+
+<div id="map" style="height: 500px;">
+
+</div> 
+<br>
+            <div class="right-align">
+                <button data-target="modal1" class="btn green modal-trigger" id="btnCargarDatos">Actualizar datos</button>
+            </div>
+
+  <div class="modal fade" id="modal_data" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">  
+          <div id="contenido_modal">
+
+         </div>          
+
+    </div>
+</div>
+
+<script>
+
+        var latlon = Geohash.decode('{{ center }}');   // 'd29spu44697'
+        
+        var map = L.map('map').setView(latlon, 14);  //[-41.2858, 174.78682]
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 20,
+    }).addTo(map);
+
+
+    var mapCollapsibleIsActive = false;
+    setInterval(function () {
+        var mapCollapsible = $("#map_collapsible")
+        if (mapCollapsible.hasClass("active") && !mapCollapsibleIsActive) {
+            mapCollapsibleIsActive = true;
+            map.invalidateSize();
+        } else {
+            mapCollapsibleIsActive = false;
+        }
+    }, 250)
+
+
+    var greenIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'green'
+    });
+
+    var redIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'red'
+    });
+
+    var yellowIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'orange'
+    });
+
+    var NoneIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'grey'
+    });
+
+    var markers = L.markerClusterGroup();
+        
+    /*    for (var i = 0; i < addressPoints.length; i++) {
+            var a = addressPoints[i];
+            var title = a[2];
+            var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
+            marker.bindPopup(title);
+            markers.addLayer(marker);
+        }
+
+        map.addLayer(markers);
+*/
+
+    var first = 0;
+    {% for a in actividades %}
+    if (first == 0)
+    {
+       if ( {{a.latitud}} != '0.00')
+        {
+           map.setView([ {{a.latitud}}, {{a.longitud}}], 13);
+           first = 1;
+        }
+    }
+
+       var icono =  L.ExtraMarkers.icon({
+                                              icon: 'fa-number',
+                                              number: {{forloop.counter}},
+                                              markerColor: '{{a.get_status_color}}'
+                                            });
+
+
+      // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: {{a.get_status_color}}Icon});
+     // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: icono});
+        var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: icono}, { title: {{forloop.counter}} });
+
+      marker.customId = '{{a.ref_actividad}}~{{a.actividad}}~{{a.fh_registro}}';
+      marker.secuencia = '{{forloop.counter}}';
+      marker.evento = '{{a.id_actividad}} {{a.fh_registro}}';
+      marker.addTo(markers);
+      {% if a.is_actividad %}marker.on("click", show_point);{% else %}marker.on("click", not_activity);{% endif %}
+         //map.addLayer(markers);
+        {% empty %}
+        {% endfor %}
+       markers.addTo(map);
+      {% for a in positions %}
+    if (first == 0)
+    {
+       if ( {{a.latitud}} != '0.00')
+        {
+           map.setView([ {{a.latitud}}, {{a.longitud}}], 13);
+           first = 1;
+        }
+    }   
+    {% endfor %}
+        var polyline = L.polyline([{% for pos in positions %}[{{pos.latitud}}, {{pos.longitud}}]{% if not forloop.last %},{% endif %}{% endfor %}], {color: 'green'}).addTo(map);
+         function not_activity(e){
+
+           //  Materialize.toast('Actividad del sistema: '+e.target.evento, 2000, 'orange');
+         }
+         var buscando = false;
+
+         function show_point(e){
+             if (buscando){
+               //  Materialize.toast('Estamos procesando una búsqueda.', 2000, 'orange');
+                 return false;
+             }
+             
+             var filtros = {};
+             filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+             filtros.data_act = e.target.customId;
+             filtros.secuencia = e.target.secuencia;
+             filtros.aproximar = $('#aprox_direction').is(":checked");
+             buscando=true;
+             $.ajax({
+                 type: "post",
+                 url: "{% url 'qorder:get_data_activity' %}",
+                 data: filtros,
+                 statusCode: {
+                     300: function() {
+                         buscando=false;
+                        // Materialize.toast('Seleccione al menos un técnico.', 2000, 'red');
+                     },
+                     500: function() {
+                         buscando=false;
+                        // Materialize.toast('Error en el servidor, contacte al administrador.', 2000, 'red');
+                     }
+
+                 },
+                 success: function( strData ){
+                     //alert(strData);
+                     buscando=false;
+                     $('#contenido_modal').html(strData);
+                     //$('#modal_data').openModal();
+                     $('#modal_data').modal('toggle');
+                 }
+             });
+
+         }
+
+     $("#btnCargarDatos").on('click', function(){
+        
+       cargarDatos();
+     });
+
+</script>
+
+
+

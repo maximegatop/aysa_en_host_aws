@@ -1,0 +1,90 @@
+
+<div id="map" style="height: 500px;">
+
+</div>
+
+<script>
+        var latlon = Geohash.decode('{{ center }}');   // 'd29spu44697'
+        
+        var map = L.map('map').setView(latlon, 14);  //[-41.2858, 174.78682]
+        mapLink = 
+            '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        L.tileLayer(
+            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; ' + mapLink + ' Contributors',
+            maxZoom: 18,
+            }).addTo(map);
+
+
+    setTimeout(function()
+    { 
+
+        
+        map.invalidateSize();
+
+    }, 250)
+  
+
+/*
+    var mapCollapsibleIsActive = false;
+    refresh = setInterval(function () {
+        var mapCollapsible = $("#map_collapsible")
+        console.log('setInterval');
+        if (mapCollapsible.hasClass("in") && !mapCollapsibleIsActive) {
+            console.log('mapCollapsibleIsActive true');
+            mapCollapsibleIsActive = true;
+            map.invalidateSize();
+            clearInterval(refresh);
+        } else {
+              console.log('mapCollapsibleIsActive falsea');
+            mapCollapsibleIsActive = false;
+        }
+    }, 250)
+*/
+
+    var greenIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'green'
+    });
+
+    var redIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'red'
+    });
+
+    var yellowIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'orange'
+    });
+
+    var markers = L.markerClusterGroup();
+
+    var first = 0;
+    {% for t in posiciones %}
+    if (first == 0)
+    {
+       if ( {{t.latitud}} != '0.00')
+        {
+           map.setView([ {{t.latitud}}, {{t.longitud}}], 13);
+           first = 1;
+        }
+    }
+
+       var icono =  L.ExtraMarkers.icon({
+                                              icon: 'fa-number',
+                                              number: {{t.secuencia}},
+                                              markerColor: 'green'
+                                            });
+
+
+      // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: {{a.get_status_color}}Icon});
+     // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: icono});
+        var marker = L.marker([{{t.latitud}}, {{t.longitud}}], {icon: icono}, { title: {{t.secuencia}} });
+
+      marker.addTo(markers);
+        {% empty %}
+        {% endfor %}
+       markers.addTo(map);
+
+
+</script>

@@ -1,0 +1,31 @@
+{% load i18n %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">{% trans "Foto/s" %}</h4>
+    </div>
+    <div id="carousel-example" data-interval="false" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            {% for item in fotos %}
+            <div class="item {% if forloop.first %} active {%     endif %}">
+                <div align="center">
+                    <img alt="Embedded Image" class="thumbnail" src="data:image/png;base64,{{ item.foto }}" />
+                </div>
+                <div class="carousel-caption">
+                    <h2>{{item.descripcion_foto}}</h2>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <a class="left carousel-control" href="#carousel-example" data-slide="prev"><i
+                class="icon-prev  fa fa-angle-left"></i></a>
+        <a class="right carousel-control" href="#carousel-example" data-slide="next"><i
+                class="icon-next fa fa-angle-right"></i></a>
+    </div>
+    <div>
+        <label class="control-label">{% trans "Lectura Registrada" %}</label>
+        <label class="control-label">{{ lectura_registrada}}</label>
+    </div>
+</div>
+</div>
+</div>
+</div>

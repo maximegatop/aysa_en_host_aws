@@ -1,0 +1,90 @@
+
+<div class="row">
+  <div class='col-md-10'>
+    <h3>Solicitud</h3>
+    <pre id="json-renderer1">{{resultado}}</pre>
+  </div>
+</div>
+
+<div class="row">
+  <div class='col-md-10'>
+    <h3>Respuesta</h3>
+    {% if tipo == 'get_log' or tipo == 'get_db3' or tipo == 'get_all'%}
+      <button id="verarchivo" onclick="generarLink('{{res}}');">Descargar archivo</button>
+    {%else%}
+      <pre id="json-renderer">{{res}}</pre>
+    {%endif%}
+  </div>
+</div>
+
+<script>
+var obj =$('#json-renderer').html();
+console.log(obj);
+    try {
+      var input = eval('(' + $('#json-renderer').html() + ')');
+    }
+    catch (error) {
+      console.log("Cannot eval JSON: " + error);
+    }
+
+    $('#json-renderer').jsonViewer(input);
+
+var obj1 =$('#json-renderer1').html();
+console.log(obj);
+    try {
+      var input1 = eval('(' + $('#json-renderer1').html() + ')');
+    }
+    catch (error) {
+      console.log("Cannot eval JSON: " + error);
+    }
+
+    $('#json-renderer1').jsonViewer(input1, {collapsed: true, withQuotes: true, withLinks: false});
+
+function generarLink(archivo)
+ {
+    var filtros = {};
+    filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+    filtros.archivo = archivo;
+    $.ajax({
+         async: true,
+         type: "post",
+         url: "{% url 'qorder:get_download_link' %}",
+         data: filtros,
+         statusCode: {
+            200: function(data){
+               //$('#resultado').html(data);
+               $("#btnEnviar").prop('disabled', false);
+               var sampleArr = base64ToArrayBuffer(data.data);
+               saveByteArray(data.nombre_archivo, sampleArr);
+             },
+            500: function() {
+                $('#resultado').html('Error leyendo respuesta');
+                toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).');
+                $("#btnEnviar").prop('disabled', false);
+            }
+         }
+    });
+  }
+
+
+  function base64ToArrayBuffer(base64) {
+    var binaryString = window.atob(base64);
+    var binaryLen = binaryString.length;
+    var bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++) {
+       var ascii = binaryString.charCodeAt(i);
+       bytes[i] = ascii;
+    }
+    return bytes;
+  }
+
+  function saveByteArray(reportName, byte) {
+      //var blob = new Blob([byte], {type: "application/zip"});
+      var blob = new Blob([byte], { type: 'text/csv' });
+      var link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      var fileName = reportName;
+      link.download = fileName;
+      link.click();
+  };
+</script>

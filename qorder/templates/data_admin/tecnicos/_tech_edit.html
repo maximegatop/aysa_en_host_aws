@@ -1,0 +1,42 @@
+{% load crispy_forms_tags %}
+   {% load i18n %} 
+<div id="edit1" class="modal-dialog">
+     <div id="edit2" class="modal-content">
+     
+       <form  id="formnew" class="form-horizontal" action="" method="post">
+              <input type="hidden" name="id" id="id" value="{{ tecnico.codigo }}">
+              <input type="hidden" name="id_oficinah"  id="id_oficinah">
+               <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal">×</button>
+                     {% if tecnico.codigo %}
+                        <h3>{% trans "Editar técnico" %} {{ tecnico.codigo}}</h3>
+                      {% else %}
+
+                           <h3>{% trans "Nuevo técnico" %} </h3>
+
+                      {% endif %}  
+               </div>
+               
+               <div id="form-modal-body" class="modal-body" style="padding-left:10px;">
+                    {% csrf_token %}
+                      
+                      {% crispy form %}
+               </div>
+             
+               <div class="modal-footer">
+
+                   <button id="btnSave" style="width:210px" class="btn btn-primary" type="button" onclick="btnSaveOnClick({{ tecnico.id }})">
+                    Grabar
+                  </button>
+                
+                   <button name="cancel" style="width:210px" data-dismiss="modal" class="btn btn-default" type="button">
+                    Cancelar
+                  </button>
+
+
+               </div>
+
+        </form>
+
+      </div>
+</div>

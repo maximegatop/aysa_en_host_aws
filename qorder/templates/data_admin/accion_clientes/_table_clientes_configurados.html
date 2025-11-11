@@ -1,0 +1,114 @@
+{% load i18n %}
+<table id="table_asig_conf_cli" class="table table-striped table-bordered table-condensed" cellspacing="0"
+       width="100%">
+    <thead>
+    <tr>
+        <th>{% trans "Nis" %}</th>
+        <th>{% trans "Nic" %}</th>
+        <th>{% trans "Nombre" %}</th>
+        <th>{% trans "Contratista" %}</th>
+        <th>{% trans "Porción" %}</th>
+        <th>{% trans "Ruta" %}</th>
+        <th>{% trans "Eliminar" %}</th>
+        <th>{% trans "Cod_Cli" %}</th>
+        <th>{% trans "Cod_Config" %}</th>
+        <th>{% trans "rutasum_id" %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for t in asig_conf_cli %}
+    <tr>
+        <td>{{t.nis|default_if_none:'--'}}</td>
+        <td>{{t.nic|default_if_none:'--'}}</td>
+        <td>{{t.nombre}}</td>
+        <td>{{t.contratista}}</td>
+        <td>{{t.itinerario}}</td>
+        <td>{{t.ruta}}</td>
+        <td><i style="text-align: center;color: red; cursor: pointer" class="fa fa-times"
+               onclick="confirmDeleteConfigCliente('{{t.nis }}' );"></i></td>
+        <td>{{t.cod_cliente}}</td>
+        <td>{{t.cod_config}}</td>
+        <td>{{t.rutasum_id}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+
+</table>
+<!-- <a onclick="dividir();">Dividir rutas</a> -->
+<script>
+
+
+
+    table_asig_conf_cli = $('#table_asig_conf_cli').DataTable({
+        language: datetable_languaje,
+        autoWidth: true,
+        info: true,
+        scrollY: 250,
+        pageLength: 250,
+        columnDefs: [
+            {
+                "targets": [7, 8, 9],
+                "visible": false,
+                "sorting": false,
+                "searchable": false
+            }
+        ],
+        dom: 'Bfrtip',
+        buttons: [
+        {
+            extend: 'excel',
+            text: 'Excel',
+            title: 'Reporte de Clientes con Acciones',
+            exportOptions: {
+                columns: [0,1,2,3,4,5,7,8,9]
+            },
+            }
+        ],
+        select: 'multi',
+        preDrawCallback: function (settings) {
+            var api = new $.fn.dataTable.Api(settings);
+            var pagination = $(this)
+                    .closest('.dataTables_wrapper')
+                    .find('.dataTables_paginate');
+
+            if (api.page.info().pages <= 1) {
+                pagination.hide();
+            }
+            else {
+                pagination.show();
+            }
+            
+        }
+    }).columns.adjust();
+    //adjust(table_asig_conf_cli)
+    table_asig_conf_cli.on('select', function (e, dt, type, indexes) {
+
+        _ids_cli_delete = "";
+
+        var m_id_to = $.map(table_asig_conf_cli.rows('.selected').data(), function (item) {
+            return item[7];
+        });
+
+        m_id_to.forEach(function (entry) {
+            _ids_cli_delete +=  entry + ",";
+        });
+     });
+    table_asig_conf_cli.on('deselect', function (e, dt, type, indexes) {
+
+        _ids_cli_delete = "";
+
+        var m_id_to = $.map(table_asig_conf_cli.rows('.selected').data(), function (item) {
+            return item[7];
+        });
+
+        m_id_to.forEach(function (entry) {
+            _ids_cli_delete += entry + ",";
+        });
+    });
+    $("#btnEliminarClientes").on('click',function(){
+        $("#ModalMsgEliminarAllClientes").modal('show')
+    })
+
+
+</script>

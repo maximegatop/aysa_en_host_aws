@@ -1,0 +1,118 @@
+{% load i18n %}
+{% load i18n %}
+<div class="col-md-12">
+    <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0,
+        0, .25);">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-11">
+                    <h2 class="panel-title" id="pntitle" >Acciones de lectura</h2>
+                </div>
+                <div class="col-md-1">
+                    <button id="btnBackCancelar" class="btn
+                    btn-default
+                     hide" onclick="isReturn(true);">
+                        Regresar</button>
+                </div>
+               
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-12">
+
+                <div role="tabpanel">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item active" role="presentation">
+                          <a class="nav-link active" id="config-tab" data-toggle="tab" href="#configuracion" role="tab" aria-controls="simple" aria-selected="true" onclick="cambiarTab(this)">Configuración</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                          <a class="nav-link" id="asignacion-tab" data-toggle="tab" href="#asignacion" role="tab" aria-controls="masiva" aria-selected="false" onclick="cambiarTab(this)">Asignación</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane show active" id="configuracion" role="tabpanel" aria-labelledby="simple-tab">
+                            {% include  'data_admin/accion_clientes/configuracion/configuracion_acciones_main.html' with feedback_form=feedback_form%}
+                        </div>
+                        <div class="tab-pane fade" id="asignacion" role="tabpanel" aria-labelledby="masiva-tab" style="display:none">
+                            {% include  'data_admin/accion_clientes/asignacion/asignacion_acciones_main.html' with feedback_form=feedback_form%}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+
+    //CREAR SELECT2
+    $(document).ready(function() {
+        $('.js-example-basic-multiple').select2();
+    });
+
+    function cambiarTab(elemento)
+    {
+        console.log("cambiar tab");
+        $(".tab-pane").addClass("fade");
+        $(".tab-pane").removeClass("show");
+        $(".tab-pane").css("display", "none");
+
+        $(elemento.hash).removeClass("fade");
+        $(elemento.hash).addClass("show");
+        $(elemento.hash).css("display", "");
+
+        // Limpiar Pantalla Configuración
+
+        adjust(table_configs);
+        adjust(table_configs_resum);
+        adjust(table_asig_conf_cli);
+
+        isReturn(true);
+        table_configs.rows().deselect();
+
+        table_configs_resum.rows().deselect();
+        table_asig_conf_cli.rows().deselect();
+
+
+        // Limpiar Pantalla Asignación
+
+        obtenerConfiguracionesResumidas();
+        //limpiarPantallaAsignacion();
+        $("#asignacion_general").css("display","");
+        $("#asignacion_asignar_cliente").css("display","none");
+        $("#titlo_clientes_asignados").css("display","none");
+        
+        table_configs_resum.rows().deselect();
+        habilitarBotonesClientes();
+
+        adjust(table_configs_resum);
+        adjust(table_asig_conf_cli);
+
+    }
+
+    //SETEO LBL
+    //$("#pntitle").html("Configuración de acciones de lectura")
+
+    //VARIABLES JS GLOBAL
+    var _codigo = "";
+    var _cod_accion = "";
+
+    var _ordenDel = "";
+    var _codCliDel = "";
+    var _ids_cli_delete = "";
+    var _ids_cli_asign = "";
+    var _ids_p_sum_asign = "";
+
+    var table_asig_conf_cli;
+    var tabla_result_clientes;
+    
+
+    //AJUSTAR TABLAS 
+    function adjust(controlname) {
+        controlname.columns.adjust();
+    }
+
+</script>

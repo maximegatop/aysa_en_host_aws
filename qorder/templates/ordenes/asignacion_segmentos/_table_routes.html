@@ -1,0 +1,94 @@
+   {% load i18n %} 
+            <table id="table_routes_coor" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%"
+            style="user-select: none;">
+            <thead>
+                <tr>
+                    <th>{% trans "lblOficina" %}</th>
+                    <th>{% trans "lblCiclo" %}</th>
+                    <th>{% trans "lblRuta" %}</th>
+                    <th>{% trans "lblItinerario" %}</th>
+                    <th>{% trans "Semana" %}</th>
+                    <th hidden>{% trans "Fecha Prevista" %}</th>
+                    <th>{% trans "Cantidad" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in rutas %}
+                <tr>
+                    <td>{{t.oficina|default_if_none:'--'}}</td>
+                    <td>{{t.ciclo|default_if_none:'--'}}</td>
+                    <td>{{t.ruta}}</td>
+                    <td>{{t.itinerario|default_if_none:'--'}}</td>
+                    <td>{{t.anio|default_if_none:''}}</td>
+                    <td hidden>{{t.fecha_estimada_resolucion|date:"d/m/Y"}}</td>
+                    <td>{{t.cantidad|default_if_none:'--'}}</td>
+                    <td>{{t.idruta|default_if_none:'--'}}</td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!--  <a onclick="dividir();">Dividir rutas</a> -->
+<script> 
+
+    $('#table_routes_coor tbody').on('click', 'tr', function (event) {
+        // Detener la propagación del evento para evitar que se propague a las celdas
+        console.log(event)
+        
+        if(procesoEnCurso){
+            return
+        }
+
+        procesoEnCurso = true
+
+        event.stopPropagation();
+
+        var row = table_routes.row(this);
+        var id_ruta = table_routes.rows(row.index()).data()[0][7];
+
+        if (row.nodes().to$().hasClass('selected')) {
+            console.log('Lista rutas ', listaRutas)
+            console.log('Id ruta ', id_ruta)
+            if(listaRutas.includes(id_ruta)){
+                procesoEnCurso = false
+                return
+            }
+
+            obtener_coordenadas(id_ruta);
+
+            if (listaRutas !== '') {
+                listaRutas += ',';
+            }
+
+            listaRutas += id_ruta;
+        } else {
+            console.log('Fila no seleccionada ', id_ruta)
+            // Fila NO seleccionada
+            var marcadores_eliminar = _rutas_coordenadas.filter(function (marcador) {
+                return marcador.ruta_id == id_ruta;
+            });
+
+            marcadores_eliminar.forEach(element => {
+                quitar_marcador(element.punto_suministro);
+            });
+
+            // Actualizar _rutas_coordenadas
+            _rutas_coordenadas = _rutas_coordenadas.filter(objeto => objeto.ruta_id !== id_ruta);
+
+            console.log(`Rutas coordenadas ${_rutas_coordenadas}`)
+
+            // Eliminar la ruta de la lista
+            listaRutas = listaRutas.replace(new RegExp(id_ruta + ','), '');
+            listaRutas = listaRutas.replace(new RegExp(id_ruta), '');
+
+            limpiarMarcadoresArrastrables()
+        }
+
+        searchPuntosSinCoor();
+        setTimeout(function() {
+            procesoEnCurso = false;
+        }, 100);  // 1000 milisegundos (1 segundo) en este ejemplo
+    });
+
+
+</script>

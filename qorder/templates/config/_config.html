@@ -1,0 +1,213 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+
+  <div class="col-md-12"><div class="panel panel-default" style="box-shadow: 0px 2px 25px 
+    rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+     <h2 class="panel-title">
+       {% trans "Liberar datos de TPL" %}
+     </h2>
+   </div>
+   <div class="panel-body">
+     <div id='liberarDatos'>
+       <form>
+         <div style="vertical-align: middle">
+           <div class="form-group">
+             <div class="col-md-2">
+               <label for="txttec">Código de 
+                técnico</label>
+              </div>
+              <div class="col-md-2">
+               <input type="text" class="form-control" 
+               id="txttec"
+               aria-describedby="Número de 
+               suministro">
+             </div>
+             <div class="col-md-4">
+               <button id="btnLiberarTPL" class="btn btn-primary" type="button" onclick="ConfirmarLiberar();">
+                Liberar TPL
+              </button>
+               
+             </input>
+           </div>
+         </div>
+       </div>
+     </form>
+   </div>
+ </div>
+</div>
+</div>
+
+<div id="modalConfirmarLiberar" class="modal fade"><div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <button type="button" class="close" 
+data-dismiss="modal"><span aria-hidden="true">×</span><span
+class="sr-only">Cerrar</span></button>
+                 <h1 class="modal-title">Atención!</h1>
+             </div>
+             <div class="modal-body">
+                 <div class="row">
+                     <div class="col-md-2">
+                         <span><i class="fa fa-question-circle-o 
+fa-4x"></i></span>
+                     </div>
+                     <div class="col-md-10">
+                         <h3><b>¿Desea liberar las órdenes de la 
+TPL?</b></h3>
+                         <br><p>El proceso de liberación de datos dejará 
+en estado "pendiente" todas las órdenes
+                         de lectura que no se hayan descargado. Los 
+datos del dispositivo móvil se borrarán en la
+                         próxima sincronización, perdiéndose todo el 
+trabajo realizado que no haya sido enviado.</p>
+                         <br><p><h4><i>Este proceso sólo debe ser usando 
+en el extravío, robo o destrucción del
+                         sispositivo o cualquier circunstancia que 
+impida la sincronización del mismo.</i></h4></p>
+                     </div>
+                 </div>
+                 <br>
+             </div>
+             <div class="modal-footer">
+                 <button id="btnCancelar" type="button" class="btn 
+btn-default" data-dismiss="modal">Cancelar</button>
+                 <button id="btnAceptarLiberar" type="button" class="btn 
+btn-danger" data-dismiss="modal">Aceptar</button>
+             </div>
+         </div><!-- /.modal-content -->
+     </div><!-- /.modal-dialog -->
+</div>
+
+
+<div class="col-md-12">
+  <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <h2 class="panel-title">
+        {% trans "tituloParametros" %}
+      </h2>
+    </div>
+    <div class="panel-body">
+      <div id='_table_parametros'>
+        {% include 'config/_table_parametros.html'  with feedback_form=feedback_form  %}
+      </div></div>
+      <div class="panel-footer">
+       <button class="btn btn-primary btn-md" data-title="Editar" id="btnAddTech" 
+       onclick="tech_new();">
+       <span class="glyphicon glyphicon-plus"></span>{% trans "lblAdd" %}
+     </button>
+   </div>
+ </div>
+</div>
+
+<div id="new"  class="modal fade">
+  {% include 'config/_param_edit.html'  with feedback_form=feedback_form  %}
+</div>
+
+<script type="text/javascript">
+function tech_new(){
+ var modal = $("new");
+
+ $.ajax({
+  url: "{% url 'qorder:configuracion_new' %}",
+  type: 'post',
+  headers: {'X-CSRFToken': '{{ csrf_token }}'},
+  datatype: 'json',
+  data: {id:'',form:'None'},
+  context: document.body
+}).done(function(response) 
+{
+  
+  $('#new').html(response);
+  $('#new').modal('toggle');
+});
+}
+
+function btnSaveOnClick(id)
+{
+
+  var modal = $("new");
+  
+  var data = $('#formparam').serialize();
+  
+  $.ajax({
+    url: "{% url 'qorder:configuracion_save' %}",
+    type: 'post',
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    datatype: 'json',
+
+    data: data,
+    statusCode: {
+      200: function(data) {
+      },
+      301: function() {
+        toastr.error('Complete los campos obligatorios', ' ', {timeOut: 2000})
+      },
+      302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('Complete los campos obligatorios', ' ', {timeOut: 2000})
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                   $("#container" ).html(xhr);   
+                   $(modal).modal('toggle');
+                   $('body').removeClass('modal-open');
+                   $('.modal-backdrop').remove();
+                 }
+               }
+             });
+
+}
+
+
+
+function ConfirmarLiberar ()
+{
+  var valor = $('#txttec').val();
+  if (valor=='')
+  {
+     toastr.error('Se necesita el id del tecnico para continuar', ' ', {timeOut: 2000})
+     return;
+  }
+  $('#modalConfirmarLiberar').modal('show');
+  return false;
+
+  
+}
+
+
+$("#btnAceptarLiberar").on("click",function(){
+       var tecnico=$('#txttec').val();
+       
+       $.ajax({
+         url: "{% url 'qorder:tecnico_liberarTPL' %}",
+         headers: {'X-CSRFToken': '{{ csrf_token }}'},
+         type: 'post',
+         datatype: 'json',
+         data: {codigo:tecnico},
+         statusCode: {
+                 200: function(data) {
+                  toastr.success(data, ' ', {timeOut: 2000})
+                 },
+                 300: function() {
+                  toastr.error('No existe el tecnico ', ' ', {timeOut: 2000})   
+                 },
+                 500: function() {
+                     toastr.error('Atención: Server error, contact an administrator.');
+                 
+             }
+     }
+
+   });
+});
+
+</script>

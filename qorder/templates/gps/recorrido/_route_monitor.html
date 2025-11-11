@@ -1,0 +1,283 @@
+{% load qorder_tags %}
+{% load i18n %}
+
+<div class="col-md-12">
+  <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">{% trans "tituloRoute" %}</h2>
+        </div>
+        <div class="input-field col-xs-6 text-right">
+          <div class="form-inline">
+            <label>{% trans "Contratista" %}</label>
+            <select class="select form-control" id="id_oficina"
+              name="oficina" onchange="searchTechnicians()">
+              {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+              {% endif %}
+              {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row"></div>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Filtros</a>
+            </h4>
+            
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <h4>Fecha</h4>
+                   <div id="sandbox-container">
+                  
+                  <div class="input-group date">
+                    <input id="fecha" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                    <div class="input-group-addon">
+                      <span class="glyphicon glyphicon-th"></span>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <h4>Horas</h4>
+                  <div id="hours"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4">
+                  <h4>Lecturista</h4>
+                </div>
+                
+                <div id="_table_techs" class="col-xs-12">
+                  {% include 'gps/recorrido/_table_techs.html' with feedback_form=feedback_form%}
+                </div>
+                <div class="container">
+                  <br>
+                  <div class="col-md-6">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="aprox_direction">Mostrar dirección aproximada</label>
+                      </div>
+                      <p></p>
+                      <p></p>
+                    </div>
+                    <div class="col-md-6">
+                      <div style="float: right;">
+                        <i class="fa fa-map-marker fa-2x" style="color:green"></i>Reciente &nbsp;
+                        <i class="fa fa-map-marker fa-2x" style="color:yellow"></i>Más de 15 Minutos &nbsp;
+                      <i class="fa fa-map-marker fa-2x" style="color:red"></i>Más de 1 hora &nbsp;</div>
+                    </div>
+                    <div class="col-md-6">
+                      <p></p>
+                      <p></p>
+                    </div>
+
+                    <button id="btnRequestTechsOnClick" style="width:210px" class="btn btn-primary pull-right" type="button">
+                      Ver técnico seleccionado
+                    </button>
+
+                    
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#map_collapsible">
+                Mapa</a>
+                </h4>
+              </div>
+              <div id="map_collapsible" class="panel-collapse collapse">
+                <div class="panel-body" id="push_map"></div>
+              </div>
+            </div>
+          </div>
+          </div>
+          </div>
+        <script>
+  
+   
+    $("#btnRequestTechsOnClick").prop("disabled",true);
+   var fecha = $('#fecha').datepicker(
+      {
+        format: "dd/mm/yyyy",
+        autoclose: true,
+        todayHighlight: true,
+        language: 'es',
+        defaultDate: new Date()
+      });
+      $("#fecha").datepicker().datepicker("setDate", new Date());
+     $("#btnRequestTechsOnClick").on('click', function(){
+       cargarDatos();
+       $('#filter_collapsible').collapse('hide');
+       $('#map_collapsible').collapse('show');
+     });
+
+
+ 
+   function cargarDatos(){
+
+        var id_tecnico="";
+        var m_ids = $.map(table_techs.rows('.selected').data(), function (item) {
+            return item[0];
+        });
+        var count = 0;
+        m_ids.forEach(function(entry) {
+            id_tecnico += entry;
+            count++;
+        });
+        if (count<1){
+           toastr.error('Seleccione un técnico.',' ', 2000);
+          return false;
+        }
+        var fecha = $('#fecha').datepicker();     
+        var fecha1 =  $("#fecha").data('datepicker').getFormattedDate('yyyymmdd');
+        
+        if (fecha.length<1){
+           toastr.error('Seleccione fecha.',' ', 2000);
+            return false;
+        }
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_tecnico = id_tecnico;
+        filtros.fecha = fecha1;
+        filtros.hours_min = slider.noUiSlider.get()[0];
+        filtros.hours_max = slider.noUiSlider.get()[1];
+        filtros.aproximar = $('#aprox_direction').is(":checked");
+        filtros.id_oficina = $('#id_oficina').val();
+        
+        $.ajax({
+            type: "post",
+            url: "{% url 'qorder:get_map_route' %}",
+            data: filtros,
+            statusCode: {
+                300: function() {
+                   toastr.error('Seleccione al menos un técnico.',' ', 2000);
+                },
+                500: function() {
+                   toastr.error('Error en el servidor, contacte al administrador.',' ', 2000);
+                }
+
+            },
+            success: function( strData ){
+                
+                $('#push_map').html(strData);
+                
+
+            }
+        });
+
+    }
+
+ 
+  $('#filter_collapsible').collapse('show');
+  
+   
+
+  $("#filter_collapse").on('click', function(){  $('#map_collapsible').collapse('hide');});
+  
+  $("#btnRequestTechs").on('click', function(){ btnRequestTechs(); });
+
+
+
+  var slider = document.getElementById('hours');
+  noUiSlider.create(slider, {
+  start: [0, 23],
+  connect: true,
+  handles: 2,
+  step: 1,
+  range: {
+  'min': 0,
+  'max': 23
+  }
+  });
+
+  function searchTechnicians(){
+  var centro = $('#id_oficina').val();
+  
+    if (centro=="")
+  {
+      $("#_table_techs").html("");
+      $("#btnRequestTechsOnClick").prop("disabled",true);
+      return;
+  }
+  $.ajax({
+  url: "{% url 'qorder:maps_route_techs' %}",
+  type: 'post',
+  datatype: 'json',
+  data: {id_centro:centro},
+  statusCode: {
+  200: function(data) {
+  $("#_table_techs").html(data);
+  $("#btnRequestTechsOnClick").prop("disabled",false);
+  },
+  301: function() {
+  //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+  },
+  500: function() {
+  toastr.error('Server Error.',' ', 2000);
+  }
+  },
+  sucess: function(response){
+  }
+  });
+  }
+  {% if user.work_units.all|length_is:'1' %}
+    searchTechnicians();
+  {% endif %}
+/*
+    $( document ).ready(function() {
+       $('#fecha').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 3 // Creates a dropdown of 15 years to control year
+  });
+});
+
+
+$('#sandbox-container .input-group.date').datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true
+});
+*/
+/*
+var $jq = jQuery.noConflict();
+$jq(document).ready(function() { 
+$jq('#sandbox-container .input-group.date').datepicker({
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true
+});
+});
+
+$(function() {
+  if (!$.fn.bootstrapDP && $.fn.datepicker && $.fn.datepicker.noConflict) 
+  {
+    var datepicker = $.fn.datepicker.noConflict();
+    $.fn.bootstrapDP = datepicker;
+  }
+
+
+  $("#sandbox-container").bootstrapDP({});
+
+
+
+});
+ */
+ $("#fecha").datepicker({});
+  </script>

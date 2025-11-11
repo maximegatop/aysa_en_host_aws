@@ -1,0 +1,17 @@
+    {% load qorder_tags %}
+    {% load i18n %} 
+        <div class="col-xs-12">
+                    <div class="input-field col-xs-1 text-right">
+                        <div class="form-inline">
+                            <select class="select form-control" id="id_ruta" name="oficina" onchange="searchRuta()">
+                                {% if not ruta.all|length_is:'1' %}
+                                <option value="">{% trans "Rutas" %}</option>
+                                {% endif %}
+                                {% for ct in ruta.all %}
+                                <option value="{{ct.idruta}}">{{ct.ruta}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+  </div>
+  </div>

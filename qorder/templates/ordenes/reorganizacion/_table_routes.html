@@ -1,0 +1,97 @@
+   {% load i18n %} 
+
+
+                        <table id="table_routes" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Contratista" %}</th>
+                                <th>{% trans "lblCiclo" %}</th>
+                                <th>{% trans "lblRuta" %}</th>
+                                
+                                <th>{% trans "lblItinerario" %}</th>
+                                <th>{% trans "lblAño" %}</th>
+                                <th>{% trans "lblsolicitadopor" %}</th>
+                                <th>{% trans "lblfechasolicitud" %}</th>
+                                <th>{% trans "lblautorizadopor" %}</th>
+                                <th>{% trans "lblfechaautorizacion" %}</th>                                
+                                <th>{% trans "lblId" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in ruta %}
+                            <tr>
+                                <td>{{t.oficina|default_if_none:'--'}}</td>
+                                <td>{{t.ruta.ciclo|default_if_none:'--'}}</td>
+                                <td>{{t.ruta.ruta}}</td>
+                                <td>{{t.ruta.rutasum.itinerario|default_if_none:'--'}}</td>
+                                <td>{{t.ruta.anio|default_if_none:'--'}}</td>
+                                <td>{{t.tecnico_solicito|default_if_none:'--'}}</td>
+                                <td>{{t.fecha_solicitud|default_if_none:'--'}}</td>
+                                <td>{{t.usuario|default_if_none:'--'}}</td>
+                                <td>{{t.fecha_autorizado|default_if_none:'--'}}</td>
+                                <td>{{t.ruta.idruta|default_if_none:'--'}}</td>
+  
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+              
+                    <script> 
+
+          var table_routes = $('#table_routes').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+           info: false,
+            scrollY: 180,
+            pageLength:6,
+
+            select: 'single',
+            columnDefs: [
+            {
+                "targets": [ 9 ],
+                "visible": false,
+                "searchable": false
+            },
+        ],
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+
+var tecnico=""
+var id_rutas ="[";
+table_routes.on( 'select', function ( e, dt, type, indexes ) {
+
+           if (table_routes.rows('.selected').data().count()>0)
+            {
+               var m_ids_rutas = $.map(table_routes.rows('.selected').data(), function (item) {
+               return item[9];
+                });
+               m_ids_rutas.forEach(function(entry) {
+               id_rutas += "" + entry + ",";
+                });
+
+               }
+           else
+           {
+             toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+             return;
+           }
+           id_rutas +=  "]";
+          });
+
+
+                    </script>

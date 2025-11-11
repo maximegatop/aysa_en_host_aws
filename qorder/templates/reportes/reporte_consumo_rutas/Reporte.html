@@ -1,0 +1,520 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+  <div id='reporte'>
+    <row>
+     <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">Reporte por rango de consumo</h2>
+            </div>
+                                                    <div class="input-field col-xs-3 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input style="width: 70%;" class="select form-control" value="{{semana}}" list="semanas" id="semana" name="semana"  autocomplete="off">
+                            <datalist id="semanas" name="semanas" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+            <div class="input-field col-xs-3 text-right">
+              <div class="form-inline">
+                <label>{% trans "Contratista" %}</label>
+                <select class="select form-control" id="id_oficina"
+                name="oficina" onchange="searchRutasum()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+                {% endif %} 
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <row>
+          <div class="col-md-5">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">{% trans "Rutas" %}</h4>
+              </div>
+
+              <div class="panel-body">
+                <input id="chkIncluirExportadas" type="checkbox" name="Incluir exportadas" checked> Sólo exportadas
+                <div id="_tabla_rutasuministro">
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+            <div class="col-md-4">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">{% trans "Rango de consumos" %}</h4>
+              </div>
+
+              <div class="panel-body">
+                <div  class="col-md-6">
+                  <div>
+                  <h4>Desde</h4>
+                  <input type="number" id="Dconsumo1" value="0">
+                  </div>
+                 <div >
+                <h4>Desde</h4> 
+                 <input type="number" id="Dconsumo2" value="51">
+                 </div>
+
+                </div>
+                <div class="col-md-6" align='left'>
+                  <div>
+                  <h4>Hasta</h4>
+                  <input type="number" id="Hconsumo1" value="50">
+                  </div>
+                 <div >
+                <h4>Hasta</h4> 
+                 <input type="number" id="Hconsumo2" value="100" >
+                 </div>
+                </div>
+                <div  class="col-md-6">
+                  <div>
+                  <h4>Desde</h4>
+                  <input type="number" id="Dconsumo3" value="101">
+                  </div>
+                 <div >
+                <h4>Desde</h4> 
+                 <input type="number" id="Dconsumo4" value="151" >
+                 </div>
+
+                </div>
+                <div class="col-md-6" align='left'>
+                  <div>
+                  <h4>Hasta</h4>
+                  <input type="number" id="Hconsumo3" value="150">
+                  </div>
+                 <div >
+                <h4>Hasta</h4> 
+                 <input type="number" id="Hconsumo4" value="200" >
+                 </div>
+                 <br>
+                </div>
+                
+                <button  id="btnLimpiar" class="btn btn-primary" style="float:right" >
+                Limpiar</button>
+              </br>
+                </div>
+
+              </div>
+            </div>
+            <div class="col-md-3">
+            <div id="fechas" class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">Fecha exportación</h4>
+              </div>
+
+
+              <div class="panel-body">
+               <h4>Desde</h4>
+               <div id="sandbox-container">
+
+                <div class="input-group date">
+                  <input id="fecha_desde" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                  <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <h4>Hasta</h4>
+              <div id="sandbox-container">
+
+                <div class="input-group date">
+                  <input id="fecha_hasta" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                  <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                  </div>
+                </div>
+              </div>
+              <div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </row>
+        <row>
+          <div class="col-md-12">
+                          <br/>
+                <button  id="btnAplicar" class="btn btn-primary" style="float:left" >
+                  Ver reporte</button>
+          </div>
+        </row>
+        <row>
+          <div class="col-md-12">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                 Resultado
+               </h4>
+             </div>
+             <div class="row">
+              <div class="panel-body">
+                <div id="_tabla_resultado" >
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </row>
+      </div>
+    </div>
+  </div>
+</row>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body" >
+        <div id="contenido"  >
+
+          <!-- Change image source for large popup-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  var fecha_desde = $('#fecha_desde').datepicker(
+  {
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true,
+    language: 'es',
+    defaultDate: new Date()
+  });
+  $("#fecha_desde").datepicker().datepicker("setDate", new Date());
+
+
+
+  var fecha_hasta = $('#fecha_hasta').datepicker(
+  {
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true,
+    language: 'es',
+    defaultDate: new Date()
+  });
+  $("#fecha_hasta").datepicker().datepicker("setDate", new Date());      
+
+
+
+  $("#chkIncluirExportadas").change(function() {
+
+     searchRutasum();
+     if($('#chkIncluirExportadas').prop('checked'))
+     {
+     $("#fechas").show();
+     }
+     else
+     {
+      $("#fechas").hide();
+     }
+
+    });
+
+
+
+    function adjust(controlname)
+    {
+      controlname.columns.adjust();
+
+    }
+
+
+    var centro = "";
+
+    $("#btnAddRutasum").prop("disabled",true);
+    {% if user.work_units.all|length_is:'1' %}
+
+    searchRutasum();
+    {% endif %}
+
+    function searchRutasum(){
+
+      centro = $('#id_oficina').val();
+      incluirExp = $('#chkIncluirExportadas').prop('checked')
+      var _sincluirExp ="1";
+
+      if(incluirExp) _sincluirExp="1"; else _sincluirExp="0";
+
+      
+
+      if (centro=="")
+      {
+        $("#tabla_rutasum").html("");
+        $("#btnAddRutasum").prop("disabled",true);
+        return;
+      }
+      $('#id_oficinah').val(centro);
+
+      var semana = $('#semana').val();
+    //console.log(aver);
+
+    $.ajax({
+      url: "{% url 'qorder:rpt_consumo_rutas_getrutassum' %}",
+      type: 'post',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      datatype: 'json',
+      data: {id_oficina:centro,exportadas:_sincluirExp,semana:semana},
+      statusCode: {
+        200: function(data) {
+          //console.log('data')
+          $("#_tabla_rutasuministro").html(data);
+          $("#btnAddRutasum").prop("disabled",false);
+
+        },
+        301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+  }
+
+
+
+
+
+
+
+  var ids_ordenes = "";
+  var fecha1 ="";
+  var fecha2 ="";
+
+  function AplicarFiltros(){
+    //console.log('aplicar filtros');
+
+    
+    
+    fecha1 =  $("#fecha_desde").data('datepicker').getFormattedDate('yyyymmdd');
+    fecha2 =  $("#fecha_hasta").data('datepicker').getFormattedDate('yyyymmdd');
+
+    
+    
+
+    if ( fecha2 >= fecha1)
+    {
+      
+    }
+    else
+    {
+      
+      toastr.error("La fecha hasta no puede ser mayor a la fecha desde","Atención!!",1500);
+      return false;
+    }
+
+    return true;
+  }
+
+  $("#btnAplicar").on("click",function(){
+
+    var centro = $('#id_oficina').val();
+
+
+    if (centro=='')
+    {
+      toastr.error("Ingrese un Contratista","Atención!!",1500);
+      return false;
+    }
+
+    Buscar();
+    
+
+  });
+
+$("#btnLimpiar").on("click",function(){
+  $('#Dconsumo1').val('');
+  $('#Dconsumo2').val('');
+  $('#Dconsumo3').val('');
+  $('#Dconsumo4').val('');
+  $('#Hconsumo1').val('');
+  $('#Hconsumo2').val('');
+  $('#Hconsumo3').val('');
+  $('#Hconsumo4').val('');
+    
+    
+
+  });
+
+
+  function Buscar()
+  {
+    var ids_ordenes='';
+    ids_ordenes ="[";
+    if (table_rutasum.rows('.selected').data().count()>0)
+    {
+
+      var m_ids_ordenes = $.map(table_rutasum.rows('.selected').data(), function (item) {
+        return item[0];
+      });
+      m_ids_ordenes.forEach(function(entry) {
+        ids_ordenes += "'" + entry + "',";
+      });
+
+    }
+    else
+    {
+      toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+      return false;
+    }
+    ids_ordenes +=  "]";
+
+    var  dcons1=parseInt($('#Dconsumo1').val());
+    var  dcons2=parseInt($('#Dconsumo2').val());
+    var  dcons3=parseInt($('#Dconsumo3').val());
+    var  dcons4=parseInt($('#Dconsumo4').val());
+    var  hcons1=parseInt($('#Hconsumo1').val());
+    var  hcons2=parseInt($('#Hconsumo2').val());
+    var  hcons3=parseInt($('#Hconsumo3').val());
+    var  hcons4=parseInt($('#Hconsumo4').val());
+
+
+
+
+
+    if(Number.isNaN(dcons1)==true&&Number.isNaN(dcons2)==true&&Number.isNaN(dcons3)==true&&Number.isNaN(dcons4)==true&&Number.isNaN(hcons1)==true&&Number.isNaN(hcons2)==true&&Number.isNaN(hcons3)==true&&Number.isNaN(hcons4)==true)
+    {
+      toastr.error("Ingrese un Rango de Consumo","Atención!!",1500);
+      return false;
+    }
+    if(Number.isNaN(dcons1)==false &&Number.isNaN(hcons1)==true||Number.isNaN(hcons1)==false&&Number.isNaN(dcons1)==true||Number.isNaN(dcons2)==false && Number.isNaN(hcons2)==true||Number.isNaN(hcons2)==false&&Number.isNaN(dcons2)==true||Number.isNaN(dcons3)==false && Number.isNaN(hcons3)==true||Number.isNaN(hcons3)==false&&Number.isNaN(dcons3)==true||Number.isNaN(dcons4)==false && Number.isNaN(hcons4)==true||Number.isNaN(hcons4)==false&&Number.isNaN(dcons4==true))
+    {
+      toastr.error("Complete el rango que desea","Atención!!",1500);
+      return false;
+    }
+    if(hcons1<dcons1||dcons2<hcons1||hcons2<dcons2||dcons3<hcons2||hcons3<dcons3||dcons4<hcons3||hcons4<dcons4||dcons4<hcons3)
+    {
+      toastr.error("Ingrese correctamente los rangos","Atención!!",1500);
+      return false;
+    }
+
+    consumo=[dcons1,hcons1,dcons2,hcons2,dcons3,hcons3,dcons4,hcons4];
+    
+    if (AplicarFiltros() == true )
+    {
+      var semana = $('#semana').val();
+      var _sincluirExp ="0";
+      var incluirExp = $('#chkIncluirExportadas').prop('checked')
+      if(incluirExp) _sincluirExp="1"; else _sincluirExp="0";
+
+      $.ajax({
+        url: "{% url 'qorder:rpt_consumo_rutas_getreporte' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: { id_oficina:centro, 
+          id_rutasum: ids_ordenes,
+          f_desde: fecha1,
+          f_hasta: fecha2,
+          semana:semana,
+          exportadas: _sincluirExp,
+          'consumos[]':consumo,
+        },
+
+        statusCode: {
+          200: function(data) {
+              //console.log('llego')
+              //onsole.log(data)
+              $("#_tabla_resultado").html(data);
+            },
+            301: function() {
+                            //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                          },
+                          500: function() {
+
+                            toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                          }
+                        }
+                      });
+
+
+    }
+    else
+    {
+
+    }
+
+  }
+
+
+  $("#filter_collapse").on("click",function(){
+    $("#filter_collapsible").collapse('hide');
+  });
+
+
+
+  $(".chkIncluirAnomalias").change(function() {
+    if(this.checked) {
+        
+    }
+});
+
+
+$('#semana').on('input', function() {
+  if( $(this).val().length === 0 ) {
+      $('#semana').val('');
+      toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+      $("#_tabla_rutasuministro").html('');
+      return false;
+    }
+  else
+  {
+    if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+    {
+      var centro = $('#id_oficina').val();
+      var semana = $('#semana').val();
+      incluirExp = $('#chkRexportar').prop('checked')
+        
+    if (centro==""||semana=="")
+    {
+      $("#_tabla_rutasuministro").html('');
+      return;
+    }
+    searchRutasum()();
+    }
+
+
+  }
+
+});
+
+
+
+
+</script>

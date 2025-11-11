@@ -1,0 +1,66 @@
+
+<div id="map" style="height: 320px;">
+
+</div>
+
+<script>
+        var latlon = Geohash.decode('{{ center }}');   // 'd29spu44697'
+        
+        var map = L.map('map').setView(latlon, 14);  //[-41.2858, 174.78682]
+        mapLink = 
+        '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        L.tileLayer(
+          'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; ' + mapLink + ' Contributors',
+            maxZoom: 20,
+          }).addTo(map);
+        
+
+        setTimeout(function()
+        { 
+          map.invalidateSize();
+        }, 250)
+
+
+        var greenIcon = L.AwesomeMarkers.icon({
+          icon: 'circle',
+          markerColor: 'green'
+        });
+
+        var redIcon = L.AwesomeMarkers.icon({
+          icon: 'circle',
+          markerColor: 'red'
+        });
+
+        var yellowIcon = L.AwesomeMarkers.icon({
+          icon: 'circle',
+          markerColor: 'orange'
+        });
+
+        var first = 0;
+          if (first == 0)
+          {
+
+           if ( '{{desc_orden.gps_latitud}}' > '0.00')
+           {
+             map.setView([ {{desc_orden.gps_latitud}}, {{desc_orden.gps_longitud}}], 13);
+             first = 1;
+           }
+         }
+         
+         var icono =  L.ExtraMarkers.icon({
+          icon: 'fa-number',
+          number: 1,
+          markerColor: 'blue'
+        });
+
+         
+      // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: {{a.get_status_color}}Icon});
+     // var marker = L.marker([{{a.latitud}}, {{a.longitud}}], {icon: icono});
+     var marker = L.marker([{{desc_orden.gps_latitud}}, {{desc_orden.gps_longitud}}], {icon: icono, title: 1 , IndexOffset: 1 ,riseOnHover : true,draggable : true});
+
+     marker.addTo(map);
+
+
+
+     </script>

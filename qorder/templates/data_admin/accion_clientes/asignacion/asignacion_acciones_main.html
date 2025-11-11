@@ -1,0 +1,1043 @@
+{% load i18n %}
+<div class="col-md-12">
+
+    <div id="asignacion_general">
+
+        <div class="col-md-12" style="margin-top: 15px">
+            <h2> Asignación de Acciones </h2>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default" style="margin-top: 10px">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12" >
+                                <h3 class="panel-title"> Seleccionar Acción </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div id="tablaconfiguracionesresumida">
+                                {% include 'data_admin/accion_clientes/_table_configuraciones_resumida.html' with feedback_form=feedback_form %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default" style="margin-top: 10px">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="panel-title"> Suministros Asignados </h3>
+                            </div>
+                            <div class="col-md-6" id="titlo_clientes_asignados" style="display:none">
+                                <h4 class="panel-title pull-right" style="display:inline"> Cantidad de Suministros Asignados: <div id="cant_clientes_asignados" style="display:inline"></div> </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <div id="clientesasignados">
+                                <div id="clientesconfig">
+                                    {% include 'data_admin/accion_clientes/_table_clientes_configurados.html' with feedback_form=feedback_form %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <div class="row">
+            <div class="col-md-12" style="margin-top: 10px;">
+                <button id="btnAgregarClientes" class="btn btn-primary pull-right" type="button" onclick="mostrarPantallaAsignarClientes()">
+                    Asignar Suministros
+                </button>
+            
+                <button id="btnEliminarClientes" class="btn btn-danger" type="button">
+                    Borrar todos los suministros en esta acción
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="asignacion_asignar_cliente" style="display:none">
+
+        <div class="row" style="margin-top: 15px">
+            <div class="col-md-11" >
+                <h2> Asignación a Suministros </h2>
+            </div>
+    
+            <div class="col-md-1">
+                <button id="btnBackClientes" class="btn btn-default" onclick="ocultarPantallaAsignarClientes()">Regresar</button>
+            </div>
+        </div>
+        
+    
+
+        <div id="buscarclientes">
+            <div id="asignarclientes" style="margin-top: 10px">
+                {% include 'data_admin/accion_clientes/_filtros_cliente.html' with feedback_form=feedback_form %}
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+<!-- VENTANA MODAL PARA ASIGNAR CLIENTE ALEATORIO -->
+<div id="ModalMsgConfirmAsignarClienteConfigAleatorio" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la acción los suministros aleatorios?</b></h3>
+                        <br>
+                        <p><i>
+                            De existir clientes previamente seleccionados a esta acción, 
+                            los mismos serán eliminados
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignClienteAleatorio()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- VENTANA MODAL PARA ASIGNAR MASIVAMENTE TODOS LOS CLIENTES DE UNA/S OFICINA/S -->
+<div id="ModalMsgConfirmAsignarClienteMasivo" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la acción todos los suministros de la oficina?</b></h3>
+                        <br>
+                        <p><i>
+                                De existir clientes previamente seleccionados a esta acción, 
+                                los mismos serán eliminados
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignarClientesMasivoxOficina()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- MODAL PARA ELIMINAR TODOS LOS CLIENTES ASIGNADOS A UNA CONFIG -->
+<div id="ModalMsgEliminarAllClientes" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar todos los suministros asignados a esta acción?</b></h3>
+                        <br>
+                        <p><i>
+                                Este proceso eliminara todos los suministros asignados a esta acción.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="deleteAllClientesCfg()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- VENTANA MODAL ASIGNACION ALEATORIA DE CLIENTES MASIVOS DE UNA OFICINA -->
+<div id="ModalAsignarClientesMasivos" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la acción todos los suministros de forma aleatoria?</b></h3>
+                        <br>
+                        <p><i>
+                                De existir clientes previamente seleccionados a esta acción, 
+                                los mismos serán eliminados
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignClientesMasivoAleatorios()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div id="ModalMsgConfirmDeleteClienteConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar el suministro configurado?</b></h3>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="DeleteClienteConfig" type="button" class="btn
+                    btn-danger" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div id="ModalMsgConfirmAsignarClienteConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la acción los suministros
+                                seleccionados?</b></h3>
+                        <br>
+                        <p><i>
+                                De existir clientes previamente seleccionados a esta acción, 
+                                los mismos serán eliminados
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfig" type="button" class="btn
+                    btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<script>
+        
+//TABS SUM ASIGNADO/BUSCAR SUM
+/*
+$('#myTab a').click(function (e) {
+    e.preventDefault();
+    if ($(e.target).closest('li').index() + 1 == 2) {
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para visualizar los clientes configurados", "Atención!!", 1500);
+            return false;
+        }
+        showDivClientes('0');
+        $(this).tab('show');
+        changetext("Suministros"+" para la configuracion "+"<b>"+ _codigo+"</b>") //CAMBIANDO TEXT LBL IZQUIERDO
+        //adjust(table_asig_conf_cli)
+    }
+    else{
+        $(this).tab('show');
+        changetext("Acciones de lectura"+" para la configuracion "+"<b>"+ _codigo+"</b>") //LBL IZQUIERDO
+        
+    }
+        
+});*/
+
+//GET CLIENTES METODO DIRECTO-- DATA = TABLA INSERTADA
+
+function obtenerClientesCargados(_codigo_config)
+{
+    if (_codigo_config == "") {
+        toastr.warning("Debe seleccionar una configuración de la tabla para ver los clientes asignados", "Atención!!", 1500);
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'qorder:get_clientes_config' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data: {
+            codigo_config: _codigo_config,
+        },
+        statusCode: {
+            200: function (data) {
+                $('#clientesconfig').html(data);
+                $("#titlo_clientes_asignados").css("display","");
+                $("#cant_clientes_asignados").html(table_asig_conf_cli.data().rows().count())
+                habilitarBotonesClientes();
+            },
+            201: function (data) {
+                toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                $('#clientesconfig').html(data);
+                $("#titlo_clientes_asignados").css("display","none")
+                habilitarBotonesClientes();
+            },
+            // 300: function (data) {
+            //     //SIRVE PARA NO MOSTRAR TODOS LOS REGISTROS
+            //     toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+            //     if(table_asig_conf_cli != undefined)
+            //         table_asig_conf_cli.rows().clear().draw()
+            //     $('#clientesconfig').html(data);
+            //     //adjust(table_asig_conf_cli)
+            // },
+            500: function () {
+                toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+            }
+        }
+    });
+}
+
+function obtenerConfiguracionesResumidas()
+{
+    $.ajax({
+        url: "{% url 'qorder:get_configuraciones' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        statusCode: {
+            200: function (data) {
+                $('#tablaconfiguracionesresumida').html(data);
+            },
+            201: function (data) {
+            },
+            500: function () {
+                toastr.error('Ocurrió un error al obtener las configuraciones.', '', { timeOut: 2000 })
+            }
+        }
+    });
+}
+
+
+function habilitarBotonesClientes()
+{
+    let cantidad_clientes_config = table_asig_conf_cli.data().rows().count();
+
+    if (cantidad_clientes_config > 0)
+    {
+        $("#btnEliminarClientes").removeAttr("disabled");
+    }
+    else
+    {
+        $("#btnEliminarClientes").attr("disabled", true);
+    }
+}
+
+
+function limpiarPantallaAsignacion()
+{
+
+    $("#oficinas").val("0").change();
+    $("#cmbtipofiltro").val("0").change();
+
+    $("#txtnis").val("");
+    $("#txtnic").val("");
+    $("#txtnombreape").val("");
+    $("#txtcantidad").val("");
+    $("#txtporcentaje1").val("");
+    $("#txtcantidad1").val("");
+    
+
+    $("#txtnis").removeAttr("disabled");
+    $("#txtnic").removeAttr("disabled");
+    $("#txtnombreape").removeAttr("disabled");
+    $("#txtcantidad").removeAttr("disabled");
+    $("#txtporcentaje1").removeAttr("disabled");
+    $("#txtcantidad1").removeAttr("disabled");
+
+    //$("#rutas").empty();
+    //$("#contratistas").empty();
+
+    $("#contratistas").val(null).trigger('change');
+
+    $("#tablaclientesresultado").html("");
+
+    _ids_cli_asign = "";
+    _ids_p_sum_asign = "";
+}
+
+function showDivClientes(idDiv) {
+
+    if (idDiv == '0') {
+        e(true)
+        $("#clientesasignados").show();
+        $("#buscarclientes").hide();
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para ver los suministros asignados", "Atención!!", 1500);
+            return;
+        }
+
+
+        $.ajax({
+            url: "{% url 'qorder:get_clientes_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+            },
+            statusCode: {
+                200: function (data) {
+                    $('#clientesconfig').html(data);
+                },
+                201: function (data) {
+                    toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                    $('#clientesconfig').html(data);
+                },
+                // 300: function (data) {
+                //     //SIRVE PARA NO MOSTRAR TODOS LOS REGISTROS
+                //     toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                //     if(table_asig_conf_cli != undefined)
+                //         table_asig_conf_cli.rows().clear().draw()
+                //     $('#clientesconfig').html(data);
+                //     //adjust(table_asig_conf_cli)
+                // },
+                500: function () {
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+
+    }
+    else {
+        e(false)
+        $("#clientesasignados").hide();
+        $("#buscarclientes").show();
+        cleanfilters(true)
+    }
+}
+
+function mostrarPantallaAsignarClientes()
+{
+    $("#asignacion_general").css("display","none");
+    $("#asignacion_asignar_cliente").css("display","");
+
+
+    limpiarPantallaAsignacion();
+}
+
+function ocultarPantallaAsignarClientes()
+{
+    $("#asignacion_general").css("display","");
+    $("#asignacion_asignar_cliente").css("display","none");
+
+
+    obtenerClientesCargados(_codigo);
+    adjust(table_configs_resum);
+}
+
+
+//GET CLIENTES METODO DIRECTO-- DATA = TABLA INSERTADA
+/*function showDivClientes(idDiv) {
+
+    if (idDiv == '0') {
+        e(true)
+        $("#clientesasignados").show();
+        $("#buscarclientes").hide();
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para ver los clientes asignados", "Atención!!", 1500);
+            return;
+        }
+
+
+        $.ajax({
+            url: "{% url 'qorder:get_clientes_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+            },
+            statusCode: {
+                200: function (data) {
+                    $('#clientesconfig').html(data);
+                },
+                201: function (data) {
+                    toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                    $('#clientesconfig').html(data);
+                },
+                // 300: function (data) {
+                //     //SIRVE PARA NO MOSTRAR TODOS LOS REGISTROS
+                //     toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                //     if(table_asig_conf_cli != undefined)
+                //         table_asig_conf_cli.rows().clear().draw()
+                //     $('#clientesconfig').html(data);
+                //     //adjust(table_asig_conf_cli)
+                // },
+                500: function () {
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+
+    }
+    else {
+        e(false)
+        $("#clientesasignados").hide();
+        $("#buscarclientes").show();
+        cleanfilters(true)
+    }
+}*/
+
+//PINTAR BOTONES FILTRO
+$("#btnSumSelect").click(function () {
+    e(true)
+})
+$("#btnBuscarSum").click(function () {
+    e(false)
+})
+function e(b) {
+    $("#btnSumSelect").toggleClass("btn-primary", b)
+    $("#btnSumSelect").toggleClass("active", b)
+    $("#btnSumSelect").toggleClass("btn-default", !b)
+
+    $("#btnBuscarSum").toggleClass("btn-primary", !b)
+    $("#btnBuscarSum").toggleClass("btn-default", b)
+    $("#btnBuscarSum").toggleClass("active", !b)
+}
+//BTN APLICAR FILTRO
+$("#btnAplicarFiltro").on('click', function () {
+    if (valFiltroBusqueda()){
+        cleanfilters(false)
+        getClientesFiltro();
+    }
+        
+})
+//VALIDAR FILTRO de busqueda
+function valFiltroBusqueda() {
+    var $contratista = $("#txtnis").val();
+    var $tecnico = $("#txtnic").val();
+    var $porcentaje = $("#txtnombreape").val();
+    var _ruta = $('#rutas').val();
+    var $oficinas = $('#oficinas').val();
+    if ($contratista == "" && $tecnico == "" && (_ruta == null || $oficinas == "0")) {
+        toastr.error("Ingrese un filtro", "Atención!!", 1500);
+        return false;
+    }
+    if ($porcentaje != "") {
+        if (!isNaN($porcentaje)) {
+            if ($porcentaje > 100 || $porcentaje < 0) {
+                toastr.error("El porcentaje ingresado es incorrecto, solo se aceptan valores del 0 al 100", "Atención!!", 1500);
+                return false;
+            }
+        } else {
+            toastr.error("Error de tipo parametro en porcentaje", "Atención!!", 1500);
+            return false;
+        }
+    }
+    return true;
+}
+//PROCESO GET CLIENTES
+function getClientesFiltro() {
+
+
+    var _nis = $("#txtnis").val();
+    var _nic = $("#txtnic").val();
+    var _nombre = $("#txtnombreape").val(); //porcentaje
+    // var _ruta = $('#rutas').val();
+    var _ruta = ''
+    var _cantidad = $("#txtcantidad").val()
+    if($("#rutas").val() != null) //obtengo TODAS Las rutas que posiblemnete se pueden seleccionar
+        for (let index = 0; index < $("#rutas").val().length; index++) {
+            _ruta += $("#rutas").val()[index]+','}
+    $.ajax({
+        url: "{% url 'qorder:get_clientes_filtro' %}",
+        type: 'post',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        datatype: 'json',
+        data: { rutasum_id: _ruta, nic: _nic, nis: _nis, nombre: _nombre, codigo_config: _codigo,cantidad:_cantidad },
+        statusCode: {
+            200: function (data) {
+                $("#tablaclientesresultado").html(data);
+            },
+            300: function () {
+                toastr.error("El técnico no tiene asignado un dispositivo", "Atención!!", 1500);
+            },
+            500: function () {
+                toastr.error("Server error, contact an administrator.", "Atención!!", 1500);
+            }
+        }
+    });
+}
+//NO ESPACIOS EN TEXT INPUT 
+var input = $("input[type='text']")
+input.on('input', function () {
+    if(this.id != 'txtParamAdicional' && this.id != 'DescripcionConfig')
+        this.value = this.value.trim();
+})
+//ASIGNAR CLIENTES A LA CFG SELECCIONADA
+//BTN ASIGNAR
+function confirmAsignarClientes() {
+    $("#ModalMsgConfirmAsignarClienteConfig").modal('show');
+}
+//PROCESO INSERT
+$("#btnAsignarClientesConfig").on('click', function () {
+
+    $('#ModalMsgConfirmDeleteClienteConfig').modal('hide');
+
+    if (_codigo == "") {
+        toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+        return;
+    }
+
+    /*
+    if (_ids_cli_asign == "") {
+        toastr.warning("Debe seleccionar al menos un cliente de la tabla para poder asignarlo a la configuración", "Atención!!", 1500);
+        return;
+    }*/
+
+    if (_ids_p_sum_asign == "") {
+        toastr.warning("Debe seleccionar al menos un punto de suministro de la tabla para poder asignarlo a la configuración", "Atención!!", 1500);
+        return;
+    }
+
+    
+
+    var _nis = $("#txtnis").val();
+    var _nic = $("#txtnic").val();
+    var _nombre = $("#txtnombreape").val();
+    var _ruta = '' //
+    if($("#rutas").val() != null) //doble validacion x supuesto cambiar
+        for (let index = 0; index < $("#rutas").val().length; index++) {
+            _ruta += $("#rutas").val()[index]+','} //29/07/2021
+
+    var tipo_fil = $("#cmbtipofiltro").val()
+    var contratista = $("#oficinas").val()
+    var porcentaje = $("#txtnombreape").val()
+    var cantidad = $("#txtcantidad").val()
+
+    $.ajax({
+        url: "{% url 'qorder:asignar_clientes_config' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data: {
+            rutasum_id: _ruta,
+            nic: _nic,
+            nis: _nis,
+            nombre: _nombre,
+            codigo_config: _codigo,
+            codigos_cliente: _ids_cli_asign,
+            codigos_punto_sum: _ids_p_sum_asign,
+
+            tipo_filtro: tipo_fil,
+            contratista: contratista,
+            porc: porcentaje,
+            cant: cantidad,
+
+        },
+        statusCode: {
+            200: function (data) {
+
+                //$("#tablaclientesresultado").html(data);
+                limpiarPantallaAsignacion();
+                toastr.success("Suministros asignados correctamente", "", 2500);
+            },
+            300: function () {
+                toastr.error("No se pudo asignar los suministros seleccionados", "Atención!!", 1500);
+            },
+            500: function () {
+                toastr.error('Ocurrio un error al intentar asignar los suministros seleccionados', '', { timeOut: 2000 })
+            }
+        }
+    });
+
+    //_ids_cli_asign = ""; //seteo cliente select
+    _ids_p_sum_asign = ""; //seteo puntos sum select
+
+});
+//btn delete cliente cfg
+function confirmDeleteConfigCliente(idCli) {
+    _codCliDel = idCli;
+    $('#ModalMsgConfirmDeleteClienteConfig').modal('show');
+}
+//DELETE CLIENTE CONFIG INDIVIDUAL
+$("#DeleteClienteConfig").on('click', function () {
+
+    console.log("delete cliente individual");
+
+    $('#ModalMsgConfirmDeleteClienteConfig').modal('hide');
+
+    if (_codigo == "") {
+        toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+        return;
+    }
+
+    if (_codCliDel == "") {
+        toastr.warning("Debe seleccionar una suministro de la tabla para poder removerlo", "Atención!!", 1500);
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'qorder:delete_cli_indiv_config' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data: {
+            codigo_config: _codigo,
+            //codigo_cliente: _codCliDel
+            codigo_punto_sum: _codCliDel
+        },
+        statusCode: {
+            200: function (data) {
+
+                //$("#clientesconfig").html(data);
+                obtenerClientesCargados(_codigo);
+                $("#cant_clientes_asignados").html(table_asig_conf_cli.data().rows().count())
+                habilitarBotonesClientes();
+                _codCliDel = "";
+                toastr.success("El suministro se eliminó correctamente", "", 1500);
+            },
+            300: function () {
+                toastr.error("No se pudo eliminar el código de suministro seleccionado", "Atención!!", 1500);
+            },
+            500: function () {
+                toastr.error('Ocurrio un error al intentar elimnar el código de suministro seleccionado', '', { timeOut: 2000 })
+            }
+        }
+    });
+
+});
+//BORRAR ACCION CFG
+function confirmBorrarAccion(codConfig, codAcc, orden) {
+    _codigo = codConfig;
+    _cod_accion = codAcc;
+    _ordenDel = orden;
+
+    $('#ModalMsgConfirmDeleteAccionConfig').modal('show');
+}
+//PROCESO DELETE
+$("#DeleteAccionConfig").on('click', function () {
+
+    $('#ModalMsgConfirmDeleteAccionConfig').modal('hide');
+
+    if (_codigo == "") {
+        toastr.warning("Debe seleccionar una configuración de la tabla para editar", "Atención!!", 1500);
+        return;
+    }
+
+    if (_cod_accion == "") {
+        toastr.warning("Debe seleccionar una acción de la tabla para asignar a la configuración", "Atención!!", 1500);
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'qorder:delete_accion_config' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data: {
+            codigo_config: _codigo,
+            codigo_accion: _cod_accion,
+            orden_ejecucion: _ordenDel
+        },
+        statusCode: {
+            200: function (data) {
+
+                $("#accionesconfig").html(data);
+                toastr.success("El código de acción se eliminó correctamente", "", 1500);
+            },
+            300: function () {
+                $('#ModalAddConfiguracion').modal('hide');
+                toastr.error("No se pudo eliminar el código de acción seleccionado", "Atención!!", 1500);
+            },
+            500: function () {
+                $('#ModalAddConfiguracion').modal('hide');
+                toastr.error('Ocurrio un error al intentar elimnar el código de acción seleccionado', '', { timeOut: 2000 })
+            }
+        }
+    });
+});
+//DELETE MASIVO DE TODAS LAS CONFIGURACIONES
+function deleteMasivo(){
+    $.ajax({
+        url: "{% url 'qorder:del_all_cfg' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data:{},
+        statusCode: {
+            200: function (data) {
+                toastr.success("Se eliminaron todas las acciones correctamente.", "", 1500);
+                $("#tablaconfiguraciones").html(data);
+            },
+            300: function () {
+                $('#ModalAddConfiguracion').modal('hide');
+                toastr.error("No existen acciones", "Atención!!", 1500);
+            },
+            500: function () {
+                $('#ModalAddConfiguracion').modal('hide');
+                toastr.error('Ocurrio un error al eliminar las acciones', '', { timeOut: 2000 })
+            }
+        }
+    });
+}
+
+
+    //LIMPIAR FILTROS
+    function cleanfilters(b){
+        if(b){
+            $("#oficinas").val("0")
+            $("#txtnis").val("")
+            $("#txtnic").val("")
+            $("#txtnombreape").val("")
+            $('#rutas').find('option').remove()
+            $("#txtcantidad").val("")
+            document.getElementById('txtcantidad').disabled = false;
+            document.getElementById('txtnombreape').disabled = false;
+        }
+        $("#tablaclientesresultado").toggleClass('hide',b)
+    }
+    //BTN AGREGAR CLIENTES A CFG MASIVO X CONTRATISTA
+    function asignarClientesMasivoxOficina(){
+        //valido que este alguna oficina seleccionada
+        var oficina_seleccion = $("#contratistas").val()
+        if(oficina_seleccion == null){
+            toastr.error('Debe seleccionar alguna oficina.', 'Atención!!!', { timeOut: 2000 })
+            return;
+        }
+        codigo_oficina = ''
+        for (let index = 0; index < $("#contratistas").val().length; index++) {
+            codigo_oficina += $("#contratistas").val()
+        }
+        $.ajax({
+            url: "{% url 'qorder:asign_config_bulk' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data:{
+                codigo_config : _codigo,
+                _of : codigo_oficina
+            },
+            statusCode: {
+                200: function (data) {
+                    limpiarPantallaAsignacion();
+                    toastr.success("Se agregaron todos los suministros", "", 2500);
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    } 
+    //OCULTAR DIV DE ASIGNACION MASIVA EN RESULTADOS
+    function ocultar_Asig_Mas(b){
+        $("#asigmasiva").toggleClass('hide',b)
+        $("#btnAsignarClSelect").toggleClass('invisible',!b)
+        $("#btnAsignarAleatorio").toggleClass('invisible',!b)
+    }
+    //ABRIR MODAL ASIGNAR ALEATORIO
+    $("#btnAsignarAleatorio").on('click',function(){
+        $("#ModalMsgConfirmAsignarClienteConfigAleatorio").modal('show')
+    })
+    //BTN ASIGNAR ALEATORIO X PORCENTAJE/CANTIDAD
+    function asignClienteAleatorio(){
+        if (valFiltroBusqueda()){
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+            return;
+        }
+        var _nis = $("#txtnis").val();
+        var _nic = $("#txtnic").val();
+        var _nombre = $("#txtnombreape").val(); //porcentaje
+        var _ruta = '' //
+        if($("#rutas").val() != null) 
+            for (let index = 0; index < $("#rutas").val().length; index++) {
+                _ruta += $("#rutas").val()[index]+','} //29/07/2021
+        var $cantidad = $("#txtcantidad").val() //cantidad
+        $.ajax({
+            url: "{% url 'qorder:asign_cliente_aleatorio' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                rutasum_id: _ruta,
+                nic: _nic,
+                nis: _nis,
+                nombre: _nombre, //porcentajeeeeee
+                codigo_config: _codigo,
+                cantidad: $cantidad
+            },
+            statusCode: {
+                200: function (data) {
+                    //$("#tablaclientesresultado").html(data);
+                    limpiarPantallaAsignacion();
+                    toastr.success("Suministros asignados correctamente", "", 2500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los suministros seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los suministros seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+        //_ids_cli_asign = "";
+        _ids_p_sum_asign = "";
+    }}
+    //BORRAR TODAS LAS CFG BTN
+    $("#btnDeleteConfiguracion").on('click',function(){
+        $('#ModalMsgEliminarAllCfg').modal('show');
+    })
+    //BTN ASIGNAR TODOS LOS CLIENTES D UNA /OFICINA
+    $("#btnAsignarMasivo").on('click',function(){
+        $("#ModalMsgConfirmAsignarClienteMasivo").modal('show')
+    })
+    //ELIMINAR TODOS LOS CLIENTES EN LA CFG
+    function deleteAllClientesCfg(){
+
+        $.ajax({
+            url: "{% url 'qorder:del_allclientes_cfg' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+            },
+            statusCode: {
+                200: function (data) {
+                    //$("#clientesconfig").html(data);
+                    obtenerClientesCargados(_codigo);
+                    $("#cant_clientes_asignados").html(table_asig_conf_cli.data().rows().count())
+                    habilitarBotonesClientes();
+                    _codCliDel = "";
+                    toastr.success("Suministros borrados correctamente", "", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los suministros seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los suministros seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //ABRIR MODAL DE ASIGNAR MASIVAMENTE CLIENTES ALEATORIAMENTE
+    function showModalAsignMasivoAleatorio(){
+        $("#ModalAsignarClientesMasivos").modal('show')
+    }
+    //METODOS PARA ASIGNAR CLIENTES MASIVOS ALEATORIOS
+    function asignClientesMasivoAleatorios(){
+        var _porcentaje = $("#txtporcentaje1").val(); //porcentaje
+        var $cantidad = $("#txtcantidad1").val() //cantidad
+        var oficina_seleccion = $("#contratistas").val()
+        if(oficina_seleccion == null){
+            toastr.error('Debe seleccionar alguna oficina', 'Atención!!!', { timeOut: 2000 })
+            return;
+        }
+        codigo_oficina = ''
+        for (let index = 0; index < $("#contratistas").val().length; index++) {
+            codigo_oficina += $("#contratistas").val()
+        }
+
+        var tipo_fil = $("#cmbtipofiltro").val()
+        
+        $.ajax({
+            url: "{% url 'qorder:asign_masivo_clien_aleatorio' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+                cantidad: $cantidad,
+                porcentaje: _porcentaje,
+                oficina : codigo_oficina,
+
+                tipo_filtro: tipo_fil
+            },
+            statusCode: {
+                200: function (data) {
+                    $("#tablaclientesresultado").html(data);
+                    limpiarPantallaAsignacion();
+                    toastr.success("Suministros asignados correctamente", "", 2500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los suministros seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los suministros seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+        }
+
+</script>

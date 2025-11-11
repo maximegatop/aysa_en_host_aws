@@ -1,0 +1,148 @@
+   {% load i18n %} 
+
+
+                        <table id="table_routes" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>{% trans "lblOficina" %}</th>
+                                <th>{% trans "lblCiclo" %}</th>
+                                <th>{% trans "lblRuta" %}</th>
+                                
+                                <th>{% trans "lblItinerario" %}</th>
+                                <th>{% trans "Division" %}</th>
+                                <th>{% trans "lblCantidad" %}</th>
+                                <th>{% trans "lblId" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in rutas %}
+                            <tr>
+                                <td>{{t.oficina|default_if_none:'--'}}</td>
+                                <td>{{t.ciclo|default_if_none:'--'}}</td>
+                                <td>{{t.ruta}}</td>
+                                <td>{{t.itinerario|default_if_none:'--'}}</td>
+                                <td>{{t.plan|default_if_none:'--'}}</td>
+                                <td>{{t.cantidad|default_if_none:'--'}}</td>
+                                <td>{{t.id|default_if_none:'--'}}</td>
+  
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+              
+                    <script> 
+
+          var table_routes_div = $('#table_routes').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+           info: false,
+        scrollY: 180,
+            pageLength:6,
+            
+            select: true,
+        columnDefs: [
+            {
+                "targets": [ 6 ],
+                "visible": false,
+                "searchable": false
+            },
+        ],
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+                
+
+    $("input[name='todos']").change(function() {
+   
+       refresh();
+   
+    });
+
+    function cargarDivisiones()
+    {
+        var todas = 2;
+        var id_tp =  $("#rutaseleccionada").val();
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_ruta=id_tp;
+        filtros.todas = todas;
+        $.ajax({
+            url: "{% url 'qorder:lista_divisiones' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                   
+                    $("#_table_divisiones").html(data);
+                 
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+        });
+    }
+
+    function cargarSuministros()
+    {
+
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_ruta=$("#rutaseleccionada").val();
+        $.ajax({
+            url: "{% url 'qorder:lista_suministros_ruta' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                   
+                    $("#_table_suministros_ruta").html(data);
+                    cargarSuministrosDivisiones();
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+        });
+    }
+
+    table_routes_div
+    .on( 'select', function ( e, dt, type, indexes ) {
+         var id_to = '';
+        
+        var m_id_to= $.map(table_routes_div.rows('.selected').data(), function (item) {
+            id_tp = item[6]
+        });
+        $("#rutaseleccionada").val(id_tp);
+        
+        cargarDivisiones();
+        cargarSuministros();
+    }); 
+
+                    </script>

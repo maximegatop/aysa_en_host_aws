@@ -1,0 +1,71 @@
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+              
+               <form  id="formcliente"  style="padding-left:10px;">
+                    <input type="hidden" name="codigo" id="codigo" value="{{ codigo }}">
+                    {% csrf_token %}
+                      
+                      {% crispy form %}
+
+               </form>
+                <div class="modal-footer">
+        <div class="btn-group pull-right">
+          
+          <a id="btnGrabar" href="#" class="btn btn-primary " onclick="btnSaveOnClick('{{ codigo }}');">Grabar cambios</a>
+        </div>
+        </div>
+        <div class="panel-body">
+  		<div class="panel panel-default">
+    		<div class="panel-heading">
+          		<h2 class="panel-title">{% trans "Contactos" %}</h2>
+        	</div>
+          	<div class="panel-body">
+        		<div id='contactos'>
+        			{% include 'data_admin/clientes/_table_contactos.html'  with feedback_form=feedback_form  %}
+        		</div>
+    		</div>
+    		<div class="panel-footer">
+           <a id="btnNew" href="#" class="btn btn-primary " onclick="contacto_new();">Nuevo contacto</a>   		
+    		</div>
+		</div>
+		</div>
+    <div id="new"  class="modal fade">
+      {% include 'data_admin/clientes/_contactos_edit.html'  with feedback_form=feedback_form  %}
+    </div>
+
+
+<script type="text/javascript">
+	
+	      function btnSaveOnClick(cliente)
+          {
+             var data = $('#formcliente').serialize();
+             
+            $.ajax({
+              url: "{% url 'qorder:cliente_save' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: data,
+              statusCode: {
+                200: function(data) {
+                	toastr.success(data, ' ', {timeOut: 2000})
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              }
+             });
+
+          }
+
+
+</script>

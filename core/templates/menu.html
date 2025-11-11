@@ -1,0 +1,317 @@
+{% load staticfiles %}
+{% load static %}
+{% load core_tags %}
+{% load i18n %}
+<!-- Nav Var -->
+<div class="container-fluid" style="padding-right:0px; padding-left:0px;">
+    <div class="row">
+        <div class="col-md-12">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                    <a href="javascript:window.location.reload(true)">
+                        <div class="logo">
+                            <img src="{% static 'images/qorder5.png' %}" alt="Qorder" width="150"/>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.username|if_page_by_user:'interfaz_importar~interfaz_exportar' %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "mnuInterfaz" %}</a>
+                                <ul class="dropdown-menu">
+                                    {% if user.username|if_page_by_user:'interfaz_importar' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:importacion' %}')">{% trans 'mnuImportar' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if user.username|if_page_by_user:'interfaz_exportar' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:exportacion' %}')">{% trans 'mnuExportar' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if user.username|if_page_by_user:'ordenes_reorganizacion_gu~ordenes_asignacion~ordenes_monitor~ordenes_consulta~ordenes_monitor_rutas~ordenes_forzado~ordenes_reorganizacion~ordenes_generacion' %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "mnuOrdenes" %}</a>
+                                <ul class="dropdown-menu">
+                                    <!--{% if user.username|if_page_by_user:'ordenes_generacion' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:generacion_main' %}')">
+                                        {% trans 'Generación' %}</a>
+                                        </li>
+                                    {% endif %}-->
+
+
+                                    <!--{% if user.username|if_page_by_user:'ordenes_reorganizacion_gu' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reorganizcion_gu_main' %}')">
+                                            {% trans 'Reorganización gu' %}</a>
+                                        </li>
+                                    {% endif %}-->
+
+                                    {% if user.username|if_page_by_user:'ordenes_asignacion' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:asignacion_main' %}')">{% trans 'mnuAsignacion' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% if user.username|if_page_by_user:'ordenes_segmentacion_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:segmentacion_rutas_main' %}')">{% trans 'Segmentación de Rutas' %}</a>
+                                        </li>
+                                    {% endif %}
+
+
+                                    {% if user.username|if_page_by_user:'ordenes_monitor' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:monitor_main' %}')">{% trans 'mnuMonitor' %}</a>
+                                        </li>
+                                    {% endif %}
+
+
+                                    {% if user.username|if_page_by_user:'ordenes_consulta' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:consulta_main' %}')">{% trans 'mnuConsulta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'ordenes_monitor_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:monitor_rutas_main' %}')">{% trans 'mnuMonitorRutas' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li class="divider"></li>
+
+                                    {% if user.username|if_page_by_user:'ordenes_forzado' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:forzado_main' %}')">{% trans 'mnuForzado' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    <!--{% if user.username|if_page_by_user:'ordenes_reorganizacion' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reorganizacion_main' %}')">
+                                        {% trans 'mnuReorganizacion' %}</a>
+                                        </li>
+                                    {% endif %}-->
+
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if user.username|if_page_by_user:'gps_ultima_posicion~gps_recorrido~qps_listado' %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "mnuGPS" %}</a>
+                                <ul class="dropdown-menu">
+                                    {% if user.username|if_page_by_user:'gps_ultima_posicion' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:ultima_posicion' %}')">{% trans 'mnuUltimaPosicion' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if user.username|if_page_by_user:'gps_recorrido' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:recorrido' %}')">{% trans 'mnuRecorrido' %}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if user.username|if_page_by_user:'qps_listado' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:listadorecorrido' %}')">{% trans 'mnuListadoRecorrido' %}</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {% if user.username|if_page_by_user:'reporte_anomalias_rutas~reporte_lecturas_rutas' %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Reportes" %}</a>
+                                <ul class="dropdown-menu">
+                                    <!--{% if user.username|if_page_by_user:'reporte_anomalia' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reporte_anomalia' %}')">
+                                            {% trans 'Reporte anomalía' %}</a>
+                                        </li>
+                                    {% endif %}-->
+
+                                    {% if user.username|if_page_by_user:'reporte_anomalias_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:rpt_anomalias_rutas' %}')">{% trans 'Reporte anomalías de la ruta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_lecturas_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:rpt_lecturas_rutas' %}')">{% trans 'Reporte lecturas de la ruta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_exportación_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:rpt_exportacion_rutas' %}')">{% trans 'Reporte exportación de la ruta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_consumo_rutas' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reporte_consumo' %}')">{% trans 'Reporte consumo de la ruta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_sum_alta_modif' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:rpt_sum_alta_modif' %}')">{% trans 'Reporte alta/modif de suministros de la ruta' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_fh' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reporte_fh' %}')">{% trans 'Reporte franja horaria' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_desem_lect' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reporte_desemp_lect' %}')">{% trans 'Reporte desempeño lecturista' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'reporte_auditoria_lect' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:reporte_auditoria_lect' %}')">{% trans 'Reporte de auditoría de lectura' %}</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if user.username %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Semana de trabajo</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" class="ignore-click"
+                                           onclick="getPage('{% url 'qorder:semana' %}')">Semana de trabajo</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if user.username|if_page_by_user:'adm_confi_acciones~adm_clientes~adm_equipos~adm_tecnicos~adm_anomalias~adm_problemas~adm_tipos_ordenes~adm_codigos~adm_encuestas~adm_geofencing~adm_rutasum' %}
+
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle"
+                                   data-toggle="dropdown">{% trans "mnuAdminDatos" %}</a>
+                                <ul class="dropdown-menu">
+                                    {% if user.username|if_page_by_user:'adm_confi_acciones' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:config_acciones_cliente_main' %}')">{% trans 'Acciones de lectura' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'adm_equipos' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:atp_main' %}')">{% trans 'mnuEquipos' %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'adm_tecnicos' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:tecnicos_main' %}')">{% trans "mnuTecnicos" %} </a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'adm_anomalias' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:anomalias_main' %}')">{% trans "mnuAnomalias" %} </a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if user.username|if_page_by_user:'adm_tipos_ordenes' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:tiposordenes_main' %}')">{% trans "mnuTiposOrdenes" %} </a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'adm_codigos' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:codigos_main' %}')">{% trans "Códigos" %} </a>
+                                        </li>
+                                    {% endif %}
+
+
+                                    <!--{% if user.username|if_page_by_user:'adm_rutasum' %}
+                                        <li><a href="#" class="ignore-click"
+                                               onclick="getPage('{% url 'qorder:rutasum_main' %}')">
+                                            {% trans "Suministros por ruta" %} </a>
+                                        </li>
+                                    {% endif %}-->
+
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {% if user.username|if_page_by_user:'settings~soporte_push' %}
+
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" href="#"
+                                   data-activates="dropdown_configuracion">
+                                    <i class="fa fa-cogs"></i></a>
+                                <ul class="dropdown-menu">
+                                    {% if user.username|if_page_by_user:'settings' %}
+                                        <li><a href="#!"
+                                               onclick="getPage('{% url 'qorder:configuracion' %}')">{% trans "mnuSettings" %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'soporte_push' %}
+                                        <li><a href="#!"
+                                               onclick="getPage('{% url 'qorder:soporte_main' %}')">{% trans "Soporte push" %}</a>
+                                        </li>
+                                    {% endif %}
+                                    {% if user.username|if_page_by_user:'is_admin' %}
+                                        <li><a href="#!" class="ignore-click"
+                                               onclick="toAdmin()">{% trans "mnuAdmin" %} </a></li>
+                                    {% endif %}
+
+                                </ul>
+                            </li>
+
+
+
+
+                        {% endif %}
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="dataLogOut">
+                                <i class="fa fa-user fa-1x"></i></a>
+                            <div id="subMenuLogOut">
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="#!">
+                                            {% if request.user.first_name %}
+                                                {{ request.user.first_name }} {{ request.user.last_name }}
+                                            {% else %}
+                                                {{ request.user.username }}
+                                            {% endif %}
+                                        </a>
+                                    </li>
+
+                                    <li><a href="#!" onclick="getPage('{% url 'qorder:change_password' %}')">{% trans "Change password" %}</a>
+                                    </li>
+
+                                    <li><a href="#!" onclick="getPage('{% url 'qorder:about' %}')">Acerca de QOrder</a></li>
+
+                                    <li>
+                                        <a href="{% url 'logout' %}" class="" title={% trans "mnuLogout" %}>
+                                   <span>
+                                   <i class="fa fa-sign-out"></i>
+                                   </span>{% trans "mnuLogout" %}
+                                        </a>
+
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+
+                    </ul>
+                </div>
+
+            </nav>
+        </div>
+    </div>
+</div>
+

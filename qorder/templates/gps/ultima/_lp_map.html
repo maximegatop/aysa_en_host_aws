@@ -1,0 +1,88 @@
+
+<div id="map" style="height: 500px;">
+
+</div>
+
+<script>
+
+        var latlon = Geohash.decode('{{ center }}');   // 'd29spu44697'
+        
+        var map = L.map('map').setView(latlon, 14);  //[-41.2858, 174.78682]
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    setTimeout(function()
+    { 
+
+        
+        map.invalidateSize();
+
+    }, 250)
+/*
+    var mapCollapsibleIsActive = false;
+    refresh = setInterval(function () {
+        var mapCollapsible = $("#map_collapsible")
+        console.log('setInterval');
+        if (mapCollapsible.hasClass("in") && !mapCollapsibleIsActive) {
+            console.log('mapCollapsibleIsActive true');
+            mapCollapsibleIsActive = true;
+            map.invalidateSize();
+            clearInterval(refresh);
+        } else {
+              console.log('mapCollapsibleIsActive falsea');
+            mapCollapsibleIsActive = false;
+        }
+    }, 250)
+*/
+
+    var greenIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'green'
+    });
+
+    var redIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'red'
+    });
+
+    var yellowIcon = L.AwesomeMarkers.icon({
+        icon: 'circle',
+        markerColor: 'orange'
+    });
+
+    {% for t in tecnicos %}
+
+    
+        {% if t.get_posicion.latitud %}
+    {% if forloop.first %}
+
+        map.setView([ {{t.get_posicion.latitud}}, {{t.get_posicion.longitud}}], 13);
+        
+    {% endif %}
+        var markerPopup{{forloop.counter}} = '<b>C&oacute;digo:</b> {{t.codigo}} <br><b>Nombre:</b> {{t.nombre_completo}} <br> <b>Fecha: </b>{{t.get_posicion.get_fecha_ultima_posicion|date:"d/m/Y H:i"}}<br><b>Pto GPS:</b> {{t.get_posicion.latitud}}, {{t.get_posicion.longitud}}<br><b>Direcci&oacute;n:</b> {% if aprox %}{{t.get_posicion.get_address}}{% else %}S/D{% endif %}';
+       // L.marker([{{t.get_posicion.latitud}}, {{t.get_posicion.longitud}}], {icon: {{t.get_posicion.get_status_color}}Icon}).addTo(map).bindPopup(markerPopup{{forloop.counter}});
+        var icono =  L.ExtraMarkers.icon({
+                                              icon: 'fa-number',
+                                              number: {{t.codigo}},
+                                              markerColor: '{{t.get_posicion.get_status_color}}'
+                                            });
+     
+        
+        L.marker( [{{t.get_posicion.latitud}}, {{t.get_posicion.longitud}}], {icon: icono}).addTo(map).bindPopup(markerPopup{{forloop.counter}});
+  
+    {% endif %}
+
+    {% empty %}
+
+    {% endfor %}
+
+
+    {% for n in tsg %}
+       toastr.error('El personal de C&oacute;digo {{ n }} no posee ning&uacute;n punto GPS registrado.',' ', 2000);
+    {% endfor %}
+
+
+
+
+</script>

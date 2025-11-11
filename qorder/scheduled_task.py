@@ -1,0 +1,119 @@
+import os
+import sys
+import django
+from django.conf import settings
+
+# Seteamos la ruta del proyecto, para que se conozca el módulo bat_webservice_python 
+project_path = '/home/ubuntu/aysaqorder/'
+sys.path.append(project_path)
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+
+django.setup()
+
+import pandas as pd
+from openpyxl import load_workbook
+from qorder.models import PuntoDeSuministro
+
+
+def run_scheduled_task():
+    
+    try:
+        
+        # order_emails = {orden.numero_orden: orden.punto_suministro.cliente.email for orden in 
+                                    # QorderOrdendetrabajo.objects.filter(estado__in=[265], envio_email=0)}
+        
+        print('hola')
+        
+        file_path = '/home/ubuntu/soporte/gps_pds_20241031.xlsx'  # Reemplaza con la ruta a tu archivo Excel
+        # df = pd.read_excel(file_path, engine='openpyxl')
+        
+        # for _, _import_row in df.iterrows():
+            
+        #     print(_)
+        #     print(_import_row['GPS_2'])
+        
+        wb = load_workbook(filename=file_path, read_only=True)
+        ws = wb.active
+        puntos_suministros = []
+        instancias_puntos_suministros = []
+        puntos_suministro_model = {punto.punto_suministro: punto for punto in PuntoDeSuministro.objects.all()}
+
+        for row in ws.iter_rows(min_row=2, values_only=True):  # Asumiendo que la primera fila es el encabezado
+            
+            try:
+                
+                gps_1 = row[3]
+                gps_2 = row[4]
+                gps_3 = row[5]
+                suministro = row[2]
+                
+                promedio_latitud = 0
+                promedio_longitud = 0
+                lista_latitud = []
+                lista_longitud = []
+                
+                if gps_1 != '[NULL]':
+                    latitud = float(gps_1.split(',')[0])
+                    longitud = float(gps_1.split(',')[1])
+                    lista_latitud.append(latitud)
+                    lista_longitud.append(longitud)
+                
+                if gps_2 != '[NULL]':
+                    latitud = float(gps_2.split(',')[0])
+                    longitud = float(gps_2.split(',')[1])
+                    lista_latitud.append(latitud)
+                    lista_longitud.append(longitud)
+                
+                if gps_3 != '[NULL]':
+                    latitud = float(gps_3.split(',')[0])
+                    longitud = float(gps_3.split(',')[1])
+                    lista_latitud.append(latitud)
+                    lista_longitud.append(longitud)
+                    
+                if len(lista_latitud) > 0:
+                    promedio_latitud = str(round(sum(lista_latitud) / len(lista_latitud), 7))
+                    
+                if len(lista_longitud) > 0:
+                    promedio_longitud = str(round(sum(lista_longitud) / len(lista_longitud), 7))
+                                
+                #gps_2 = row[4].strip()
+                #gps_3 = row[5].strip()
+                suministro = str(row[2])
+                #promedio_latitud = gps_2
+                #promedio_longitud = gps_3
+                    
+                puntos_suministros.append({'punto_suministro': suministro, 'promedio_latitud':promedio_latitud, 'promedio_longitud': promedio_longitud})
+                
+            except Exception as e:
+                print(e)
+            
+        print(puntos_suministros)
+        
+        for punto in puntos_suministros:
+            punto_suministro = punto['punto_suministro']
+            punto_latitud = punto['promedio_latitud']
+            punto_longitud = punto['promedio_longitud']
+            
+            try:
+                if punto_suministro in puntos_suministro_model:
+                    if punto_latitud != '0' and punto_longitud != '0':
+                        puntos_suministro_model.get(punto_suministro).gps_latitud = punto_latitud
+                        puntos_suministro_model.get(punto_suministro).gps_longitud = punto_longitud
+                        puntos_suministro_model.get(punto_suministro).save()
+            except Exception as e:
+                print('Error en proceso de insercion')
+                
+        wb.close()
+        
+        '''
+        for punto in puntos_suministro_model:
+            puntos_suministro_model.get(punto).save()
+            break
+        '''
+                
+    except Exception as e:
+        print('Error en proceso')
+
+if __name__ == "__main__":
+    run_scheduled_task()

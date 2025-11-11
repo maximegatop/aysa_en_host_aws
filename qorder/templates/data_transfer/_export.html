@@ -1,0 +1,96 @@
+<div class="card margin-s" style="height: 800px;">
+    <div class="card-content">
+        <span class="card-title black-text">Exportar &Oacute;rdenes</span>
+        <div class="row">
+            <div class="input-field col s6">
+                <select id="sel_centro">
+                    {% if not user.work_units.all|length_is:'1' %}
+                    <option value="" selected>Oficina Comercial:</option>
+                    {% endif %}
+                    {% for ct in user.work_units.all %}
+                    <option value="{{ct.id_workunit}}">{{ct}}</option>
+                    {% endfor %}
+                </select>
+                <label>Oficina Comercial</label>
+            </div>
+        </div>
+
+        <div class="right-align">
+            <button data-target="modal1" class="btn green modal-trigger" >
+                Exportar &oacute;rdenes</button>
+        </div>
+
+        <div class="row" >
+            <label class="active" for="textarea1">Logs de Exportaci&oacute;n:</label>
+            <div class="input-field col s12" style="height:250px; overflow:auto;" >
+                <span id="textarea1"></span>                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+        <div class="modal-content ">
+
+            <h6 class="row blue-grey-text">Confirmar</h6>
+            <div id="divider" class="divider"></div>
+            <br>
+
+            <p><h6>Está por iniciar el proceso de exportación de archivo. Por favor no interrumpa la operación una vez iniciada y aguarde a que la misma se complete.<h6></p>
+            <h6>¿Desea comenzar la Exportación?</h6>
+            </div>
+        <div class="modal-footer">
+            <button id="btnExport" type="button" class="modal-action modal-close waves-effect green btn ">Aceptar</button>
+            <a href="#!" type="button" class="modal-action modal-close red btn ">Cancelar</a>
+        </div>
+    </div>
+
+    <script>
+        $('select').material_select();
+        $('.modal-trigger').leanModal();
+        $("#title_bc").html("Exportar");
+
+        $('#btnExport').on('click', function(){
+            var filtros = {};
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.id_centro = $('#sel_centro').val();
+            filtros.tipo = 'e';
+
+            if (filtros.id_centro.length==0){
+            Materialize.toast('Seleccione un Contratista por favor.', 2000, 'red');
+            return false;
+            }
+
+            $.ajax({
+                url: "{% url 'qorder:export_import' %}",
+                type: 'post',
+                datatype: 'json',
+                data: filtros,
+                statusCode: {
+                    200: function(data) {
+                        $('#textarea1').html(data);
+                        Materialize.toast('Exportación Finalizada.', 2000, 'green');
+                    },
+                    300: function() {
+                        Materialize.toast('El proceso no pudo ser iniciado.', 2000, 'red');
+                        $('#textarea1').html('Atención: El proceso no pudo ser iniciado.');
+                    },
+                    301: function() {
+                        Materialize.toast('Atención: El proceso demora demasiado.', 2000, 'red');
+                        $('#textarea1').html('El proceso demora demasiado.');                    },
+                    302: function() {
+                        Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                        $('#textarea1').html('Atención: Proceso fallido, no inició el log.');
+                    },
+                    500: function() {
+                        Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                        $('#textarea1').html('Atención: Server error, contact an administrator.');
+                    }
+
+                }
+            });
+        });
+
+    </script>

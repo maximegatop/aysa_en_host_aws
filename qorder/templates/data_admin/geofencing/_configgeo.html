@@ -1,0 +1,526 @@
+{% load crispy_forms_tags %}
+{% load i18n %}
+<div class="section">
+  <div class="col-md-12">
+    <div class="row row-grid" style="margin-top: 15px;">
+     <form  id="formnew" class="form-horizontal" action="" method="post"> 
+      <div class="col-md-6">
+        <div id="map" style="width: 600px; height: 400px"></div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#asignarusuarios" aria-controls="asignarusuarios" role="tab"
+                data-toggle="tab">Asignar usuarios</a>
+              </li>
+              <li role="presentation">
+                <a href="#asignaritinerarios" aria-controls="asignaritinerarios" role="tab"
+                data-toggle="tab">Asignar itinerarios</a>
+              </li>
+              <li role="presentation">
+                <a href="#configurarnotificaciones" aria-controls="configurarnotificaciones"
+                role="tab" data-toggle="tab">Configurar notificaciones</a>
+              </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+              <div role="tabpanel" class="tab-pane active" id="asignarusuarios">
+                <table id="table_tecnicos" class="table table-bordered table-condensed table-striped" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th>{% trans "lblCode" %}</th>
+                      <th>{% trans "lblFirstName" %}</th>
+                      <th>{% trans "lblLastName" %}</th>
+                      <th>{% trans "lblTP" %}</th>
+                      <th>{% trans "lblAsignar" %}</th>
+                      <th></th>
+                      <th>Id</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for t in tecnicos %}
+                      <tr>
+                        <td>{{t.codigo|default_if_none:'--'}}</td>
+                        <td>{{t.nombre|default_if_none:'--'}}</td>
+                        <td>{{t.apellido|default_if_none:'--'}}</td>
+                        <td>{{t.tp|default_if_none:'--'}}</td>
+                        {% if t.activo == 1 %}
+                          <td><a href="#"><i class="fa fa-check fa-fw text-success"></i></a> </td>
+                          <td>1</td>
+                        {% else %}
+                          <td><a href="#"><i class="fa fa-remove fa-fw text-danger"></i></a> </td>
+                          <td></td>
+                        {% endif %}
+                        <td>{{t.id}}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="tab-pane" role="tabpanel" id="asignaritinerarios">
+                <table id="table_rutas" class="table table-bordered table-condensed table-striped">
+                  <thead>
+                    <tr>
+                      <th>{% trans "lblOficina" %}</th>
+                      <th>{% trans "lblCiclo" %}</th>
+                      <th>{% trans "lblRuta" %}</th>
+                      <th>{% trans "lblItinerario" %}</th>
+                      <th>{% trans "lblAsignar" %}</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for t in rutas %}
+                      <tr>
+                        <td>{{t.oficina|default_if_none:'--'}}</td>
+                        <td>{{t.ciclo|default_if_none:'--'}}</td>
+                        <td>{{t.ruta|default_if_none:'--'}}</td>
+                        <td>{{t.itinerario|default_if_none:'--'}}</td>
+                        {% if t.activo == 1 %}
+                          <td><a href="#"><i class="fa fa-check fa-fw text-success"></i></a> </td>
+                          <td>1</td>
+                        {% else %}
+                          <td><a href="#"><i class="fa fa-remove fa-fw text-danger"></i></a> </td>
+                          <td></td>
+                        {% endif %}
+                        <td>{{t.id}}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="tab-pane" role="tabpanel" id="configurarnotificaciones">
+               
+                 {% crispy form %}
+                 
+              </div>                  
+            </div>
+          </div>
+          </div>
+          
+        <div class="btn-group">
+          
+          <a id="btnGrabar" href="#" class="btn btn-default">Grabar cambios</a>
+        </div>
+        
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+           <script>
+
+
+
+
+$('#table_tecnicos tbody').on( 'click', 'td', function () {
+
+    var rowIdx = table_techs.cell( this ).index().row;
+    var colIdx = table_techs.cell(this).index().column;
+    //var codigo = table_techs.cell(rowIdx,5).data() ;
+    if (colIdx==4)
+    {
+       var cell = table_techs.cell(rowIdx,5).data();
+       if (cell==0)
+       {
+            table_techs.cell(rowIdx,4).data('<a href="#"><i class="fa fa-check fa-fw text-success"></i></a>').draw();
+            table_techs.cell(rowIdx,5).data('1').draw();
+            
+
+        }
+        else
+        {
+            table_techs.cell(rowIdx,4).data('<i class="fa fa-remove fa-fw text-danger"></i></a>').draw();
+            table_techs.cell(rowIdx,5).data('0').draw();
+            
+    
+       }
+    
+    }
+
+  
+} );
+
+
+    
+
+          var table_techs = $('#table_tecnicos').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+            dom: 'ft<"bottom"Bp><"clear">',
+            "columnDefs": [
+            {
+              "targets": [ 4],
+              "visible": true,
+              "sorting" : false,
+              "searchable": false
+            },
+         {
+              "targets": [ 5,6],
+              "visible": false,
+              "sorting" : false,
+              "searchable": false
+            },
+            ], 
+            pageLength:6,
+
+            select: 'multi',
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            },
+                    buttons: [
+            {
+                text: 'Marcar todas',
+                action: function () {
+                    
+                    for (rowIdx = 0; rowIdx < table_techs.rows().count(); rowIdx++) { 
+            table_techs.cell(rowIdx,4).data('<a href="#"><i class="fa fa-check fa-fw text-success"></i></a>').draw();
+            table_techs.cell(rowIdx,5).data('1').draw();
+}
+
+                }
+            },
+            {
+                text: 'Desmarcar todas',
+                action: function () {
+                  for (rowIdx = 0; rowIdx < table_techs.rows().count(); rowIdx++) {
+                                table_techs.cell(rowIdx,4).data('<i class="fa fa-remove fa-fw text-danger"></i></a>').draw();
+            table_techs.cell(rowIdx,5).data('0').draw();
+          }
+                }
+            }
+        ]
+          });
+
+          var table_rutas = $('#table_rutas').DataTable( {
+            language: datetable_languaje,
+            autoWidth: false,
+            dom: 'ft<"bottom"Bp><"clear">',
+            "columnDefs": [
+            {
+              "targets": [ 4],
+              "visible": true,
+              "sorting" : false,
+              "searchable": false
+            },
+         {
+              "targets": [ 5,6],
+              "visible": false,
+              "sorting" : false,
+              "searchable": false
+            },
+            ], 
+            pageLength:6,
+
+            select: 'single',
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            },
+           buttons: [
+            {
+                text: 'Marcar todas',
+                action: function () {
+                    
+                    for (rowIdx = 0; rowIdx < table_rutas.rows().count(); rowIdx++) { 
+            table_rutas.cell(rowIdx,4).data('<a href="#"><i class="fa fa-check fa-fw text-success"></i></a>').draw();
+            table_rutas.cell(rowIdx,5).data('1').draw();
+}
+
+                }
+            },
+            {
+                text: 'Desmarcar todas',
+                action: function () {
+                  for (rowIdx = 0; rowIdx < table_rutas.rows().count(); rowIdx++) {
+                                table_rutas.cell(rowIdx,4).data('<i class="fa fa-remove fa-fw text-danger"></i></a>').draw();
+            table_rutas.cell(rowIdx,5).data('0').draw();
+          }
+                }
+            }
+        ]
+          });
+
+
+        $("#btnGrabar").click(function() {
+        var centro = $('#id_oficina').val();
+        var m_id_to= $.map(table_geof.rows('.selected').data(), function (item) {
+            id_tp = item[3]
+        });
+        var circle = "["
+        var polygon = "["
+    
+        map.eachLayer(function(layer){
+            if (layer instanceof L.Polyline) {
+                var vertices = layer.getLatLngs();
+                
+                for(i=0;i<vertices.length;i++)
+                    {
+                     var centro = Geohash.encode(vertices[i].lat,vertices[i].lng,12);
+                     polygon += "'" + centro + "',";
+                    }
+                
+
+            }
+
+            if (layer instanceof L.Circle) {
+                var centro = Geohash.encode(layer.getLatLng().lat,layer.getLatLng().lng,12);
+                circle += "'" + centro  + "',";
+                circle += "'" + layer.getRadius()  + "',";
+               
+            }
+            
+        });
+        polygon += "]";
+        circle +=  "]";
+
+        var ids_rutas = "[";
+        var m_ids = $.map(table_rutas.rows().data(), function (item) {
+                     if( item[5]==1 )
+                        return item[6];
+                     else
+                        return '';
+                   });
+        m_ids.forEach(function(entry) {
+           if(entry)
+                  ids_rutas += "'" + entry + "',";
+           });
+        ids_rutas +=  "]";
+
+        var ids_tecnicos = "[";
+        var m_id1s = $.map(table_techs.rows().data(), function (item) {
+                    
+                     if( item[5]==1 )
+                        return item[6];
+                     else
+                        return '';
+                   });
+        
+        m_id1s.forEach(function(entry) {
+          
+           if(entry)
+                  ids_tecnicos +=  entry +",";
+           });
+        ids_tecnicos +=  "]";
+        filter = {};
+        filter.csrfmiddlewaretoken = '{{csrf_token}}';
+        filter.id_geofencing = id_tp;
+        filter.id_oficina = centro;
+        filter.ids_tecnicos = ids_tecnicos;
+        filter.ids_rutas = ids_rutas;
+        filter.circle = circle;
+        filter.polygon = polygon;
+        filter.center = Geohash.encode(map.getCenter().lat,map.getCenter().lng,12);
+        filter.zoom = map.getZoom();
+        filter.entrada =  $('#formnew').serialize();
+       
+        
+
+
+           $.ajax({
+              url: "{% url 'qorder:geofencing_savedetail' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: filter,
+              context: document.body,
+              statusCode: {
+                200: function(data) {
+                    toastr.success('Datos grabados correctamente', ' ', {timeOut: 2000}) 
+              
+                  
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                   // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+            }
+            
+             
+            });
+
+
+});
+
+
+var getShapes = function (drawnItems) {
+
+        var shapes = [];
+        shapes["polyline"] = [];
+        shapes["circle"] = [];
+        shapes["marker"] = [];
+
+        drawnItems.eachLayer(function (layer) {
+
+            // Note: Rectangle extends Polygon. Polygon extends Polyline.
+            // Therefore, all of them are instances of Polyline
+            if (layer instanceof L.Polyline) {
+                shapes["polyline"].push(layer.getLatLngs())
+            }
+
+            if (layer instanceof L.Circle) {
+                shapes["circle"].push([layer.getLatLng()],layer.getRadius())
+            }
+
+            if (layer instanceof L.Marker) {
+                shapes["marker"].push([layer.getLatLng()],layer.getRadius());
+            }
+
+        });
+
+        return shapes;
+    };
+        var latlon = Geohash.decode('{{ center }}');   // 'd29spu44697'
+        var zoom = 14;
+        {% if geofdetalle %}
+            latlon = Geohash.decode('{{geofdetalle.geohash_centro_mapa}}');
+            zoom = {{geofdetalle.zoom_mapa}};
+       {% endif %}
+
+        var map = L.map('map').setView(latlon, zoom);  //[-41.2858, 174.78682]
+        mapLink = 
+            '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        L.tileLayer(
+            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; ' + mapLink + ' Contributors',
+            maxZoom: 18,
+            }).addTo(map);
+       var drawnItems = new L.FeatureGroup();
+     map.addLayer(drawnItems);
+
+    var drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polygon: {
+          shapeOptions: {
+            color: 'purple'
+          },
+          allowIntersection: false,
+          drawError: {
+            color: 'orange',
+            timeout: 1000
+          },
+          showArea: false,
+          metric: true,
+          repeatMode: true
+        },
+        polyline: false,
+        rect: {
+          shapeOptions: {
+            color: 'steelblue'
+          },
+        },
+        circle: {
+          shapeOptions: {
+            color: 'steelblue'
+          },
+        },
+        marker: false,
+      },
+      edit: {
+        featureGroup: drawnItems
+      }
+    });
+    map.addControl(drawControl);
+    
+       {% if circle %}
+             var puntos = eval("{{circle}}");
+             latlonc = Geohash.decode(puntos[0]);
+         // Add a circle...
+         var  circleOptions = {
+                 color: 'steelblue'
+                
+             };
+          
+         var circle = new L.Circle(latlonc, puntos[1], circleOptions);
+         drawnItems.addLayer(circle);
+
+       {% endif %}
+       {% if polygon %}
+          var puntos = eval("{{polygon}}");
+        
+          var polygonPoints = [];
+          for ( i =0; i<puntos.length;i++)
+              {
+              var punto =  Geohash.decode(puntos[i]);
+              polygonPoints.push(punto);
+             }
+         var polygon = new L.Polygon(polygonPoints);
+         drawnItems.addLayer(polygon);
+           
+       {% endif %}
+
+    setTimeout(function()
+    { 
+
+        
+        map.invalidateSize();
+
+    }, 250)
+    
+
+
+
+ map.on('draw:created', function (e) {
+        var type = e.layerType,
+        layer = e.layer;
+        // solo permite dibujar una figura
+        if(drawnItems && drawnItems.getLayers().length!==0){
+           drawnItems.clearLayers();
+         }           
+        drawnItems.addLayer(layer); 
+        
+    });
+
+map.on('draw:edited', function (e) {
+    var layers = e.layers;
+    layers.eachLayer(function (layer) {
+        
+    });
+    var shapes = getShapes(layers);
+
+    
+});
+
+
+
+   
+
+
+    map.on('draw:created', function (e) {
+      var type = e.layerType,
+        layer = e.layer;
+
+ 
+
+      drawnItems.addLayer(layer);
+    });
+
+    </script>

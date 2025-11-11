@@ -1,0 +1,1047 @@
+{% load i18n %}
+      <style type="text/css">
+      .tg  {border-collapse:collapse;border-spacing:0;}
+      .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;}
+      .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;}
+
+      .tg .tg-lqy6{font-family:Verdana, Geneva, sans-serif !important;;vertical-align:top;text-align:left;vertical-align:top}
+      .tg .tg-9hbo{font-family:Verdana, Geneva, sans-serif !important;;vertical-align:top;font-weight:bold;vertical-align:top}
+      </style>
+      <div class="col-md-12">
+        <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+          <div class="panel-heading">
+            <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+              <div class="col-xs-11">
+                <h2 class="panel-title">{% trans "Revisión de lectura" %}</h2>
+              </div>
+              <div class="col-xs-1">
+                <button type="button" class="btn btn-default" onclick="cerrar();">Cerrar</button>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="panel-group" id="accordion">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">
+                    <a id="datos_suministro_collapse" data-toggle="collapse" data-parent="#accordion"
+                    href="#datos_suministro_collapsible">Datos suministro</a>
+                  </h3>
+                </div>
+                <div id="datos_suministro_collapsible" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="panel panel-default">
+                          <div class="panel-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                              <li role="presentation" class="active">
+                                <a href="#datoscliente" aria-controls="datoscliente" role="tab" data-toggle="tab">Datos cliente</a>
+                              </li>
+                              <li role="presentation">
+                                <a href="#datoscontacto" aria-controls="datoscontacto" role="tab" data-toggle="tab">Datos del contacto</a>
+                              </li>
+                            </ul>
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                              <div role="tabpanel" class="tab-pane active" id="datoscliente">
+                                <table id="datoscli" class="table table-bordered table-condensed table-striped">
+                                  <thead>
+                                   <tr>
+                                    <th>Campo</th>
+                                    <th>Valor</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Código</td>
+                                    <td>{{sumin.cliente.codigo}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Nombre</td>
+                                    <td>{{sumin.cliente.nombre|default_if_none:'--'}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Apellido 1</td>
+                                    <td>{{sumin.cliente.apellido_1|default_if_none:'--'}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Apellido 2</td>
+                                    <td>{{sumin.cliente.apellido_2|default_if_none:'--'}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td>Dirección</td>
+                                    <td>{{sumin.cliente.calle|default_if_none:'--'}} {{sumin.cliente.numero_puerta|default_if_none:' '}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                            <div class="tab-pane" role="tabpanel" id="datoscontacto">
+                             <table id="datoscont" class="table table-bordered table-condensed table-striped">
+                              <thead>
+                                <tr>
+                                  <th>Nombre</th>
+                                  <th>Apellido 1</th>
+                                  <th>Apellido 2</th>
+                                  <th>Teléfono fijo</th>
+                                  <th>Teléfono móvil</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for t in contactos %}
+                                <tr>
+                                  <td>{{t.nombre}}</td>
+                                  <td>{{t.apellido_1|default_if_none:'--'}}</td>
+                                  <td>{{t.apellido_2|default_if_none:'--'}}</td>
+                                  <td>{{t.telefono_fijo|default_if_none:'--'}}</td>
+                                  <td>{{t.telefono_movil|default_if_none:'--'}}</td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-6">
+                    <div class="panel panel-default">
+                      <div class="panel-body">
+                       <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                          <a href="#datossuministro" aria-controls="datossuministro" role="tab"
+                          data-toggle="tab">Datos del suministro</a>
+                        </li>
+                        <li role="presentation">
+                          <a href="#datosmedidor" aria-controls="datosmedidor" role="tab" data-toggle="tab">Datos del medidor</a>
+                        </li>
+                      </ul>
+                      <!-- Tab panes -->
+
+                      <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="datossuministro">
+
+                          <table id="datossum" class="table table-bordered table-condensed table-striped">
+                            <thead>
+                              <tr>
+                                <th>Campo</th>
+                                <th>Valor</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Nic</td>
+                                <td>{{sumin.punto_suministro}}</td>
+                              </tr>
+                              <tr>
+                                <td>Nis</td>
+                                <td>{{sumin.num_contrato}}</td>
+                              </tr>
+                              <tr>
+                                <td>Referencia finca</td>
+                                <td>{{sumin.ref_finca|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Ref. dirección</td>
+                                <td>{{sumin.ref_direccion|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Ref.suministro</td>
+                                <td>{{sumin.ref_suministro|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Tarifa</td>
+                                <td>{{sumin.tarifa|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Tipo Servicio</td>
+                                <td>{{sumin.tipo_servicio|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Estado suministro</td>
+                                <td>{{sumin.estado_suministro|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Calle</td>
+                                <td>{{sumin.calle|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Nro.Puerta</td>
+                                <td>{{sumin.numero_puerta|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Piso</td>
+                                <td>{{sumin.piso|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Duplicador</td>
+                                <td>{{sumin.duplicador|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Localidad</td>
+                                <td>{{sumin.localidad|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Municipio</td>
+                                <td>{{sumin.municipio|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Barrio</td>
+                                <td>{{sumin.barrio|default_if_none:'--'}}</td>
+                              </tr>
+
+                              <tr>
+                                <td>Departamento</td>
+                                <td>{{sumin.departamento|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Código postal</td>
+                                <td>{{sumin.codigo_postal|default_if_none:'--'}}</td>
+                              </tr>
+
+
+
+
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="tab-pane" role="tabpanel" id="datosmedidor">
+                          <table id="datosmed" class="table table-bordered table-condensed table-striped">
+                            <thead>
+                              <tr>
+                                <th>Campo</th>
+                                <th>Valor</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Nro.Medidor</td>
+                                <td>{{aparato.num_serie|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Tipo Aparato</td>
+                                <td>{{aparato.tipo_aparato|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Marca</td>
+                                <td>{{aparato.marca|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Intensidad</td>
+                                <td>{{aparato.tipo_intensidad|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Tipo fase</td>
+                                <td>{{aparato.tipo_fase|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Tensión</td>
+                                <td>{{aparato.tipo_tension|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Fecha fabricación</td>
+                                <td>{{aparato.fecha_fabricacion|default_if_none:'--'}}</td>
+                              </tr>
+                              <tr>
+                                <td>Fecha instalación</td>
+                                <td>{{aparato.fecha_instalacion|default_if_none:'--'}}</td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion" href="#datosconsumos_collapsible">
+                Datos consumo</a>
+              </h3>
+            </div>
+            <div id="datosconsumos_collapsible" class="panel-collapse collapse in">
+
+              <div class="panel-body">
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="panel panel-default">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Histórico de consumos</h4>
+                      </div>
+                      <div class="panel-body">
+                        <canvas id="myChartR" width="300" height="380"></canvas>
+                      </div>
+                    </div>
+
+
+
+
+
+                    <div class="panel panel-default" style="height: 389px;">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">Datos Históricos</h4>
+                      </div>
+                      <div class="panel-body">
+                        <ul class="nav nav-tabs" role="tablist">
+                          <li role="presentation" class="active">
+                            <a href="#histlecturas" aria-controls="histlecturas" role="tab" data-toggle="tab">Hist.Lecturas</a>
+                          </li>
+                          <!--<li role="presentation">
+                            <a href="#histanomalias" aria-controls="histanomalias" role="tab" data-toggle="tab">Hist.Anomalías</a>
+                          </li>
+                          <li role="presentation">
+                            <a href="#histfotos" aria-controls="histfotos" role="tab" data-toggle="tab">Hist.Fotos</a>
+                          </li>
+                        </ul>
+                      -->
+                      <!-- Tab panes -->
+                      <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="histlecturas">
+                          <table class="table table-striped table-bordered table-condensed" >
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Fecha Lectura</th>
+                                <th>Lectura</th>
+                                <th>Consumo</th>
+                                <th>Tipo Csmo.</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for t in consumos_anteriores %}
+                              <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{t.fecha_lectura|default_if_none:'--'}}</td>
+                                <td>{{t.lectura|default_if_none:'--'}}</td>
+                                <td>{{t.valor_consumo|default_if_none:'--'}}</td>
+                                <td>{{t.tipo_consumo}}</td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="tab-pane" role="tabpanel" id="histanomalias">
+                          <table class="table table-striped table-bordered table-condensed" >
+                            <thead>
+                              <tr>
+                                <th>{% trans "Código" %}</th>
+                                <th>{% trans "Descripción" %}</th>
+                                <th>{% trans "Observación" %}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for t in anomalias %}
+                              <tr>
+                                <td>{{t.id_anomalia.id_anomalia|default_if_none:'--'}}</td>
+                                <td>{{t.id_anomalia.descripcion|default_if_none:'--'}}</td>
+                                <td>{{t.id_observacion.descripcion|default_if_none:'--'}}</td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="tab-pane" role="tabpanel" id="histfotos">
+                          <div class="carousel slide" id="carousel-example" data-interval="false"
+                          data-ride="carousel">
+                          <div class="carousel-inner">
+                            <div class="item active">
+
+                            </div>
+                          </div>
+                          <a class="left carousel-control" href="#carousel-example" data-slide="prev"><i class="icon-prev  fa fa-angle-left"></i></a>
+                          <a class="right carousel-control" href="#carousel-example" data-slide="next"><i class="icon-next fa fa-angle-right"></i></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+              <div class="col-md-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">Última lectura</h4>
+                  </div>
+                  <div class="panel-body">
+                    <div id="_datos_suministro">
+                      <table class="tg">
+                        <tbody>
+                          <tr>
+                            <td class="tg-9hbo">Lecturista: </td>
+                            <td class="tg-lqy6">{{lecturista}}</td>
+                            <td class="tg-9hbo">   </td>
+                            <td class="tg-9hbo">Secuencia real: </td>
+                            <td class="tg-lqy6">{{secuencia_real}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-9hbo">Fecha lectura: </td>
+                            <td class="tg-lqy6">{{fecha|date:"d/m/Y H:i"}}</td>
+                            <td class="tg-9hbo">   </td>
+                            <td class="tg-9hbo">Fecha anterior: </td>
+                            <td class="tg-lqy6">{{fecha_anterior|date:"d/m/Y"}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-9hbo">Tope inferior: </td>
+                            <td class="tg-lqy6">{{tope_inferior}}</td>
+                            <td class="tg-9hbo">   </td>
+                            <td class="tg-9hbo">Tope superior: </td>
+                            <td class="tg-lqy6">{{tope_superior}}</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-9hbo">Lectura anterior: </td>
+                            <td class="tg-lqy6">{{lectura_anterior}}</td>
+                            <td class="tg-9hbo">   </td>
+                            <td class="tg-9hbo">Consumo anterior: </td>
+                            <td class="tg-lqy6">{{consumo_anterior}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li role="presentation" class="active">
+                        <a href="#lecturas" aria-controls="lecturas" role="tab" data-toggle="tab">Lecturas</a>
+                      </li>
+                      <li role="presentation">
+                        <a href="#anomalias" aria-controls="anomalias" role="tab" data-toggle="tab">Anomalías</a>
+                      </li>
+                      <li role="presentation">
+                        <a href="#fotos" aria-controls="fotos" role="tab" data-toggle="tab">Fotos</a>
+                      </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content" >
+                      <div role="tabpanel" class="tab-pane active" id="lecturas">
+                        <table id="tablalectura" class="table table-bordered table-condensed">
+                          <thead>
+                            <tr>
+                              <th>Lectura</th>
+                              <th>Consumo</th>
+                              <th>Lectura Modif.</th>
+                              <th>Consumo Modif.</th>
+                              <th>Tipo Csmo.</th>
+                              <th>Intentos</th>
+                              <th>Cons Hist</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for t in lecturas %}
+                            <tr>
+                              <td>{{t.lectura|default_if_none:'--'}}</td>
+                              <td>{{t.consumo|default_if_none:'--'}}</td>
+                              <td></td>
+                              <td></td>
+                              <td>{{t.tipo_consumo|default_if_none:'--'}}</td>
+                              <td>{{t.cantidad_intentos|default_if_none:'--'}}</td>
+                              <td>{{t.consulto_historico|default_if_none:'--'}}</td>
+                            </tr>
+                            {% endfor %}
+
+                          </tbody>
+                        </table>
+                        <form class="form-horizontal" role="form">
+                          <div class="form-group">
+                            <div class="col-sm-2">
+                              <label for="inputPassword3" class="control-label">Lectura</label>
+                            </div>
+                            <div class="col-sm-5">
+
+                              <input  type="text" class="form-control" id="inputCantidad" size="{{aparato.num_ruedas}}" maxlength="{{aparato.num_ruedas}}" placeholder="">
+                            </div>
+                            <div class="col-sm-5">
+
+                              <a href="#" class="btn btn-default" onclick="corregir();">Corregir</a>
+                            </div>
+                          </div>
+
+                          <div class="form-group">
+                            <div class="col-sm-5"> <button type='button' class="btn btn-default"  onclick="confirmar();">Confirmar lectura relevada
+                            </button></div>
+
+                            <div class="col-sm-5"> <button type='button' class="btn btn-default"  onclick="modificar();">Confirmar lectura modificada
+                            </button></div>
+                          </div>
+
+                        </form>
+
+                      </div>
+                      <div class="tab-pane" role="tabpanel" id="anomalias">
+                        <table id="anomalia_table"class="table table-striped table-bordered table-condensed" >
+                          <thead>
+                            <tr>
+                              <th>{% trans "Código" %}</th>
+                              <th>{% trans "Descripción" %}</th>
+                              <th>{% trans "Comentario Adicional" %}</th>
+                              <th>{% trans "Observación" %}</th>
+                              <th>{% trans "Editar" %}</th>
+                              <th>{% trans "Eliminar" %}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for t in anomalias %}
+                            <tr>
+                              <td>{{t.id_anomalia.id_anomalia|default_if_none:'--'}}</td>
+                              <td>{{t.id_anomalia.descripcion|default_if_none:'--'}}</td>
+                              <td>{{t.id_observacion|default_if_none:'--'}}</td>
+                              <td>{{t.comentario|default_if_none:'--'}}</td>
+                              <td>
+                                    <p data-placement="top" data-toggle="tooltip" title={% trans "lblEdit" %}>
+
+                                      <button class="btn btn-primary btn-xs" data-title="Editar" id="btnEditar"
+                                      onclick="modifanom('{{t.id_anomalia.id_anomalia}}','{{t.id_anomalia.descripcion}}','{{t.comentario}}');">
+                                          <span class="glyphicon glyphicon-pencil"></span>
+                                      </button>
+
+                                    </p>
+                              </td>
+                              <td>
+                                <p id="enable" data-placement="top" data-toggle="tooltip" title='{% trans "Eliminar" %}' %}>
+                                  <button data-target="modal1" class=" btn-btn-xs" data-title="Eliminar" id="btnEliminar"
+                                  onclick="deleteruta('{{t.id_anomalia.id_anomalia}}');">
+                                  <span class="glyphicon glyphicon-remove"  style="color:red"></span>
+                                </button>
+
+                              </p>
+
+                            </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                        <button class="btn btn-primary btn-md" data-title="Editar" id="btnAddTech" {% if  ct.id_workunit %}disabled{% endif %}
+         onclick="addanom();">
+         <span class="glyphicon glyphicon-plus"></span>{% trans "lblAdd" %}
+       </button>
+                      </div>
+
+                      <div class="tab-pane" role="tabpanel" id="fotos">
+<div id="carousel-generic" class="carousel slide" data-ride="carousel" data-interval="0" data-slide-to="{{forloop.counter0}}">
+<div class="carousel-inner" role="listbox">
+{% for item in fotos %}
+<div class="item {% if forloop.first %} active {%     endif %}">
+  <div align="center">
+    <img alt="Embedded Image" class="thumbnail zoom" src="data:image/png;base64,{{ item.foto }}" />
+              <div class="carousel-caption">
+            <h2>{{item.descripcion_foto}}</h2>
+
+          </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+  <a class="left carousel-control" href="#carousel-generic" role="button" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+  </a>
+  <a class="right carousel-control" href="#carousel-generic" role="button" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+  </a>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">Mapa</h4>
+                </div>
+                <div class="panel-body">
+                  <div id="mapa" >
+                    {% include 'ordenes/revision/_mapa.html'  with feedback_form=feedback_form  %}
+                  </div>
+                </div>
+                </div
+              </div>
+            </div>
+          </div>
+          <div class="row">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+<div id="modalmodif" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                          class="sr-only">Cerrar</span></button>
+      <h2>Modificar Anomalía</h2>
+    </div>
+    <div class="modal-body" style="height:180px">
+
+                 <div class='col-xs-5'>
+                  <label for="inputPassword3" class="control-label">Anomalía</label>
+
+
+                 <input  type="text" class="form-control" id="inputanom" style="width: 200px;" placeholder="">
+                 </div>
+
+                  <div class='col-xs-5 col-xs-offset-2'>
+                 <label for="inputPassword3" class="control-label">Descripción</label>
+
+
+                 <input  type="text" class="form-control" id="inputdesc"  placeholder="" style="width: 200px;">
+
+                  </div>
+                <div class='col-xs-12' style="top:10px">
+                 <label for="inputPassword3" class="control-label">Comentario</label>
+
+
+                 <input  type="text" class="form-control" id="inputcom"  placeholder="">
+                </div>
+    </div>
+    <div class="modal-footer">
+      <button id="btncancelar" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+      <button id="btnguardar" type="button" class="btn btn-primary" data-dismiss="modal">Guardar</button>
+    </div>
+  </div>
+  </div>
+  </div>
+
+<div id="modaladd" class="modal  modal-wide fade" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                          class="sr-only">Cerrar</span></button>
+      <h2>Agregar Anomalía</h2>
+    </div>
+    <div class="modal-body" style="height:180px">
+
+                 <div class="input-field col-xs-12 left">
+
+              <div class="form-inline" >
+
+               <label>{% trans "Localidad" %}</label>
+                 <select class="select form-control" id="select_anomalia" name="localidad">
+
+                  <option value="anomalia">{% trans "Anomalias" %}</option>
+
+                  {% for ct in anomalia.all %}
+
+                  <option value="{{ct.id_anomalia}}">{{ct.id_anomalia}} - {{ct.descripcion}}</option>
+                  {% endfor %}
+                </select>
+               </div>
+             </div>
+
+
+                <div class='col-xs-12' style="top:10px">
+                 <label for="inputPassword3" class="control-label">Comentario</label>
+
+
+                 <input  type="text" class="form-control" id="inputcomadd"  placeholder="">
+                </div>
+    </div>
+    <div class="modal-footer">
+      <button id="bntcancel" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+      <button id="btnsave" type="button" class="btn btn-primary" data-dismiss="modal">Guardar</button>
+    </div>
+  </div>
+  </div>
+  </div>
+
+
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="myModalLabel"></h4>
+        </div>
+        <div class="modal-body" >
+          <div class="top1 thumbnail zoom"  >
+            <!-- Change image source for large popup-->
+            <img src="..." class="img-responsive" alt="Responsive image">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+</div>
+</div>
+</div>
+
+<script type="text/javascript">
+
+var table_lecturar = $('#tablalectura').DataTable( {
+  language: datetable_languaje,
+  autoWidth: true,
+  searching: false,
+  ordering: false,
+  info: false,
+
+  select: false,
+  preDrawCallback: function (settings) {
+    var api = new $.fn.dataTable.Api(settings);
+    var pagination = $(this)
+    .closest('.dataTables_wrapper')
+    .find('.dataTables_paginate');
+
+    if (api.page.info().pages <= 1) {
+      pagination.hide();
+    }
+    else {
+      pagination.show();
+    }
+
+  }
+});
+
+$(function () {
+  $("#inputCantidad").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter
+            if ($(this).val().length < {{aparato.num_ruedas}} || $.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+                // Allow: Ctrl+A
+                // (e.keyCode == 65 && e.ctrlKey === true) ||
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+              return;
+            }
+            else {
+              event.preventDefault();
+            }
+            // Ensure that it is a number and stop the keypress
+            if ($(this).val().length < {{aparato.num_ruedas}} || (e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+              e.preventDefault();
+            }
+            else {
+              event.preventDefault();
+            }
+          });
+    }); // end of $
+
+function corregir()
+{
+
+ var position = window.pageYOffset;
+ var valor = $("#inputCantidad").val();
+ if (valor=="")
+  return;
+var lecanterior =  $("#lecturaanterior").val();
+var consumo = valor -  {{lectura_anterior}};
+var cell = table_lecturar.cell( 0, 2);
+cell.data( valor ).draw();
+var cellc = table_lecturar.cell( 0, 3);
+cellc.data(consumo).draw();
+window.scrollTo(0, position);
+}
+
+function confirmar()
+{
+
+ $.ajax({
+  url: "{% url 'qorder:confirmar_lectura' %}",
+  type: 'post',
+  headers: {'X-CSRFToken': '{{ csrf_token }}'},
+  datatype: 'json',
+  data: {numero_orden:'{{orden.numero_orden}}',lectura:{{lecturas.0.lectura}}},
+  statusCode: {
+    200: function(data) {
+     refresh();
+     cerrar();
+   },
+
+   500: function() {
+    toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+  }
+}
+});
+
+}
+
+
+function modificar()
+{
+
+  var cell = table_lecturar.cell( 0, 2);
+  lectura_nueva =  cell.data();
+  if (lectura_nueva=='')
+  {
+   toastr.error('Ingrese una nueva lectura.', ' ', {timeOut: 2000})
+   return;
+ }
+ var cellc = table_lecturar.cell( 0, 3);
+ consumo = cellc.data();
+ $.ajax({
+  url: "{% url 'qorder:corregir_lectura' %}",
+  type: 'post',
+  headers: {'X-CSRFToken': '{{ csrf_token }}'},
+  datatype: 'json',
+  data: {numero_orden:'{{orden.numero_orden}}',lectura:{{lecturas.0.lectura}},lectura_nueva:lectura_nueva ,consumo:consumo},
+  statusCode: {
+    200: function(data) {
+     refresh();
+     cerrar();
+   },
+   500: function() {
+    toastr.error('Esta Lectura ya fue modificada', ' ', {timeOut: 2000})
+  }
+}
+});
+}
+
+function cerrar()
+{
+  $("#revision").html('');
+  $("#revision").hide();
+  $("#consulta").show();
+
+}
+
+
+
+
+function LoadChart() {
+  var periodos = [];
+  var consumos = [];
+  {% for t in consumos_anteriores %}
+  periodos.push("{{t.fecha_lectura|date:'m / Y'|default_if_none:'--'}}");
+  consumos.push({{t.valor_consumo}});
+  {% endfor %}
+  
+  
+  var promedio = 0;
+
+  for( i=0; i<consumos.length; i++ ){
+    promedio += consumos[i];
+  }
+  promedio = promedio / consumos.length;
+  var prom=[];
+  for( var i=0; i<consumos.length; i++ ){
+   prom.push(promedio);
+ }
+ 
+
+ var barChartData = {
+  labels: periodos,
+  datasets: [{
+    type: 'bar',
+    label: "Consumos",
+    data: consumos,
+    fill: false,
+    backgroundColor: '#71B37C',
+    borderColor: '#71B37C',
+    hoverBackgroundColor: '#71B37C',
+    hoverBorderColor: '#71B37C',
+    yAxisID: 'y-axis-1'
+  }, {
+    label: "Promedio",
+    type:'line',
+    data: prom,
+    fill: false,
+    borderColor: '#EC932F',
+    backgroundColor: '#EC932F',
+    pointBorderColor: '#EC932F',
+    pointBackgroundColor: '#EC932F',
+    pointHoverBackgroundColor: '#EC932F',
+    pointHoverBorderColor: '#EC932F',
+    yAxisID: 'y-axis-2'
+  } ]
+};
+
+var ctx = document.getElementById("myChartR").getContext("2d");
+
+window.myBar = new Chart(ctx, {
+  type: 'bar',
+  data: barChartData,
+  options: {
+    responsive: false,
+    tooltips: {
+      mode: 'label'
+    },
+    elements: {
+      line: {
+        fill: false
+      }
+    },
+    scales: {
+      xAxes: [{
+        display: true,
+        gridLines: {
+          display: false
+        },
+        labels: {
+          show: true,
+        }
+      }],
+      yAxes: [{
+        type: "linear",
+        display: true,
+        position: "left",
+        id: "y-axis-1",
+        gridLines:{
+          display: false
+        },
+        labels: {
+          show:true,
+
+        }
+      }, {
+        type: "linear",
+        display: false,
+        position: "right",
+        id: "y-axis-2",
+        gridLines:{
+          display: false
+        },
+        labels: {
+          show:true,
+
+        }
+      }]
+    }
+  }
+});
+}
+$('.thumbnail').on('click', function(){
+ var img = $(this).find('img');
+ 
+ 
+ $('.img-responsive').attr('src', this.currentSrc);
+ $('#myModal').modal('toggle');
+});
+
+
+
+function deleteruta(data)
+{
+  var delanom=data;
+  $.ajax({
+      url: "{% url 'qorder:deleteanom' %}",
+      type: 'post',
+      datatype: 'json',
+      data: {anomalia:delanom,numero_orden:'{{orden.numero_orden}}'},
+      statusCode: {
+        200: function() {
+          refresh();
+          cerrar();
+        },
+        300: function() {
+            toastr.error('No se puede eliminar esta anomalia.', ' ', {timeOut: 2000})
+        },
+        500: function() {
+
+          toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+        }
+        }
+    });
+
+}
+
+function modifanom(anom_modif,desc_modif,comen_modif)
+{
+
+  $('#inputanom').val(anom_modif);
+  $('#inputdesc').val(desc_modif);
+  $('#inputcom').val(comen_modif);
+  $("#inputanom").prop('disabled', true);
+  $("#inputdesc").prop('disabled', true);
+  $('#modalmodif').modal('show');
+
+}
+$("#btncancelar").on("click",function(){
+  $('#inputanom').val('');
+  $('#inputdesc').val('');
+  $('#inputcom').val('');
+  $('#modalmodif').modal('hide');
+});
+
+$("#btnguardar").on("click",function(){
+  var anom=$('#inputanom').val();
+  var desc=$('#inputdesc').val();
+  var coment=$('#inputcom').val();
+  $('#modalmodif').modal('hide');
+  $.ajax({
+      url: "{% url 'qorder:updateanom' %}",
+      type: 'post',
+      datatype: 'json',
+      data: {anomalia:anom,numero_orden:'{{orden.numero_orden}}',coment:coment,desc:desc},
+      statusCode: {
+        200: function() {
+        $('#modalmodif').modal('hide');
+        $(document.body).removeClass("modal-open");
+        $(".modal-backdrop").remove();
+          refresh();
+          cerrar();
+
+        },
+        300: function() {
+              toastr.error('No se puede modificar este tipo de anomalia', ' ', {timeOut: 2000})
+        },
+        500: function() {
+
+          toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+        }
+        }
+    });
+
+
+});
+
+function addanom()
+{
+
+  $('#modaladd').modal('show');
+
+}
+
+
+$("#btnsave").on("click",function(){
+  var anomalia=$('#select_anomalia').val();
+  var coment=$('#inputcomadd').val();
+
+  $.ajax({
+      url: "{% url 'qorder:addanomalia' %}",
+      type: 'post',
+      datatype: 'json',
+      data: {anomalia:anomalia,numero_orden:'{{orden.numero_orden}}',coment:coment},
+      statusCode: {
+        200: function() {
+          $('#modaladd').modal('hide');
+          $(document.body).removeClass("modal-open");
+          $(".modal-backdrop").remove();
+          refresh();
+          cerrar();
+        },
+        300: function() {
+            toastr.error('No se puede generar la anomalia, Ya existe para la orden', ' ', {timeOut: 2000})
+        },
+        500: function() {
+
+          toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+        }
+        }
+    });
+
+
+});
+
+
+</script>

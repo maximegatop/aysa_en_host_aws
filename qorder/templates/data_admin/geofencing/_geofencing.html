@@ -1,0 +1,248 @@
+{% load qorder_tags %}
+{% load i18n %}
+
+<div class="col-md-12">
+  <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">{% trans "tituloGeofencing" %}</h2>
+        </div>
+        <div class="input-field col-xs-6 text-right">
+          <div class="form-inline">
+            <label>{% trans "lblOffice" %}</label>
+            <select class="select form-control" id="id_oficina"
+              name="oficina" onchange="searchGeof()">
+              {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "lblOffice" %}</option>
+              {% endif %}
+              {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row"></div>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Zonas geofencing</a>
+            </h4>
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+              <div class="row">
+             
+                <div id="_table_geof" class="col-xs-12">
+               
+                </div>
+             
+
+          
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#map_collapsible">
+                Área</a>
+                </h4>
+              </div>
+              <div id="map_collapsible" class="panel-collapse collapse">
+                <div id="_detail_geofencing"> </div>
+              </div>
+            </div>
+          </div>
+          </div>
+          </div>
+
+<div id="new" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+
+</div>
+
+
+        <script>
+  
+            function geof_new(){
+             var modal = $("new");
+             var centro = $('#id_oficina').val();
+             $('#id_oficinah').val(centro);
+
+             $.ajax({
+              url: "{% url 'qorder:geofencing_new' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id_centro:centro},
+              context: document.body
+            }).done(function(response) 
+            {
+              
+              $('#new').html(response);
+              $('#new').modal('toggle');
+            });
+           }
+  
+         $("#filter_collapse").on('click', function(){  $('#map_collapsible').collapse('hide');});
+
+
+     $("#btnRequestTechs").on('click', function(){
+       cargarDatos();
+       $('#filter_collapsible').collapse('hide');
+       $('#map_collapsible').collapse('show');
+     });
+
+         function btnSaveOnClick(id)
+          {
+
+            var modal = $("new");
+
+            $('#id_oficinah').val($('#id_oficina').val());
+            var data = $('#formgeofencing').serialize();
+
+            $.ajax({
+              url: "{% url 'qorder:geofencing_save' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: data,
+              statusCode: {
+                200: function(data) {
+                   $('#new').modal('toggle');
+                   $('body').removeClass('modal-open');
+                   $('.modal-backdrop').remove();
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('Complete los campos obligatorios', ' ', {timeOut: 2000})
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                   $("#_table_geof" ).html(xhr);   
+
+                 }
+               }
+             });
+
+          }
+
+ 
+    function cargarDatos(){
+        //TODO: ASIGNAR LA ORDEN
+        var id_tecnico="";
+        var m_ids = $.map(table_techs_rm.rows('.selected').data(), function (item) {
+            return item[0];
+        });
+        var count = 0;
+        m_ids.forEach(function(entry) {
+            id_tecnico += entry;
+            count++;
+        });
+
+        var fecha = $('#fecha').pickadate('picker').get('select', 'yyyymmdd');
+
+        if (count<1){
+           toastr.error('Seleccione un técnico.',' ', 2000);
+            return false;
+        }
+        if (fecha.length<1){
+           toastr.error('Seleccione fecha.',' ', 2000);
+            return false;
+        }
+
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_tecnico = id_tecnico;
+        filtros.fecha = fecha;
+        filtros.hours_min = slider.noUiSlider.get()[0];
+        filtros.hours_max = slider.noUiSlider.get()[1];
+        filtros.aproximar = $('#aprox_direction').is(":checked");
+
+        $.ajax({
+            type: "post",
+            url: "{% url 'qorder:get_map_route' %}",
+            data: filtros,
+            statusCode: {
+                300: function() {
+                   toastr.error('Seleccione al menos un técnico.',' ', 2000);
+                },
+                500: function() {
+                   toastr.error('Error en el servidor, contacte al administrador.',' ', 2000);
+                }
+
+            },
+            success: function( strData ){
+                
+                $('#push_map').html(strData);
+                
+
+            }
+        });
+
+    }
+
+ //$(document).ready(function(){
+  $('#filter_collapsible').collapse('show');
+  
+   
+
+  $("#filter_collapse").on('click', function(){  $('#map_collapsible').collapse('hide');});
+  
+  $("#btnRequestTechs").on('click', function(){ btnRequestTechs(); });
+  //$( "#datepicker" ).datepicker();
+
+  
+
+  function searchGeof(){
+  var centro = $('#id_oficina').val();
+  
+   $('#id_oficinah').val(centro);
+  $.ajax({
+  url: "{% url 'qorder:geofencing_list' %}",
+  type: 'post',
+  datatype: 'json',
+  data: {id_centro:centro},
+  statusCode: {
+  200: function(data) {
+  $("#_table_geof").html(data);
+  },
+  301: function() {
+  //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+  },
+  500: function() {
+  toastr.error('Server Error.',' ', 2000);
+  }
+  },
+  sucess: function(response){
+  }
+  });
+  }
+  {% if user.work_units.all|length_is:'1' %}
+    
+      //var latlon = Geohash.decode('u120fxw');
+    searchGeof();
+  {% endif %}
+
+   
+ 
+  </script>

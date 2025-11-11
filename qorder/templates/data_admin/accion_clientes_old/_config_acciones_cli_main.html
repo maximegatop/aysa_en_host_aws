@@ -1,0 +1,1641 @@
+{% load i18n %}
+<div class="col-md-12">
+    <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0,
+        0, .25);">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-11">
+                    <h2 class="panel-title" id="pntitle" ></h2>
+                </div>
+                <div class="col-md-1">
+                    <button id="btnBackCancelar" class="btn
+                    btn-default
+                     hide" onclick="isReturn(true);">
+                        Regresar</button>
+                </div>
+               
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-12">
+                <div class="panel">
+                    <div id="body_cfg">
+                            <div id="tablaconfiguraciones">
+                                {% include 'data_admin/accion_clientes/_table_configuraciones.html' with feedback_form=feedback_form %}
+                            </div>
+                    </div>
+                    <div id="tabs" class="hide">
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li class="active"><a href="#config" data-toggle="tab"> <span><i
+                                            class="fa fa-cog"></i></span>
+                                    Configurar acciones</a></li>
+                            <li class=""><a href="#config_acciones" data-toggle="tab"> <span><i
+                                            class="fa fa-exchange"></i></span>
+                                    Asignar/Desasignar configuraciones a
+                                    suministro</a>
+                            </li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                            <div class="tab-pane fade in active" id="config">
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="admin_config">
+                                        <div class="col-md-12">
+                                            <div class="col-md-6">
+                                                {% include 'data_admin/accion_clientes/_table_acciones.html' with feedback_form=feedback_form %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="ddlOrdenEjecucion">Orden
+                                                            de ejecución</label>
+                                                        <select class="select
+                                                            form-control" id="ddlOrdenEjecucion" name="ordenejecucion">
+                                                            <option value="1" selected>1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                            <option value="5">5</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="ddlTipoAcccion">Tipo
+                                                            acción</label>
+                                                        <select class="select
+                                                            form-control" id="ddlTipoAcccion" name="TipoAcccion">
+                                                            <option value="FOTO" selected>FOTO</option>
+                                                            <!-- <option value="BARRAS" disabled>CÓDIGO
+                                                                DE BARRAS</option> -->
+                                                            <!-- <option value="MENSAJE" disabled>MENSAJE</option>
+                                                            <option value="ENCUESTA" disabled>ENCUESTA</option>
+                                                            <option value="VOZ" disabled>MENSAJE
+                                                                DE VOZ</option>
+                                                            <option value="TEXTO" disabled>INGRESO
+                                                                DE TEXTO</option> -->
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="txtParamAdicional">Parámetro
+                                                            adicional</label>
+                                                        <input id="txtParamAdicional" class="form-control" type="text"
+                                                            value="" autocomplete="off" maxlength="99" name="txtParamAdicional">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-check" hidden>
+                                                            <input id="chkObligatorio" class="form-check-input"
+                                                                type="checkbox" value="">
+                                                            <label class="form-check-label"
+                                                                for="chkObligatorio">Obligatorio</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <button id="btnAsignarAccion" class="btn
+                                                        btn-primary
+                                                        pull-right" onclick="asignarAccionAConfig();">
+                                                        
+                                                        Asignar
+                                                        acción</button>
+                                                    <!-- <button id="btnBackCancelar" class="btn
+                                                    btn-danger
+                                                    pull-right" onclick="isReturn(true);" style="margin-right: 1%;">
+                                                        <span class="fa fa-mail-reply"></span>
+                                                        Cancelar</button> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <hr>
+                                            <h3> Detalles de Configuración
+                                            </h3>
+                                            <div id="accionesconfig">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="config_acciones">
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="asignclientes">
+                                        <div class="col-md-12">
+
+                                            <div class="btn-group
+                                                btn-toggle">
+                                                <button class="btn btn-sm
+                                                    btn-default" onclick="showDivClientes('1')" id="btnBuscarSum">
+                                                    <span class="fa fa-search"></span>
+                                                    Buscar
+                                                    Suministros</button>
+                                                <button class="btn btn-sm
+                                                    btn-primary active" onclick="showDivClientes('0')"
+                                                    id="btnSumSelect">
+                                                    <span class="fa fa-check"></span>
+                                                    Suministros
+                                                    seleccionados</button>
+
+                                            </div>
+
+                                        </div>
+                                        <br>
+                                        <br>
+                                        <br>
+
+                                        <div class="col-md-12">
+                                            <div id="clientesasignados" style="display: block">
+                                                <div>
+                                                    <div id="clientesconfig">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="buscarclientes" style="display: none">
+                                            <div id="asignarclientes">
+                                                {% include 'data_admin/accion_clientes/_filtros_cliente.html' with feedback_form=feedback_form %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div> 
+            </div>
+        </div>
+        <div class="panel-footer show" id="footerpanel">
+           
+            <button id="btnNuevaConfiguracion" class="btn
+            btn-primary " onclick="agregarNuevaConfig();">
+            <span class="fa fa-plus"></span>
+            Nueva configuración
+        </button>
+        <button id="btnNuevaAccion" class="btn
+            btn-primary" onclick="isReturn(false);" disabled style="margin-left: 1%;">
+            <span class="glyphicon glyphicon-plus"></span>
+            Agregar Acción
+        </button>
+        <button id="btnDeleteConfiguracion" class="btn
+                    btn-danger pull-right">
+                    <i class="fa fa-trash"></i>
+                    Borrar todas las configuraciones
+                </button>
+        </div>
+    </div>
+</div>
+<!-- VENTANAS MODALES------------------**************************************************************** -->
+<div id="ModalAddConfiguracion" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title">
+                   
+                        Nueva configuración
+                </h3>
+            </div>
+
+            <div class="modal-body" style="padding-left: 80px;padding-right:
+                80px;padding-top: 20px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="id_codigo" class="form-group">
+                            <label for="id_codigo" class="control-label requiredField">
+                                Código
+                                <span class="asteriskField">*</span>
+                            </label>
+                            <div class="controls">
+                                <input class="text form-control" id="CodigoConfig" name="codigo" type="text" required validate
+                                    autocomplete="off" maxlength="50">
+                            </div>
+        
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="id_descripcion" class="form-group">
+                            <label for="id_descripcion" class="control-label
+                                requiredField">
+                                Descripción
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="controls">
+                                <input class="text form-control" id="DescripcionConfig" name="descripcion" type="text" requiere
+                                    validate autocomplete="off" maxlength="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="id_activo" class="form-group">
+                            <label for="id_activo" class="control-label requiredField">
+                                Activo
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="controls">
+                                <select class="select form-control" id="estadoConfig" name="oficina">
+                                    <option value="1">Si</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="id_fecha" class="form-group">
+                            <label for="id_fecha" class="control-label requiredField">
+                                Fecha de vigencia
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                                <input id="fecha_validacionConfig" type="text" class="form-control" data-provide="datepicker"
+                                    data-date-format="dd/mm/yyyy" autocomplete="off" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="CloseAddParam">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="SaveAddConfig">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="ModalEditConfiguracion" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="modal-title">
+                   
+                        Editar configuración
+                </h3>
+            </div>
+
+            <div class="modal-body" style="padding-left: 80px;padding-right:
+                80px;padding-top: 20px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="id_codigo_edit" class="form-group">
+                            <label for="id_codigo" class="control-label requiredField">
+                                Código
+                                <span class="asteriskField">*</span>
+                            </label>
+                            <div class="controls">
+                                <input class="text form-control" id="Codigo_edit" name="codigo" type="text" requiere validate
+                                    autocomplete="off" value="LALALA" disabled maxlength="50">
+                            </div>
+        
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-6">
+                        <div id="id_descripcion_edit" class="form-group">
+                            <label for="id_descripcion" class="control-label
+                                requiredField">
+                                Descripción
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="controls">
+                                <input class="text form-control" id="Descripcion_edit" name="descripcion" type="text" requiere
+                                    validate autocomplete="off" value="desc" maxlength="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="id_activo_edit" class="form-group">
+                            <label for="id_activo" class="control-label requiredField">
+                                Activo
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="controls">
+                                <select class="select form-control" id="estado_edit" name="oficina">
+                                    <option value="1">Si</option>
+                                    <option value="0" selected>No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="id_fecha_edit" class="form-group">
+                            <label for="id_fecha" class="control-label requiredField">
+                                Fecha de Vigencia
+                                <span class="asteriskField">*</span>
+                            </label>
+        
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </div>
+                                <input id="fecha_validacion_edit" type="text" class="form-control" data-provide="datepicker"
+                                    data-date-format="dd/mm/yyyy" autocomplete="off" value="20/05/2017" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <i><b><span id="vencido"></span></b></i>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="CloseEditParam">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="SaveEditConfig">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="ModalMsgConfirmDeleteConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar la configuración de acciones?</b></h3>
+                        <p>
+                            <i>Este proceso eliminará las acciones configuradas
+                                y los clientes asignado al mismo.</i>
+                        </p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="DeleteConfig" type="button" class="btn btn-danger" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div id="ModalMsgConfirmDeleteAccionConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar la acción configurada?</b></h3>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="DeleteAccionConfig" type="button" class="btn
+                    btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div id="ModalMsgConfirmDeleteClienteConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar el cliente configurado?</b></h3>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="DeleteClienteConfig" type="button" class="btn
+                    btn-danger" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div id="ModalMsgConfirmAsignarClienteConfig" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la configuración los clientes
+                                seleccioandos?</b></h3>
+                        <br>
+                        <p><i>
+                                La configuración estará disponible al realizarse
+                                una generación de datos nueva para el
+                                dispositivo
+                                móvil.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfig" type="button" class="btn
+                    btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<!-- VENTANA MODAL PARA ELIMINAR CFG -->
+<div id="ModalMsgEliminarAllCfg" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar todas las configuraciones?</b></h3>
+                        <p>
+                            <i>Este proceso eliminará todas las configuraciones con sus acciones establecidas
+                                y los clientes asignados a la misma.</i>
+                        </p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnDeleteAllCfg" type="button" class="btn btn-danger" data-dismiss="modal" onclick="deleteMasivo()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- VENTANA MODAL PARA ASIGNAR CLIENTE ALEATORIO -->
+<div id="ModalMsgConfirmAsignarClienteConfigAleatorio" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la configuración los clientes aleatorios?</b></h3>
+                        <br>
+                        <p><i>
+                                La configuración estará disponible al realizarse
+                                una generación de datos nueva para el
+                                dispositivo
+                                móvil.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignClienteAleatorio()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- VENTANA MODAL PARA ASIGNAR MASIVAMENTE TODOS LOS CLIENTES DE UNA/S OFICINA/S -->
+<div id="ModalMsgConfirmAsignarClienteMasivo" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la configuración todos los clientes de la oficina?</b></h3>
+                        <br>
+                        <p><i>
+                                La configuración estará disponible al realizarse
+                                una generación de datos nueva para el
+                                dispositivo
+                                móvil.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignarClientesMasivoxOficina()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- MODAL PARA ELIMINAR TODOS LOS CLIENTES ASIGNADOS A UNA CONFIG -->
+<div id="ModalMsgEliminarAllClientes" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea eliminar todos los clientes asignados a esta configuración?</b></h3>
+                        <br>
+                        <p><i>
+                                Este proceso eliminara todos los clientes asignados a esta configuración.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="deleteAllClientesCfg()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- VENTANA MODAL ASIGNACION ALEATORIA DE CLIENTES MASIVOS DE UNA OFICINA -->
+<div id="ModalAsignarClientesMasivos" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2">
+                        <span><i class="fa fa-question-circle-o fa-4x"></i></span>
+                    </div>
+                    <div class="col-md-10">
+                        <h3><b>¿Desea asignar a la configuración todos los clientes de forma aleatoria?</b></h3>
+                        <br>
+                        <p><i>
+                                La configuración estará disponible al realizarse
+                                una generación de datos nueva para el
+                                dispositivo
+                                móvil.
+                            </i></p>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnAsignarClientesConfigAleatorio" type="button" class="btn
+                    btn-primary" data-dismiss="modal" onclick="asignClientesMasivoAleatorios()">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<!-- JS -->
+<script>
+    //SETEO LBL
+    $("#pntitle").html("Configuración de acciones de lectura")
+
+    //VARIABLES JS GLOBAL
+    var _codigo = "";
+    var _cod_accion = "";
+
+    var _ordenDel = "";
+    var _codCliDel = "";
+    var _ids_cli_delete = "";
+    var _ids_cli_asign = "";
+
+    var table_asig_conf_cli;
+    var tabla_result_clientes;
+    
+    //AJUSTAR TABLAS 
+    function adjust(controlname) {
+        controlname.columns.adjust();
+    }
+    //VALIDAR CAMPOS CFG
+    function validar(codigo, desc, fec) {
+        var letters = /^[A-Za-z0-9]+$/;
+        var codigo_n_null = $(codigo).val();
+        var desc_n_null = $(desc).val();
+        var fec_n_null = $(fec).val();
+        
+        if (codigo_n_null == "") {
+            toastr.error('Debe ingresar un Código!', 'Atención!!!', { timeOut: 2000 })
+            $(codigo).focus();
+            return false;
+        }
+
+        if (!codigo_n_null.match(letters)) {
+            toastr.error('Debe ingresar un Código correcto!', 'Atención!!!', { timeOut: 2000 })
+            $(codigo).focus();
+            return false;
+        }
+
+        if (desc_n_null == "") {
+            toastr.error('Debe ingresar una Descripción!', 'Atención!!!', { timeOut: 2000 })
+            $(desc).focus();
+            return false;
+        }
+
+        if (fec_n_null == "") {
+            toastr.error('Debe ingresar una Fecha de Vigencia!', 'Atención!!!', { timeOut: 2000 })
+            $(fec).focus();
+            return false;
+        }
+        if (esVencido(fec)) {
+            toastr.error("Debe ingresar una fecha de vigencia mayor a " + new Date(Date.now()).toLocaleDateString(), 'Atención!!!', { timeOut: 2000 })
+            return false;
+        }
+        return true;
+    }
+    //VALIDAR FECHA DE VIGENCIA
+    function esVencido(fecha) {
+        fec = $(fecha).val()
+        var fec_converted = fec.split("/");
+        var fec_selected = new Date(fec_converted[2] + "-" + fec_converted[1] + "-" + fec_converted[0]);
+        var $today = new Date(Date.now())
+        if (fec_selected < $today) {
+            $(fecha).focus();
+            return true;
+        }
+        return false
+    }
+    //BTN AGREGAR NUEVA CFG
+    function agregarNuevaConfig() {
+        $('#ModalAddConfiguracion').modal('show');
+    }
+    //GUARDAR CFG X MODAL
+    $("#SaveAddConfig").on('click', function () {
+        if (validar("#CodigoConfig", "#DescripcionConfig", "#fecha_validacionConfig"))
+            SaveAddConfig();
+    });
+    //PROCESO INSERT NUEVA CFG
+    function SaveAddConfig() {
+        var idconfig = $("#CodigoConfig").val();
+        var descrip = $("#DescripcionConfig").val();
+        var estado = "";
+
+        if ($("#estadoConfig").val() == "1")
+            estado = "1";
+        else
+            estado = "0";
+
+        var fechavigencia = $("#fecha_validacionConfig").val();
+
+        $.ajax({
+            url: "{% url 'qorder:nueva_configuracion' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: idconfig,
+                descrip_config: descrip,
+                estado_config: estado,
+                fechavigencia_config: fechavigencia
+            },
+            statusCode: {
+                200: function (data) {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    $("#tablaconfiguraciones").html(data);
+                    $("#CodigoConfig").val("");
+                    $("#DescripcionConfig").val("");
+                    $("#estadoConfig").val("1"); //Si
+
+                    var date = new Date();
+                    $("#fecha_validacionConfig").datepicker("setDate", date);
+                    toastr.success("Código de configuración registrado correctamente", "Atención!!", 1500);
+                    $("#txtConfigCount").text("") 
+                    $("#txtConfigCount").text($("#txtConfigCount").text()+" (Existen cambios, actualize)") //LBL CANT CFG'S
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+
+    }
+    //EDIT CONFIG-- ONCLICK-- GET CFG (No edit)
+    function editConfig(id) {
+        if (id == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para editar", "Atención!!", 1500);
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'qorder:getconfiguracion_edit' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: id,
+            },
+            statusCode: {
+                200: function (data) {
+
+                    $('#ModalEditConfiguracion').modal('show');
+
+                    $("#Codigo_edit").val(data.codigo);
+                    $("#Descripcion_edit").val(data.descripcion);
+                    $("#estado_edit").val(data.activo); //Si
+
+                    $("#fecha_validacion_edit").val(data.fecha_vigencia)
+                    if (esVencido("#fecha_validacion_edit")) {
+                        $("#vencido").css("color", "red")
+                        $("#vencido").html("Vencido actualice Configuracion")
+                    }
+                    else {
+                        $("#vencido").css("color", "green")
+                        $("#vencido").html("En Vigencia")
+                    }
+                },
+                300: function () {
+                    $('#ModalEditConfiguracion').modal('hide');
+                    toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalEditConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //BTN GUARDAR EDIT
+    $("#SaveEditConfig").on('click', function () {
+        if (validar("#Codigo_edit", "#Descripcion_edit", "#fecha_validacion_edit"))
+            SaveEditConfig();
+    });
+    //PROCESO UPDATE
+    function SaveEditConfig() {
+
+        var idconfig = $("#Codigo_edit").val();
+        var descrip = $("#Descripcion_edit").val();
+        var estado = "";
+
+        if ($("#estado_edit").val() == "1")
+            estado = "1";
+        else
+            estado = "0";
+
+        var fechavigencia = $("#fecha_validacion_edit").val();
+
+        $.ajax({
+            url: "{% url 'qorder:editar_configuracion' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: idconfig,
+                descrip_config: descrip,
+                estado_config: estado,
+                fechavigencia_config: fechavigencia
+            },
+            statusCode: {
+                200: function (data) {
+                    $('#ModalEditConfiguracion').modal('hide');
+                    $("#tablaconfiguraciones").html(data);
+                    //Limpiamos
+                    $("#Codigo_edit").val("");
+                    $("#Descripcion_edit").val("");
+                    $("#estado_edit").val("1"); //Si
+                    
+                    var date = new Date();
+                    $("#fecha_validacion_edit").datepicker("setDate", date);
+                    toastr.success("Código de configuración actualizado correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    $('#ModalEditConfiguracion').modal('hide');
+                    toastr.error("Ocurrio un error al actualizar el código de configuración. Favor contactar con el administrador", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalEditConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error en el proceso de actualización. Favor contactar con el administrador', '', { timeOut: 2000 })
+                }
+            }
+        });
+        _codigo = ""
+    }
+    //BTN DELETE CONFIG
+    function confirmDeleteConfig(id) {
+        _codigo = id;
+        $('#ModalMsgConfirmDeleteConfig').modal('show');
+    }
+    //PROCESO DELETE
+    $("#DeleteConfig").on('click', function () {
+
+        $('#ModalMsgConfirmDeleteConfig').modal('hide');
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para editar", "Atención!!", 1500);
+            return;
+        }
+        $.ajax({
+            url: "{% url 'qorder:delete_configuracion' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+            },
+            statusCode: {
+                200: function (data) {
+                    $("#tablaconfiguraciones").html(data);
+                    toastr.success("El código de configuración se eliminó correctamente", "Atención!!", 1500);
+                    $("#txtConfigCount").text("")
+                    $("#txtConfigCount").text($("#txtConfigCount").text()+" (Se encontraron cambios)")
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    });
+    //HIDE BUTTON REGRESAR
+    function hidebtnRegresar(b){
+        var btn = $("#btnBackCancelar")
+        btn.toggleClass('show',b)
+        btn.toggleClass('hide',!b)
+    }
+    //HIDE FOOTER
+    function hidefooter(b){
+        var footer = $("#footerpanel")
+        footer.toggleClass("show",b)
+        footer.toggleClass("hide",!b)
+    }
+    //BTN TOGGLE NUEVA ACCION
+    function isReturn(b) {
+        $("#tabs").toggleClass("hide", b)
+        $("#body_cfg").toggleClass("hide", !b)
+        if (!b) {
+            cagarAccionesConfig(_codigo);
+            ocultAcum(true)
+            changetext("Acciones de lectura"+" para la configuracion "+"<b>"+ _codigo+"</b>")
+            hidefooter(false)
+            hidebtnRegresar(true)
+            $('.nav-tabs a:first').tab('show') //Primera tab
+        } else {
+            ocultAcum(false)
+            changetext("Configuracion de acciones de lectura")
+            adjust(table_configs)
+            hidefooter(true)
+            hidebtnRegresar(false)
+        }
+    }
+    //cambiar titulo de presentacion cabecera
+    function changetext(args){
+        $("#pntitle").text("")
+        $("#pntitle").html(args)
+    }
+    //SELECCIONAR CFG Y OBTENER SU CODIGO
+    table_configs.on('select', function (e, dt, type, indexes) {
+        //var _config_activa = 'No';
+        $("#btnNuevaAccion").prop('disabled', false);
+        
+        var m_id_to = $.map(table_configs.rows('.selected').data(), function (item) {
+            //_config_activa = item[2];
+            _codigo = item[0];
+        });
+        
+        // if (_config_activa == "No") {
+        //     $("#btnNuevaAccion").prop('disabled', true);
+        // }
+        // else {
+        //     $("#btnNuevaAccion").prop('disabled', false);
+        // }
+        //cagarAccionesConfig(_codigo);
+
+    });
+    //DESELECCIONAR CFG
+    table_configs.on('deselect', function (e, dt, type, indexes) {
+        _codigo = "";
+        $("#btnNuevaAccion").prop('disabled', true);
+    });
+    //SELECCIONAR ACCION Y OBTENER SU CODIGO
+    table_acciones.on('select', function (e, dt, type, indexes) {
+        var m_id_to = $.map(table_acciones.rows('.selected').data(), function (item) {
+            _cod_accion = item[0];
+        });
+    });
+    //DESELECCIONAR ACCION
+    table_acciones.on('deselect', function (e, dt, type, indexes) {
+        _cod_accion = "";
+    });
+    //ASIGNAR ACCION A LA CFG SELECCIONADA
+    function asignarAccionAConfig() {
+        var _existeOrden = false;
+        var _existe = false;
+        var _ordenaux = "0";
+        var _orden = "0";
+        var _param_add = "";
+        var _obligatorio = "0"; //1-si, 0-no
+        var _tipo = "";
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para editar", "Atención!!", 1500);
+            return;
+        }
+
+        if (_cod_accion == "") {
+            toastr.warning("Debe seleccionar una acción de la tabla para asignar a la configuración", "Atención!!", 1500);
+            return;
+        }
+
+        // validar orden de ejecucion
+        tabla_acciones_config.rows().every(function (rowIdx, tableLoop, rowLoop) {
+            var data = this.data();
+
+            _ordenaux = data[3];
+            if (_existeOrden == false) {
+                if (_ordenaux == $("#ddlOrdenEjecucion").val()) {
+                    toastr.warning("El orden de ejecución seleccionado ya se encuentra asignado a una acción", "Atención!!", 1500);
+                    _existeOrden = true;
+                    _existe = true;
+                    return;
+                }
+                else {
+                    _existeOrden = false;
+                }
+            }
+
+        });
+        if (_existe == true) {
+            _existe = false;
+            return;
+        }
+        _orden = $("#ddlOrdenEjecucion").val();
+        _param_add = $("#txtParamAdicional").val();
+
+        if ($('#chkObligatorio').prop('checked'))
+            _obligatorio = "1";
+        else
+            _obligatorio = "0";
+
+        _tipo = $("#ddlTipoAcccion").val();
+
+        $.ajax({
+            url: "{% url 'qorder:asig_accion_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+                codigo_accion: _cod_accion,
+                orden: _orden,
+                param_add: _param_add,
+                obligatorio: _obligatorio,
+                tipo_accion: _tipo
+            },
+            statusCode: {
+                200: function (data) {
+
+                    $("#accionesconfig").html(data);
+                    toastr.success("Acción asignada correctamente", "Atención!!", 1500);
+                    if (parseInt(_orden) < 5)
+                        $("#ddlOrdenEjecucion").val((parseInt(_orden) + 1).toString());
+                    else $("#ddlOrdenEjecucion").val("1");
+
+                    $("#txtParamAdicional").val("");
+                    $('#chkObligatorio').prop('checked', false);
+                    $("#ddlTipoAcccion").val("FOTO");
+                    adjust(tabla_acciones_config)
+
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("El código de acción ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al asignar el código de acción.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //Carga acciones de la cfg en la tabla detalles
+    function cagarAccionesConfig(idConfig) {
+        $.ajax({
+            url: "{% url 'qorder:cargar_acciones_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: { codigo_config: idConfig },
+            statusCode: {
+                200: function (data) {
+                    $("#accionesconfig").html(data);
+                    adjust(table_acciones)
+                },
+                300: function () {
+                    toastr.error("Ya existe un parametro con ese codigo", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Server error, contact an administrator.', ' ', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //Ocultar CFG ACUM
+    function ocultAcum(b) {
+        $("#cfg_acum").toggleClass("hide", b)
+    }
+    
+    //TABS SUM ASIGNADO/BUSCAR SUM
+    $('#myTab a').click(function (e) {
+        e.preventDefault();
+        if ($(e.target).closest('li').index() + 1 == 2) {
+            if (_codigo == "") {
+                toastr.warning("Debe seleccionar una configuración de la tabla para visualizar los clientes configurados", "Atención!!", 1500);
+                return false;
+            }
+            showDivClientes('0');
+            $(this).tab('show');
+            changetext("Suministros"+" para la configuracion "+"<b>"+ _codigo+"</b>") //CAMBIANDO TEXT LBL IZQUIERDO
+            //adjust(table_asig_conf_cli)
+        }
+        else{
+            $(this).tab('show');
+            changetext("Acciones de lectura"+" para la configuracion "+"<b>"+ _codigo+"</b>") //LBL IZQUIERDO
+            
+        }
+            
+    });
+    //GET CLIENTES METODO DIRECTO-- DATA = TABLA INSERTADA
+    function showDivClientes(idDiv) {
+
+        if (idDiv == '0') {
+            e(true)
+            $("#clientesasignados").show();
+            $("#buscarclientes").hide();
+
+            if (_codigo == "") {
+                toastr.warning("Debe seleccionar una configuración de la tabla para ver los clientes asignados", "Atención!!", 1500);
+                return;
+            }
+
+
+            $.ajax({
+                url: "{% url 'qorder:get_clientes_config' %}",
+                type: 'post',
+                datatype: 'json',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                data: {
+                    codigo_config: _codigo,
+                },
+                statusCode: {
+                    200: function (data) {
+                        $('#clientesconfig').html(data);
+                    },
+                    201: function (data) {
+                        toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                        $('#clientesconfig').html(data);
+                    },
+                    // 300: function (data) {
+                    //     //SIRVE PARA NO MOSTRAR TODOS LOS REGISTROS
+                    //     toastr.warning("Existen mas de 1000 registros, no se mostraran en la tabla", "Atención!!", 1500);
+                    //     if(table_asig_conf_cli != undefined)
+                    //         table_asig_conf_cli.rows().clear().draw()
+                    //     $('#clientesconfig').html(data);
+                    //     //adjust(table_asig_conf_cli)
+                    // },
+                    500: function () {
+                        toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                    }
+                }
+            });
+
+        }
+        else {
+            e(false)
+            $("#clientesasignados").hide();
+            $("#buscarclientes").show();
+            cleanfilters(true)
+        }
+    }
+    //PINTAR BOTONES FILTRO
+    $("#btnSumSelect").click(function () {
+        e(true)
+    })
+    $("#btnBuscarSum").click(function () {
+        e(false)
+    })
+    function e(b) {
+        $("#btnSumSelect").toggleClass("btn-primary", b)
+        $("#btnSumSelect").toggleClass("active", b)
+        $("#btnSumSelect").toggleClass("btn-default", !b)
+
+        $("#btnBuscarSum").toggleClass("btn-primary", !b)
+        $("#btnBuscarSum").toggleClass("btn-default", b)
+        $("#btnBuscarSum").toggleClass("active", !b)
+    }
+    //BTN APLICAR FILTRO
+    $("#btnAplicarFiltro").on('click', function () {
+        if (valFiltroBusqueda()){
+            cleanfilters(false)
+            getClientesFiltro();
+        }
+            
+    })
+    //VALIDAR FILTRO de busqueda
+    function valFiltroBusqueda() {
+        var $contratista = $("#txtnis").val();
+        var $tecnico = $("#txtnic").val();
+        var $porcentaje = $("#txtnombreape").val();
+        var _ruta = $('#rutas').val();
+        var $oficinas = $('#oficinas').val();
+        if ($contratista == "" && $tecnico == "" && (_ruta == null || $oficinas == "0")) {
+            toastr.error("Ingrese un filtro", "Atención!!", 1500);
+            return false;
+        }
+        if ($porcentaje != "") {
+            if (!isNaN($porcentaje)) {
+                if ($porcentaje > 100 || $porcentaje < 0) {
+                    toastr.error("El porcentaje ingresado es incorrecto, solo se aceptan valores del 0 al 100", "Atención!!", 1500);
+                    return false;
+                }
+            } else {
+                toastr.error("Error de tipo parametro en porcentaje", "Atención!!", 1500);
+                return false;
+            }
+        }
+        return true;
+    }
+    //PROCESO GET CLIENTES
+    function getClientesFiltro() {
+
+
+        var _nis = $("#txtnis").val();
+        var _nic = $("#txtnic").val();
+        var _nombre = $("#txtnombreape").val(); //porcentaje
+        // var _ruta = $('#rutas').val();
+        var _ruta = ''
+        var _cantidad = $("#txtcantidad").val()
+        if($("#rutas").val() != null) //obtengo TODAS Las rutas que posiblemnete se pueden seleccionar
+            for (let index = 0; index < $("#rutas").val().length; index++) {
+                _ruta += $("#rutas").val()[index]+','}
+        $.ajax({
+            url: "{% url 'qorder:get_clientes_filtro' %}",
+            type: 'post',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            datatype: 'json',
+            data: { rutasum_id: _ruta, nic: _nic, nis: _nis, nombre: _nombre, codigo_config: _codigo,cantidad:_cantidad },
+            statusCode: {
+                200: function (data) {
+                    $("#tablaclientesresultado").html(data);
+                },
+                300: function () {
+                    toastr.error("El técnico no tiene asignado un dispositivo", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error("Server error, contact an administrator.", "Atención!!", 1500);
+                }
+            }
+        });
+    }
+    //NO ESPACIOS EN TEXT INPUT 
+    var input = $("input[type='text']")
+    input.on('input', function () {
+        if(this.id != 'txtParamAdicional' && this.id != 'DescripcionConfig')
+            this.value = this.value.trim();
+    })
+    //ASIGNAR CLIENTES A LA CFG SELECCIONADA
+    //BTN ASIGNAR
+    function confirmAsignarClientes() {
+        $("#ModalMsgConfirmAsignarClienteConfig").modal('show');
+    }
+    //PROCESO INSERT
+    $("#btnAsignarClientesConfig").on('click', function () {
+
+        $('#ModalMsgConfirmDeleteClienteConfig').modal('hide');
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+            return;
+        }
+
+        if (_ids_cli_asign == "") {
+            toastr.warning("Debe seleccionar al menos un cliente de la tabla para poder asignarlo a la configuración", "Atención!!", 1500);
+            return;
+        }
+
+        var _nis = $("#txtnis").val();
+        var _nic = $("#txtnic").val();
+        var _nombre = $("#txtnombreape").val();
+        var _ruta = '' //
+        if($("#rutas").val() != null) //doble validacion x supuesto cambiar
+            for (let index = 0; index < $("#rutas").val().length; index++) {
+                _ruta += $("#rutas").val()[index]+','} //29/07/2021
+
+        var tipo_fil = $("#cmbtipofiltro").val()
+        var contratista = $("#oficinas").val()
+        var porcentaje = $("#txtnombreape").val()
+        var cantidad = $("#txtcantidad").val()
+
+        $.ajax({
+            url: "{% url 'qorder:asignar_clientes_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                rutasum_id: _ruta,
+                nic: _nic,
+                nis: _nis,
+                nombre: _nombre,
+                codigo_config: _codigo,
+                codigos_cliente: _ids_cli_asign,
+
+                tipo_filtro: tipo_fil,
+                contratista: contratista,
+                porc: porcentaje,
+                cant: cantidad,
+
+            },
+            statusCode: {
+                200: function (data) {
+
+                    $("#tablaclientesresultado").html(data);
+                    toastr.success("Clientes asignados correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los clientes seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los cliente seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+
+        _ids_cli_asign = ""; //seteo cliente select
+
+    });
+    //btn delete cliente cfg
+    function confirmDeleteConfigCliente(idCli) {
+        _codCliDel = idCli;
+        $('#ModalMsgConfirmDeleteClienteConfig').modal('show');
+    }
+    //DELETE CLIENTE CONFIG INDIVIDUAL
+    $("#DeleteClienteConfig").on('click', function () {
+
+        $('#ModalMsgConfirmDeleteClienteConfig').modal('hide');
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+            return;
+        }
+
+        if (_codCliDel == "") {
+            toastr.warning("Debe seleccionar una cliente de la tabla para poder removerlo", "Atención!!", 1500);
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'qorder:delete_cli_indiv_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+                codigo_cliente: _codCliDel
+            },
+            statusCode: {
+                200: function (data) {
+
+                    $("#clientesconfig").html(data);
+                    _codCliDel = "";
+                    toastr.success("El cliente se eliminó correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo eliminar el código de cliente seleccionado", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar elimnar el código de cliente seleccionado', '', { timeOut: 2000 })
+                }
+            }
+        });
+
+    });
+    //BORRAR ACCION CFG
+    function confirmBorrarAccion(codConfig, codAcc, orden) {
+        _codigo = codConfig;
+        _cod_accion = codAcc;
+        _ordenDel = orden;
+
+        $('#ModalMsgConfirmDeleteAccionConfig').modal('show');
+    }
+    //PROCESO DELETE
+    $("#DeleteAccionConfig").on('click', function () {
+
+        $('#ModalMsgConfirmDeleteAccionConfig').modal('hide');
+
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla para editar", "Atención!!", 1500);
+            return;
+        }
+
+        if (_cod_accion == "") {
+            toastr.warning("Debe seleccionar una acción de la tabla para asignar a la configuración", "Atención!!", 1500);
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'qorder:delete_accion_config' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+                codigo_accion: _cod_accion,
+                orden_ejecucion: _ordenDel
+            },
+            statusCode: {
+                200: function (data) {
+
+                    $("#accionesconfig").html(data);
+                    toastr.success("El código de acción se eliminó correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("No se pudo eliminar el código de acción seleccionado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al intentar elimnar el código de acción seleccionado', '', { timeOut: 2000 })
+                }
+            }
+        });
+    });
+    //DELETE MASIVO DE TODAS LAS CONFIGURACIONES
+    function deleteMasivo(){
+        $.ajax({
+            url: "{% url 'qorder:del_all_cfg' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data:{},
+            statusCode: {
+                200: function (data) {
+                    toastr.success("Se eliminaron todas las configuraciones", "Atención!!", 1500);
+                    $("#tablaconfiguraciones").html(data);
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("No existen configuraciones", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //LIMPIAR FILTROS
+    function cleanfilters(b){
+        if(b){
+            $("#oficinas").val("0")
+            $("#txtnis").val("")
+            $("#txtnic").val("")
+            $("#txtnombreape").val("")
+            $('#rutas').find('option').remove()
+            $("#txtcantidad").val("")
+            document.getElementById('txtcantidad').disabled = false;
+            document.getElementById('txtnombreape').disabled = false;
+        }
+        $("#tablaclientesresultado").toggleClass('hide',b)
+    }
+    //CREAR SELECT2
+    $(document).ready(function() {
+                $('.js-example-basic-multiple').select2();
+        });
+    //BTN AGREGAR CLIENTES A CFG MASIVO X CONTRATISTA
+    function asignarClientesMasivoxOficina(){
+        //valido que este alguna oficina seleccionada
+        var oficina_seleccion = $("#contratistas").val()
+        if(oficina_seleccion == null){
+            toastr.error('Debe seleccionar alguna oficina.', 'Atención!!!', { timeOut: 2000 })
+            return;
+        }
+        codigo_oficina = ''
+        for (let index = 0; index < $("#contratistas").val().length; index++) {
+            codigo_oficina += $("#contratistas").val()
+        }
+        $.ajax({
+            url: "{% url 'qorder:asign_config_bulk' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data:{
+                codigo_config : _codigo,
+                _of : codigo_oficina
+            },
+            statusCode: {
+                200: function (data) {
+                    toastr.success("Se agregaro todos los suministros", "Atención!!", 1500);
+                },
+                300: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                },
+                500: function () {
+                    $('#ModalAddConfiguracion').modal('hide');
+                    toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                }
+            }
+        });
+    } 
+    //OCULTAR DIV DE ASIGNACION MASIVA EN RESULTADOS
+    function ocultar_Asig_Mas(b){
+        $("#asigmasiva").toggleClass('hide',b)
+        $("#btnAsignarClSelect").toggleClass('invisible',!b)
+        $("#btnAsignarAleatorio").toggleClass('invisible',!b)
+    }
+    //ABRIR MODAL ASIGNAR ALEATORIO
+    $("#btnAsignarAleatorio").on('click',function(){
+        $("#ModalMsgConfirmAsignarClienteConfigAleatorio").modal('show')
+    })
+    //BTN ASIGNAR ALEATORIO X PORCENTAJE/CANTIDAD
+    function asignClienteAleatorio(){
+        if (valFiltroBusqueda()){
+        if (_codigo == "") {
+            toastr.warning("Debe seleccionar una configuración de la tabla", "Atención!!", 1500);
+            return;
+        }
+        var _nis = $("#txtnis").val();
+        var _nic = $("#txtnic").val();
+        var _nombre = $("#txtnombreape").val(); //porcentaje
+        var _ruta = '' //
+        if($("#rutas").val() != null) 
+            for (let index = 0; index < $("#rutas").val().length; index++) {
+                _ruta += $("#rutas").val()[index]+','} //29/07/2021
+        var $cantidad = $("#txtcantidad").val() //cantidad
+        $.ajax({
+            url: "{% url 'qorder:asign_cliente_aleatorio' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                rutasum_id: _ruta,
+                nic: _nic,
+                nis: _nis,
+                nombre: _nombre, //porcentajeeeeee
+                codigo_config: _codigo,
+                cantidad: $cantidad
+            },
+            statusCode: {
+                200: function (data) {
+                    $("#tablaclientesresultado").html(data);
+                    toastr.success("Clientes asignados correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los clientes seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los cliente seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+        _ids_cli_asign = "";
+    }}
+    //BORRAR TODAS LAS CFG BTN
+    $("#btnDeleteConfiguracion").on('click',function(){
+        $('#ModalMsgEliminarAllCfg').modal('show');
+    })
+    //BTN ASIGNAR TODOS LOS CLIENTES D UNA /OFICINA
+    $("#btnAsignarMasivo").on('click',function(){
+        $("#ModalMsgConfirmAsignarClienteMasivo").modal('show')
+    })
+    //ELIMINAR TODOS LOS CLIENTES EN LA CFG
+    function deleteAllClientesCfg(){
+
+        $.ajax({
+            url: "{% url 'qorder:del_allclientes_cfg' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+            },
+            statusCode: {
+                200: function (data) {
+                    $("#clientesconfig").html(data);
+                    toastr.success("Clientes borrados correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los clientes seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los cliente seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+    }
+    //ABRIR MODAL DE ASIGNAR MASIVAMENTE CLIENTES ALEATORIAMENTE
+    function showModalAsignMasivoAleatorio(){
+        $("#ModalAsignarClientesMasivos").modal('show')
+    }
+    //METODOS PARA ASIGNAR CLIENTES MASIVOS ALEATORIOS
+    function asignClientesMasivoAleatorios(){
+        var _porcentaje = $("#txtporcentaje1").val(); //porcentaje
+        var $cantidad = $("#txtcantidad1").val() //cantidad
+        var oficina_seleccion = $("#contratistas").val()
+        if(oficina_seleccion == null){
+            toastr.error('Debe seleccionar alguna oficina', 'Atención!!!', { timeOut: 2000 })
+            return;
+        }
+        codigo_oficina = ''
+        for (let index = 0; index < $("#contratistas").val().length; index++) {
+            codigo_oficina += $("#contratistas").val()
+        }
+
+        var tipo_fil = $("#cmbtipofiltro").val()
+        
+        $.ajax({
+            url: "{% url 'qorder:asign_masivo_clien_aleatorio' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_config: _codigo,
+                cantidad: $cantidad,
+                porcentaje: _porcentaje,
+                oficina : codigo_oficina,
+
+                tipo_filtro: tipo_fil
+            },
+            statusCode: {
+                200: function (data) {
+                    $("#tablaclientesresultado").html(data);
+                    toastr.success("Clientes asignados correctamente", "Atención!!", 1500);
+                },
+                300: function () {
+                    toastr.error("No se pudo asignar los clientes seleccionados", "Atención!!", 1500);
+                },
+                500: function () {
+                    toastr.error('Ocurrio un error al intentar asignar los cliente seleccionados', '', { timeOut: 2000 })
+                }
+            }
+        });
+        }
+</script>

@@ -1,0 +1,222 @@
+   {% load i18n %} 
+
+                        <table id="table_routes" class="table table-striped table-bordered" cellspacing="0" width="100%" style="font-size:11px" >
+                        <thead>
+                            <tr>
+                                <th>{% trans "Secuencia" %}</th>
+                                <th>{% trans "Ruta" %}</th>
+                                <th>{% trans "Punto Suministro" %}</th>
+                                
+                                <th>{% trans "Itinerario" %}</th>
+                                <th>{% trans "Dirección" %}</th>
+                                <th>{% trans "Numero Puerta" %}</th>
+                                <th>{% trans "Porcion Original" %}</th>
+                                <th>{% trans "Secuencia Original" %}</th>
+                                <th>{% trans "Unidad Original" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in reubicar_suministros %}
+                            <tr>
+                                <td>{{t.Secuencia|default_if_none:'--'}}</td>
+                                <td>{{t.ruta|default_if_none:'--'}}</td>
+                                <td>{{t.punto_suministro}}</td>
+                                <td>{{t.itinerario|default_if_none:'--'}}</td>
+                                <td>{{t.direccion|default_if_none:''}}</td>
+                                <td>{{t.numero_puerta|default_if_none:''}}</td>
+                                <td>{{t.porcion_original|default_if_none:'--'}}</td>
+                                <td>{{t.sec_original|default_if_none:'--'}}</td>
+                                <td>{{t.unidad_original|default_if_none:'--'}}</td>
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+
+
+                    </table>
+                  <!--  <a onclick="dividir();">Dividir rutas</a> -->
+                    <script> 
+
+          var table_sum = $('#table_routes').DataTable( {
+            language:{
+              info:"Visualizando _START_ a _END_ de _TOTAL_ Suministros",
+              search:"Buscar",
+              lengthMenu: " ",
+              zeroRecords: "No se encontraron resultados",
+              infoEmpty: "Visualizando 0 a _END_ de _TOTAL_ Suministros ",
+              infoFiltered:'',
+              emptyTable:"No hay resultados ",
+              paginate:{
+                previous:"Anterior.",
+                next:"Siguiente.",
+              }
+            },
+             select: {
+                style:'multi',
+                info:false,
+                
+            },
+            scrollY: 600,
+            autoWidth: false,
+            scrollX: true,
+            pageLength:20,             
+            
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+
+              if (api.page.info().pages <= 1) {
+
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+
+              }
+              setTimeout(function() { adjust(table_datosum); }, 100);
+
+            }
+
+            
+          });
+
+            table_sum.on( 'click', 'td', function () {
+              var suministros='[';
+              var id_suministros='';
+              var datas='';
+              datas=table_sum.row( $(this).parents('tr') ).data();
+              id_suministros=datas[2];
+              
+              getNextSec();
+            var rowIdx = table_sum.cell( this ).index().row;
+            //  var addRow = table_techs_cuadrilla.rows( rowIdx ).data()
+          
+            var rowNew = [valor.toString(),table_sum.cell({row:rowIdx,column:1}).data(),table_sum.cell({row:rowIdx,column:2}).data(),table_sum.cell({row:rowIdx,column:3}).data(),table_sum.cell({row:rowIdx,column:4}).data(),table_sum.cell({row:rowIdx,column:5}).data(),table_sum.cell({row:rowIdx,column:6}).data(),table_sum.cell({row:rowIdx,column:7}).data(),table_sum.cell({row:rowIdx,column:8}).data()];
+
+            table_sum.rows(rowIdx).remove().draw();                          
+            var row = table_datosum.row.add(rowNew).draw();
+            $("#btnTransferir").prop("disabled",false);
+            $("#btnDelete").prop("disabled",true);
+            var value = 1;
+            //$('#loading').show();
+            table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                   var d = this.data();
+                   d[0] = value.toString();
+                   value=value+1;
+                   suministros += d[0]+"|"+d[2]+",";
+              } );
+             
+             table_datosum
+              .rows(  )
+              .invalidate('data')
+              .draw();
+             suministros+="]";
+             
+             var ruta=$('#id_ruta').val();
+             var id_centro = $('#id_oficina').val();
+             var semana = $('#semana').val();
+             if (id_centro=='')
+             {
+               toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+               return;
+             }
+          
+             if(semana=='')
+             { 
+               toastr.error('Seleccione una Ruta', ' ', {timeOut: 2000})
+               return;
+             }
+             $.ajax({
+               url: "{% url 'qorder:reinsertar_suministro' %}",
+               type: 'post',
+               headers: {'X-CSRFToken': '{{ csrf_token }}'},
+               datatype: 'json',
+               data: {id_oficina:id_centro,id_suministros:id_suministros,ruta:ruta,semana:semana,suministros:suministros},
+               statusCode: {
+                 200: function(data) {
+                   $("#_tabla_suministro").html(data);
+                   
+                 },
+                 301: function() {
+                                 //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                               },
+                               500: function() {
+                                 toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                               }
+                             }
+                 });         
+
+
+
+
+
+
+               //$('#loading').hide();
+                 toastr.success('Suministros Renumerados Correctamente', ' ', {timeOut: 2000});
+  });
+function getNextSec()
+{
+            
+            table_datosum
+             .rows(  )
+             .invalidate('data')
+             .draw();
+           if (table_datosum.rows('.selected').count()>0)
+            {
+
+              var rows = table_datosum.rows( '.selected' ).indexes();
+              
+              var data = table_datosum.rows( rows ).data();
+              
+              var valorsig = -1;             
+              var valor1=parseInt(data[0]);
+             
+            table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                 if (valorsig==-1)
+                 {
+                   var data1 = this.data()[0];
+                   var data2 = parseInt(data1);
+                   if (valorsig==-1 && data2>valor1 )
+                   {
+                     valorsig = data2;
+                   }
+                 }
+             } );
+             
+             
+
+               if (valorsig>-1)
+               {
+                valor=parseInt((valorsig + valor1)/2);
+               }
+            
+            else
+            {
+                valor=valor1 + 5;
+            } 
+            
+           
+            return true;
+            }
+           else
+           {
+           
+            if (table_datosum.rows().count()==0)
+            {
+              valor=10;
+              return true;
+            }
+            else
+            {
+             valor=1;
+             return true;
+           }
+}
+            
+     
+ }
+
+   
+                    </script>

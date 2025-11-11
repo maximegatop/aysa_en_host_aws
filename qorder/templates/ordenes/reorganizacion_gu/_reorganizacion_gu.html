@@ -1,0 +1,259 @@
+    {% load qorder_tags %}
+    {% load i18n %} 
+
+    <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">{% trans "Asignación Suministro por Ruta" %}</h2>
+            </div>
+            <div class="input-field col-xs-3 text-right">
+              <div class="form-inline">
+                <label>{% trans "Semana" %}</label>
+                <input list="semanas" id="semana" name="semana"onchange="searchRutasum()" autocomplete="off">
+                <datalist id="semanas" name="semanas" >
+                  <option value="{{semana}}"></option>
+                  <option value="TODAS"></option>
+                </datalist>
+              </div>
+            </div>
+            <div class="input-field col-xs-3 text-right">
+              <div class="form-inline">
+                <label>{% trans "Contratista" %}</label>
+                <select class="select form-control" id="id_oficina" name="oficina" onchange="searchRutasum()">
+                  {% if not user.work_units.all|length_is:'1' %}
+                  <option value="">{% trans "Contratista" %}</option>
+                  {% endif %}
+                  {% for ct in user.work_units.all %}
+                  <option value="{{ct.id_workunit}}">{{ct}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="row"></div>
+          <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+                  href="#filter_collapsible">Rutas</a>
+                </h4>
+              </div>
+              <div id="filter_collapsible" class="panel-collapse collapse in">
+                <div id="filterContainer" class="panel-body">
+                  <div class="row">
+                    <div id='_load_rutas'>
+
+                      {% include 'ordenes/reorganizacion_gu/_load_rutas.html'  with feedback_form=feedback_form  %}
+                    </div>
+
+                    <div class="col-md-12">
+
+
+                     <div class="panel-body">
+                      <h3 class="col-xs-6 text-left">Suministros Asignados</h3>
+                      <h3 class="col-xs-6 text-left">Suministros Disponibles</h3> 
+
+
+                      <div class="panel-body">
+                        <div id='_tabla_suministro'>
+
+                          {% include 'ordenes/reorganizacion_gu/_table_suministros.html'  with feedback_form=feedback_form  %}
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+                </div>
+                                            <div class="row col-md-12" >
+                          <div align="center">
+                            <button class="btn btn-default"  id="btnobtener"> > </button>
+                            <button class="btn btn-default"  id="btnTransferir"> Renumerar</button>
+                          </div>
+                          <div align="center">
+                            <button class="btn btn-default"  id="btnreubicar"> < </button>
+                          </div>
+                        </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+
+
+$('#filter_collapsible').collapse('hide');
+
+
+
+function searchRutasum(){
+
+      var centro = $('#id_oficina').val();
+      var semana = $('#semana').val();
+      
+      if (centro=="" || semana=="" )
+      {
+      $("#tabla_rutasum").html("");
+      $("#btnAddRutasum").prop("disabled",true);
+      return;
+      }
+      $.ajax({
+        url: "{% url 'qorder:obtener_rutas' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {id_oficina:centro,num_semana:semana},
+        statusCode: {
+          200: function(data) {
+            
+            $('#filter_collapsible').collapse('show');
+            $("#_load_rutas").html(data);
+            $("#btnAddRutasum").prop("disabled",false);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+
+function searchRuta(){
+
+      var centro = $('#id_oficina').val();
+      var ruta=$('#id_ruta').val();
+      var semana = $('#semana').val();
+
+      
+      //alert(ruta);
+      $('#id_oficinah').val(centro);
+      $.ajax({
+        url: "{% url 'qorder:cargar_suministros' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {id_oficina:centro,ruta:ruta,semana:semana},
+        statusCode: {
+          200: function(data) {
+            $("#_tabla_suministro").html(data);
+            $('#suministros_collapsible').collapse('hide');
+            $('#filter_collapsible').collapse('show');
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+    }
+
+  $("#btnobtener").on("click",function(){
+     var ruta=$('#id_ruta').val();
+     var id_suministros='[';
+     if (table_datosum.rows('.selected').data().count()>0)
+     {
+
+      var m_ids_ordenes = $.map(table_datosum.rows('.selected').data(), function (item) {
+        return item[8];
+      });
+      m_ids_ordenes.forEach(function(entry) {
+        id_suministros += "'" + entry + "',";
+      });
+
+      }
+    else
+    {
+      toastr.error("Seleccione al menos un suministro","Atención!!",1500);
+      return;
+    }
+    id_suministros +=  "]";
+
+    
+    var id_centro = $('#id_oficina').val();
+    var semana = $('#semana').val();
+    if (id_centro=='')
+    {
+      toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+      return;
+    }
+
+    if(semana=='')
+    { 
+      toastr.error('Seleccione una Ruta', ' ', {timeOut: 2000})
+      return;
+    }
+    $.ajax({
+      url: "{% url 'qorder:insertar_suministro' %}",
+      type: 'post',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      datatype: 'json',
+      data: {id_oficina:id_centro,id_orden:id_suministros,ruta:ruta},
+      statusCode: {
+        200: function(data) {
+          table_datosum.row('.selected').remove().draw( false );
+          $("#_tabla_suministro").html(data);
+          
+        },
+        301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+  });
+
+
+
+$("#btnreubicar").on("click",function(){
+    var id_suministros='[';
+     if (table_sum.rows('.selected').data().count()>0)
+     {
+
+      var m_ids_ordenes = $.map(table_sum.rows('.selected').data(), function (item) {
+        return item[2];
+      });
+      m_ids_ordenes.forEach(function(entry) {
+        id_suministros += "'" + entry + "',";
+      });
+
+      }
+    else
+    {
+      toastr.error("Seleccione al menos un suministro","Atención!!",1500);
+      return;
+    }
+    id_suministros +=  "]";
+
+    
+
+
+
+  });
+
+
+</script>

@@ -1,0 +1,272 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+    <div class="col-md-12">
+        <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {% trans "tituloProblemas" %}
+                </h2>
+          </div>
+          <div class="panel-body">
+          <div id='_table_techs'>
+            {% include 'data_admin/problemas/_table_problemas.html'  with feedback_form=feedback_form  %}
+           </div></div>
+           <div class="panel-footer">
+             <button class="btn btn-primary btn-md" data-title="Editar" id="btnAddTech" 
+               onclick="newProblema();">
+               <span class="glyphicon glyphicon-plus"></span>{% trans "lblAdd" %}
+             </button>
+           </div>
+        </div>
+    </div>
+             
+
+
+<!-- /.modal-dialog --> 
+
+<div id="new" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+
+  {% include 'data_admin/problemas/_problemas_edit.html'  with feedback_form=feedback_form  %}
+
+</div>
+<script>
+
+            function newProblema(){
+             var modal = $("new");
+
+             $.ajax({
+              url: "{% url 'qorder:problemas_new' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id:'',form:'None'},
+              context: document.body
+            }).done(function(response) 
+            {
+              
+              $('#new').html(response);
+              $('#new').modal('toggle');
+            });
+           }
+
+
+           function edit(data){
+             var modal = $("new");
+             
+             $.ajax({
+              url: "{% url 'qorder:problemas_edit' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id:data,form:'None'},
+              context: document.body
+            }).done(function(response) 
+            {
+              
+              $('#new').html(response);
+              $('#new').modal('toggle');
+            });
+          }
+
+
+
+
+
+          function btnSaveOnClick(id)
+          {
+
+            var modal = $("new");
+            
+            var data = $('#formanomalia').serialize();
+            
+            $.ajax({
+              url: "{% url 'qorder:problemas_save' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: data,
+              statusCode: {
+                200: function(data) {
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('Complete los campos obligatorios', ' ', {timeOut: 2000})
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                   $("#container" ).html(xhr);   
+                   $(modal).modal('toggle');
+                   $('body').removeClass('modal-open');
+                   $('.modal-backdrop').remove();
+                 }
+               }
+             });
+
+          }
+
+
+
+  
+
+  // ---------------------------------------------------------- Generic Confirm  
+
+    function confirm(heading, question, cancelButtonTxt, okButtonTxt, callback) {
+
+    var confirmModal = 
+      $('<div class="modal fade">' +        
+          '<div class="modal-dialog">' +
+          '<div class="modal-content">' +
+          '<div class="modal-header">' +
+            '<a class="close" data-dismiss="modal" >&times;</a>' +
+            '<h3>' + heading +'</h3>' +
+          '</div>' +
+
+          '<div class="modal-body">' +
+            '<p>' + question + '</p>' +
+          '</div>' +
+
+          '<div class="modal-footer">' +
+            '<a href="#!" class="btn" data-dismiss="modal">' + 
+              cancelButtonTxt + 
+            '</a>' +
+            '<a href="#!" id="okButton" class="btn btn-primary">' + 
+              okButtonTxt + 
+            '</a>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+        '</div>');
+
+    confirmModal.find('#okButton').click(function(event) {
+      callback();
+      confirmModal.modal('hide');
+    }); 
+
+    confirmModal.modal('show');    
+  };  
+
+  
+  function enable(id,accion,rowid) {
+    // get txn id from current table row
+    //var id = $(this).data('id');
+    
+    var heading = ''; 
+    var question ='{% trans "lblConfirmEnableOn" %} ' + id + '.'; 
+    var cancelButtonTxt = '{% trans "btnCancel" %}'; 
+    var okButtonTxt = '{% trans "btnConfirm" %}'; 
+
+   if (accion==1)
+   {
+      heading = '{% trans "lblEnable" %}';
+      question = '{% trans "lblConfirmEnable" %} ' + id + '.';
+   }
+   else
+    {
+      heading = '{% trans "lblDisable" %}';
+      question = '{% trans "lblConfirmDisable" %} ' + id + '.';
+    }
+    var callback = function() {
+            var filtros = {};
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.id = id;
+            filtros.name = 'enable';
+            filtros.action = accion;
+               
+            $.ajax({
+              url: "{% url 'qorder:problemas_cflags' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: filtros,
+              statusCode: {
+                200: function(data) {
+                   var cell = table_problemas.cell(rowid,2);
+                    
+                  
+                   if (data.activo ==1)
+                   {
+                  
+                     table_problemas.cell(rowid,2).data('<p id="disable" data-placement="top" data-toggle="tooltip" title={% trans "lblDisable" %}><button class="btn btn-danger btn-xs" data-title="disable" ><span class="glyphicon glyphicon-ok-circle"></span></button></p>').draw();
+                    
+                
+                   }
+                   else
+                   {
+                   
+                     table_problemas.cell(rowid,2).data('<p id="enable" data-placement="top" data-toggle="tooltip" title={% trans "lblEnable" %}><button class="btn btn-success btn-xs" data-title="enable"  ><span class="glyphicon glyphicon-ban-circle"></span></button></p>').draw();
+                   
+                    }
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {
+                if ( $(xhr).find('.has-error').length > 0 ) {
+                 $(modal).find('.modal-body').html(xhr);
+                 toastr.error('{% trans "lblCompleteMandatoryField" %}', ' ', {timeOut: 2000})
+                    // formAjaxSubmit(form, modal);
+                  } else {
+                 //  $("#container" ).html(xhr);   
+                   //$(modal).modal('toggle');
+                   //$('body').removeClass('modal-open');
+                  // $('.modal-backdrop').remove();
+                   
+
+                   
+                    //table_anomalias.row(rowid).invalidate().draw();
+                 }
+               }
+             });
+
+    
+    };
+    confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
+  }
+
+$('#table_problemas tbody').on( 'click', 'td', function () {
+
+    var rowIdx = table_problemas.cell( this ).index().row;
+    var colIdx = table_problemas.cell(this).index().column;
+    var codigo = table_problemas.cell(rowIdx,0).data() ;
+    if (colIdx==2)
+    {
+       var cell = table_problemas.cell(rowIdx,2).data();
+        
+       if (cell.search('id="enable"')>0)
+       {
+            
+            enable(codigo,1,rowIdx);
+        }
+        else
+        {
+            
+           enable(codigo,0,rowIdx);
+       }
+    }
+
+  
+} );
+
+        </script>

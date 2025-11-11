@@ -1,0 +1,214 @@
+{% load qorder_tags %}
+{% load i18n %}
+
+<div class="col-md-12">
+  <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">{% trans "Reporte de Anomalías" %}</h2>
+        </div>
+                            <div class="input-field col-xs-3 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <select class="select form-control" value="{{semana}}" class="select form-control" id="semana" name="semana" onchange="searchRoutes()">
+
+                                <option value="{{semana}}">{{semana}}</option>
+                                <option value="TODAS">Sin filtro por semana</option>
+                            </select>
+                        </div>
+                    </div>
+        <div class="input-field col-xs-3 text-right">
+          <div class="form-inline">
+            <label>{% trans "Contratista" %}</label>
+            <select class="select form-control" id="id_oficina"
+              name="oficina" onchange="searchRoutes()">
+              {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+              {% endif %}
+              {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row"></div>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Filtros</a>
+            </h4>
+            
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+              <div class="row">
+
+                
+                <div id="_table_routes" class="col-xs-6">
+                  {% include 'reportes/reporte_anomalia/_table_routes.html' with feedback_form=feedback_form%}
+                </div>
+                <div id="_table_anomalias" class="col-xs-6">
+                  {% include 'reportes/reporte_anomalia/_table_anomalias.html' with feedback_form=feedback_form%}
+                </div>                
+                <div class="container">
+                    <div class="col-md-6">
+                      <p></p>
+                      <p></p>
+                      <p></p>
+                      <p></p>
+                    </div>
+
+                    <button id="btnRequestTechsOnClick" class="btn btn-primary pull-right" type="button">
+                      Ver reporte
+                    </button>
+
+
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#report_collapsible">
+                Listado de Anomalías</a>
+                </h4>
+              </div>
+              <div id="report_collapsible" class="panel-collapse collapse">
+<div class="panel-body" id="push_map"></div>
+              </div>
+            </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+
+        <script>
+  
+
+   $("#btnRequestTechsOnClick").prop("disabled",true);
+
+   $("#btnRequestTechsOnClick").on('click', function(){
+       cargarDatos();
+
+     
+     });
+
+
+ 
+    function cargarDatos(){
+        
+        var id_ruta="[";
+        var id_anomalia = "[";
+        var m_ids = $.map(table_rutas.rows('.selected').data(), function (item) {
+            return item[4];
+        });
+        var count = 0;
+        m_ids.forEach(function(entry) {
+            id_ruta += "'" + entry + "',";;
+            count++;
+        });
+        id_ruta += "]"
+
+        if (count<1){
+           toastr.error('Seleccione una ruta.',' ', 2000);
+            return false;
+        }
+        var m_idsa = $.map(table_anomalias.rows('.selected').data(), function (item) {
+            return item[0];
+        });
+        var counta = 0;
+        m_idsa.forEach(function(entry) {
+            id_anomalia += "'" + entry + "',";
+            counta++;
+        });
+        if (counta<1){
+           toastr.error('Seleccione una anomalia.',' ', 2000);
+            return false;
+        }
+       id_anomalia += "]";
+        var semana = $('#semana').val();
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_ruta = id_ruta;
+        filtros.id_anomalia = id_anomalia;
+        filtros.semana = semana;
+        
+        $.ajax({
+            type: "post",
+            url: "{% url 'qorder:get_listadoanomalia' %}",
+            data: filtros,
+            statusCode: {
+                300: function() {
+                   toastr.error('Seleccione al menos un técnico.',' ', 2000);
+                },
+                500: function() {
+                   toastr.error('Error en el servidor, contacte al administrador.',' ', 2000);
+                }
+
+            },
+            success: function( strData ){
+     
+                $('#push_map').html(strData);
+                       $('#filter_collapsible').collapse('hide');
+       $('#report_collapsible').collapse('show');
+
+            }
+        });
+        
+
+    }
+
+ //$(document).ready(function(){
+  $('#filter_collapsible').collapse('show');
+  
+   
+
+  $("#filter_collapse").on('click', function(){  $('#report_collapsible').collapse('hide');});
+  
+  $("#btnRequestTechs").on('click', function(){ btnRequestTechs(); });
+  //$( "#datepicker" ).datepicker();
+
+
+
+    function searchRoutes(){
+      $("#btnRequestTechsOnClick").prop("disabled",false);
+      var centro = $('#id_oficina').val();
+
+
+    
+      $.ajax({
+        url: "{% url 'qorder:table_routes' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,csrfmiddlewaretoken : '{{csrf_token}}'},
+        statusCode: {
+          200: function(data) {
+            
+            $("#_table_routes").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+  {% if user.work_units.all|length_is:'1' %}
+    searchRoutes();
+  {% endif %}
+
+
+  </script>

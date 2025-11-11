@@ -1,0 +1,76 @@
+{% load crispy_forms_tags %}
+   {% load i18n %} 
+<div id="edit1" class="modal-dialog modal-lg" >
+ <div id="edit2" class="modal-content"  style="height: 100%;">
+   <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">×</button>
+     <h3>{% trans "Observaciones para anomalia" %} {{ anomalia.id_anomalia}}</h3>
+   </div>     
+   <div id="form-modal-body" class="modal-body" style="padding-left:10px; height:75%;">
+
+     {% include 'data_admin/anomalias/_table_codigos.html'  with feedback_form=feedback_form  %}
+     {% include 'data_admin/anomalias/_table_observaciones.html'  with feedback_form=feedback_form  %}
+     </div>
+     <div class="modal-footer">
+
+   <button id="btnSave" style="width:210px" class="btn btn-primary" type="button" onclick="btnSaveObsOnClick('{{ anomalia.id_anomalia }}')">
+    Grabar
+  </button>
+
+   <button name="cancel" style="width:210px" class="btn btn-default" type="button" data-dismiss="modal">
+    Cancelar
+  </button>
+
+ </div>
+</div>
+</div>
+<script>
+         function btnSaveObsOnClick(id)
+          {
+            
+             var modal = $("#modalobs");
+            var codigos = '';
+            var data = {};
+            data.id_anomalia = id;
+            data.accion = 'observaciones';
+            table_observaciones.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                var data = this.data();
+                
+                if (codigos=='')
+                    codigos = data[0];
+                else
+                    codigos = codigos + ',' + data[0];
+ 
+        
+         } );
+            data.codigos = codigos;
+            
+            $.ajax({
+              url: "{% url 'qorder:anomalias_save' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: data,
+              statusCode: {
+                200: function(data) {
+                   $(modal).modal('toggle');
+                   $('body').removeClass('modal-open');
+                   $('.modal-backdrop').remove();
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              }
+
+             });
+
+          }
+</script>

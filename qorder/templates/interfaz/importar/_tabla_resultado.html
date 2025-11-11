@@ -1,0 +1,100 @@
+{% load i18n %} 
+
+  <div class="row col-md-6" >
+
+         <div class="panel panel-default ">
+           <div class="panel-heading">
+                <h3 class="panel-title">
+                    {% trans "Log de Importación" %}
+                </h3>
+          </div>
+          <div class="panel-body">
+            <div class="input-field" style="height:350px; overflow:auto;" >
+                 <table id="str1" class="table " cellspacing="0" width="100%" style="border-collapse:collapse;">
+
+              <tbody>
+                {% for s in str1 %}
+                <tr>
+                  <td style="border:0px solid #000;">{{s|default_if_none:''}}</td>
+                </tr> 
+                {% endfor %}
+              </tbody>
+            </table>
+            </div>
+            </div>
+            </div>
+
+
+    </div>
+    <div class="row col-md-6" >
+
+         <div class="panel panel-default ">
+           <div class="panel-heading">
+                <h3 class="panel-title">
+                    {% trans "Rutas" %}
+                </h3>
+          </div>
+          <div class="panel-body">
+          
+            <div class="input-field" style="height:350px; overflow:auto;" >
+               <table id="resultado" class="table table-striped table-bordered" cellspacing="0" width="100%" >
+              <thead>
+                <tr>
+                  <th>{% trans "Ruta" %}</th>
+                  <th>{% trans "Ciclo" %}</th>
+                  <th>{% trans "Itinerario" %}</th>
+                  <th>{% trans "Año" %}</th>
+                  <th>{% trans "Cantidad" %}</th>      
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in rutas %}
+                <tr>
+                  <td >{{s.ruta|default_if_none:''}}</td>
+                  <td>{{s.ciclo|default_if_none:''}}</td>
+                  <td>{{s.itinerario|default_if_none:''}}</td>
+                  <td>{{s.anio|default_if_none:''}}</td>
+                  <td>{{s.cantidad|default_if_none:''}}</td>
+                </tr> 
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+            </div>
+          </div>
+        </div>
+
+
+    </div>
+</div>
+
+    
+
+  <script>
+
+
+          var table_rutas = $('#resultado').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+
+            
+            pageLength:6,
+
+            select: 'single',
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+
+</script>

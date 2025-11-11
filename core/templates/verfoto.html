@@ -1,0 +1,31 @@
+{% load i18n %}
+
+{% load static %}
+<script type="text/javascript" src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<link type="text/css" rel="stylesheet" href="{% static 'css/bootstrap.min.css' %} " />
+
+<div class="container">
+    <h2>Contrato : {{fotos.0.contrato}}</h2>
+    <h2>Numero de serie : {{fotos.0.numeroSerie}} </h2>
+    <div class="col-md-12">
+        <div id="carousel-example" data-interval="false" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {% for item in fotos %}
+                <div class="item {% if forloop.first %} active {%endif %}">
+                    <div align="center">
+                        <img alt="Embedded Image" class="thumbnail zoom" src="data:image/png;base64,{{ item.foto }}" />
+
+                    </div>
+                    <div class="carousel-caption">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a class="left carousel-control" href="#carousel-example" data-slide="prev"><i
+                    class="icon-prev  fa fa-angle-left"></i></a>
+            <a class="right carousel-control" href="#carousel-example" data-slide="next"><i
+                    class="icon-next fa fa-angle-right"></i></a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+{% load i18n %} 
+<div class="col-md-3">
+  <center><h3><b>Resumen general de la oficina</b></h3><center>
+ <div width="50" height="50">
+ <canvas id="myChart" width="50px" height="50px"></canvas>
+</div>
+</div>
+<div class="col-md-2">
+ <br><br>
+ 
+ <h4 id="tituloCantLeido">Cantidad leídos: {{leidos}}</h4>
+ <h4 id="tituloCantNoLeido">Cantidad no leídos: 0</h4> 
+ <h4 id="tituloCantTotal">Cantidad total: {{cantidad_total}}</h4>
+ </div>
+
+
+
+<script> 
+
+          var table_estados = $('#table_estado').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+            "bSort": false,
+            searching: false,
+            scrollY: 180,
+            pageLength:6,
+            "paging":   false,
+                "ordering": false,
+             "info":     false,
+            select: 'single',
+
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+
+
+var data = {
+    labels: [
+        "Sin leer",
+        "Leídos"
+    ],
+    datasets: [
+        {
+            data: [0, 0],
+            backgroundColor: [
+                "#BFBFBF",
+                "#EE7402"
+               
+            ],
+            hoverBackgroundColor: [
+                "#BFBFBF",
+                "#EE7402"
+                
+            ]
+        }]
+    };
+
+var ctx = document.getElementById("myChart").getContext("2d");
+var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data
+    });
+
+
+
+function starChart( val1,  val2){
+
+
+var cantNoLeido = eval(val2) - eval(val1);
+
+$('#tituloCantLeido').text('Cantidad leídos: ' + val1);
+$('#tituloCantNoLeido').text('Cantidad no leídos: ' + cantNoLeido);
+$('#tituloCantTotal').text('Cantidad total: ' + val2);
+
+
+data = {
+    labels: [
+        "Sin leer",
+        "Leídos"
+    ],
+    datasets: [
+        {
+            data: [val1, val2],
+            backgroundColor: [
+                "#BFBFBF",
+                "#EE7402"
+               
+            ],
+            hoverBackgroundColor: [
+                "#BFBFBF",
+                "#EE7402"
+                
+            ]
+        }]
+    };
+
+    // And for a doughnut chart
+    myDoughnutChart.data.datasets[0].data[0]= val2-val1;
+    myDoughnutChart.data.datasets[0].data[1]= val1;
+    myDoughnutChart.update();
+}
+
+    starChart( {{leidos}}, {{cantidad_total}});
+
+
+
+         
+</script>

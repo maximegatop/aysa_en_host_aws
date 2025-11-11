@@ -1,0 +1,426 @@
+{% load qorder_tags %}
+{% load i18n %}
+<row>
+    <div class="col-md-12">
+        <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {% trans "Exportación" %}
+                </h2>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="input-field col-xs-3 text-left">
+                        <div class="form-inline">
+                            <label>{% trans "Contratista" %}</label>
+                            <select class="select form-control" id="id_oficina" name="oficina" onchange="searchRuta()">
+                                {% if not user.work_units.all|length_is:'1' %}
+                                <option value="">{% trans "Contratista" %}</option>
+                                {% endif %}
+                                {% for ct in user.work_units.all %}
+                                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-field col-xs-3 text-left">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input class="select form-control" value="{{semana}}" list="semanas" id="semana" name="semana" onchange="searchRutasum();" autocomplete="off">
+                            <datalist id="semanas" name="semanas" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 ">
+                        <button data-target="modal1" id="btnExport" class="btn btn-primary">
+                            Exportar Rutas
+                        </button>
+                    </div>
+
+
+
+
+
+
+                    <div class="col-md-2">
+                        <button data-target="modal1" id="btndescargar" class="btn btn-primary">
+                            Descargar Archivo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row col-md-6">
+                    <br>
+                    <div class="panel panel-default ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                {% trans "Rutas a Exportar" %}
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row col-md-3">
+                                <input id="chkRexportar" type="checkbox" name="Reexportar" checked> Reexportar
+                            </div>
+                            <div id="tabla_export">
+
+                                {% include 'interfaz/exportar/table_export.html' with feedback_form=feedback_form %}
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="row col-md-6">
+                    <br>
+                    <div class="panel panel-default ">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                {% trans "Log de Exportación" %}
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+
+                            <div class="input-field" style="height:350px; overflow:auto;">
+                                <span id="textarea1"></span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</row>
+<!-- Modal Structure -->
+
+<div id="modal1" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+
+                <br>
+                <p>Está por iniciar el proceso de exportación de rutas. Por favor no interrumpa la operación una vez
+                    iniciada y aguarde a que la misma se complete.</p>
+                <h3>¿Desea comenzar la Exportación?</h3>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelar" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnExport1" type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<div id="modaldeletefile" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Cerrar</span></button>
+                <h1 class="modal-title">Atención!</h1>
+            </div>
+            <div class="modal-body">
+
+                <br>
+                <p>¿Desea generar un nuevo archivo?</p>
+
+            </div>
+            <div class="modal-footer">
+                <button id="btnno" type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                <button id="btnyes" type="button" class="btn btn-primary" data-dismiss="modal">Si</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<script>
+
+
+
+
+
+
+
+
+$('#btnyes').on('click', function(){
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_centro = $('#id_oficina').val();
+        filtros.flag=1;
+        if (filtros.id_centro.length==0){
+            Materialize.toast('Seleccione un contratista por favor.', 2000, 'red');
+            return false;
+        }
+        $.ajax({
+            url: "{% url 'qorder:archivo_exportacion' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                    200: function(data) {
+                        $('#modal1').modal('show');
+                    },
+                    300: function() {
+                       // Materialize.toast('El proceso no pudo ser iniciado.', 2000, 'red');
+                        $('#textarea1').html('Atención: No existen Rutas para Exportar.');
+                    },
+                    301: function() {
+                       // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                        $('#textarea1').html('Atención: El proceso demora demasiado.');
+                    },
+                    302: function() {
+                       //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                        $('#textarea1').html('Atención: Proceso fallido, no inició el log.');
+                    },
+                    500: function() {
+                       // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                        $('#textarea1').html('Atención: Server error, contact an administrator.');
+                    }
+
+                }
+        });
+    });
+
+$('#btndescargar').on('click', function(){
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_centro = $('#id_oficina').val();
+        var oficina=$('#id_oficina').val()
+        if (filtros.id_centro.length==0){
+            toastr.error('Seleccione un Contratista', ' ', {timeOut: 1500})
+            return false;
+        }
+        $.ajax({
+            url: "{% url 'qorder:send_file' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                    200: function(data) {
+                       
+                        var sampleArr = base64ToArrayBuffer(data.data);
+                        saveByteArray(oficina+".zip", sampleArr);
+                    },
+
+             }
+        });
+    });
+
+
+
+
+$('#btnno').on('click', function(){
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_centro = $('#id_oficina').val();
+        filtros.flag=0;
+        if (filtros.id_centro.length==0){
+            Materialize.toast('Seleccione un contratista por favor.', 2000, 'red');
+            return false;
+        }
+        $.ajax({
+            url: "{% url 'qorder:archivo_exportacion' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                    200: function(data) {
+                        $('#modal1').modal('show');
+                    },
+                    300: function() {
+                       // Materialize.toast('El proceso no pudo ser iniciado.', 2000, 'red');
+                        $('#textarea1').html('Atención: No existen Rutas para Exportar.');
+                    },
+                    301: function() {
+                       // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                        $('#textarea1').html('Atención: El proceso demora demasiado.');
+                    },
+                    302: function() {
+                       //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                        $('#textarea1').html('Atención: Proceso fallido, no inició el log.');
+                    },
+                    500: function() {
+                       // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                        $('#textarea1').html('Atención: Server error, contact an administrator.');
+                    }
+
+                }
+        });
+    });
+
+
+$("#btnExport").on("click",function(){
+  var id_centro = $('#id_oficina').val();
+  if (id_centro=='')
+  {
+     toastr.error('Seleccione un contratista', ' ', {timeOut: 2000})
+     return;
+  }
+  $('#modaldeletefile').modal('show');
+  return false;
+});
+
+    $('#btnExport1').on('click', function(){
+        var id_rutas ="[";
+            if (table_routes.rows('.selected').data().count()>0)
+            {
+
+                var m_ids_ordenes = $.map(table_routes.rows('.selected').data(), function (item) {
+                return item[8];
+                 });
+                m_ids_ordenes.forEach(function(entry) {
+                id_rutas += "'" + entry + "',";
+                 });
+             
+                }
+            else
+            {
+              toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+              return;
+            }
+            id_rutas+=  "]";
+
+
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_centro = $('#id_oficina').val();
+        filtros.tipo = 'i';
+        filtros.ruta=id_rutas
+        filtros.semana=$('#semana').val();
+        console.log(id_rutas)
+        if (filtros.id_centro.length==0){
+            Materialize.toast('Seleccione un contratista por favor.', 2000, 'red');
+            return false;
+        }
+
+        console.log('debug');
+
+        $.ajax({
+            url: "{% url 'qorder:result_exportacion' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                    200: function(data) {
+                        searchRuta();
+                        $('#textarea1').html(data);
+                        document.getElementById("btndescargar").style.visibility="visible"
+                         //$.toaster({ priority : 'success', title : ' ', message : 'Exportación Finalizada'});
+                    },
+                    300: function() {
+                       // Materialize.toast('El proceso no pudo ser iniciado.', 2000, 'red');
+                        $('#textarea1').html('Atención: No existen Rutas para Exportar.');
+                    },
+                    301: function() {
+                       // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                        $('#textarea1').html('Atención: El proceso demora demasiado.');                   
+                    },
+                    302: function() {
+                       //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                        $('#textarea1').html('Atención: Proceso fallido, no inició el log.');
+                    },
+                    500: function() {
+                       // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                        $('#textarea1').html('Atención: Server error, contact an administrator.');
+                    }
+
+                }
+        });
+    });
+
+$("#chkRexportar").prop('checked', false);
+
+
+function search()
+    {
+      searchRuta();
+
+    }
+    {% if user.work_units.all|length_is:'1' %}
+
+      search();
+    {% endif %}
+
+
+    $("#chkRexportar").change(function() {
+
+     searchRuta();
+
+    });
+    function searchRuta(){
+      incluirExp = $('#chkRexportar').prop('checked')
+      console.log(incluirExp)
+
+
+      var centro = $('#id_oficina').val();
+
+      if (centro=='')
+      {
+        toastr.error('Seleccione un Contratista', ' ', {timeOut: 1500})
+        return false;
+      }
+      console.log(centro);
+      $('#id_oficinah').val(centro);
+    
+      var semana = $('#semana').val();
+    
+      $.ajax({
+        url: "{% url 'qorder:tables_routes' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,selectexport:incluirExp,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}'},
+        statusCode: {
+          200: function(data) {
+            console.log(data);
+            $("#tabla_export").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+
+function base64ToArrayBuffer(base64) {
+    var binaryString = window.atob(base64);
+    var binaryLen = binaryString.length;
+    var bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++) {
+       var ascii = binaryString.charCodeAt(i);
+       bytes[i] = ascii;
+    }
+    return bytes;
+ }
+
+function saveByteArray(reportName, byte) {
+    var blob = new Blob([byte], {type: "application/zip"});
+    var link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    var fileName = reportName;
+    link.download = fileName;
+    link.click();
+};
+
+</script>
+

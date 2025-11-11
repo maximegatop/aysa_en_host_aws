@@ -1,0 +1,280 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+  <div id='consulta'>
+<row>
+   <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">{% trans "Consulta Rutas" %}</h2>
+            </div>
+                                <div class="input-field col-xs-3 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input style="width: 70%;" class="select form-control" value="{{semana}}" list="semanas" id="semana" name="semana"  autocomplete="off">
+                            <datalist id="semanas" name="semanas" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+            <div class="input-field col-xs-3 text-right">
+              <div class="form-inline">
+                <label>{% trans "Contratista" %}</label>
+                <select class="select form-control" id="id_oficina"
+                name="oficina" onchange="searchRoutesConsulta()">
+                {% if not user.work_units.all|length_is:'1' %}
+                  <option value="">{% trans "Contratista" %}</option>
+                  {% endif %} 
+                  {% for ct in user.work_units.all %}
+                  <option value="{{ct.id_workunit}}">{{ct}}</option>
+                  {% endfor %}
+                  </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">{% trans "Rutas" %}</h4>
+              </div>
+              <div class="panel-body">
+                <div id="_table_rutas">
+                  {% include 'ordenes/consulta/_table_routes.html'  with feedback_form=feedback_form  %}
+                </div>
+              </div>
+            </div>
+           
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">{% trans "Suministros" %}</h4>
+                </div>
+                <div class="panel-body">
+                  <div id="_table_ordenes">
+                    
+                  </div>
+                </div>
+              </div>
+            
+            {% if activa_revision  %}
+            <form class="form-horizontal" role="form">
+              <div class="form-group">
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <div class="radio">
+                      <label>
+                        <input checked type="radio" name="todos" value="1">{% trans "Lecturas en revisión" %}</label>
+                    </div>
+                    <div class="radio">
+                      <label>
+                        <input type="radio" name="todos" value="2">{% trans "Todos los suministros" %}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+               <div id="_datos_suministro">
+                   
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</row>
+</div>
+
+<div id='revision' >
+
+</div>
+
+<script>
+    var table_routes
+    var id_tecnico = "";
+    {% if user.work_units.all|length_is:'1' %}
+
+    searchRoutesConsulta();
+   
+    {% endif %}
+
+    function searchRoutesConsulta(){
+
+      var centro = $('#id_oficina').val();
+      
+      $('#id_oficinah').val(centro);
+    
+      var semana = $('#semana').val();
+     
+      $.ajax({
+        url: "{% url 'qorder:consulta_route' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,semana:semana},
+        statusCode: {
+          200: function(data) {
+           
+            $("#_table_rutas").html(data);
+            refreshtr();
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+
+
+
+function refreshtr()
+{
+     try{
+if ( $.fn.dataTable.isDataTable( '#table_routes' ) ) {
+    table_routes.destroy();
+   }
+} catch(err){}
+
+
+     table_routes = $('#table_routes').DataTable( {
+            language: datetable_languaje,
+            autoWidth: true,
+           info: false,
+        scrollY: 180,
+            pageLength:6,
+
+            select: {
+            style: 'single',
+            selector: 'td:nth-child(1) , td:nth-child(2) , td:nth-child(3) , td:nth-child(4) , td:nth-child(5)'
+            },
+        columnDefs: [
+            {
+                "targets": [ 0,7 ],
+                "visible": false,
+                "searchable": false
+            },
+        ],
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+
+    table_routes
+    .on( 'select', function ( e, dt, type, indexes ) {
+
+        refresh();
+    });
+
+
+         table_routes.on( 'select', function ( e, dt, type, indexes ) {
+          if ($("input[name='todos[]']"))
+        var id_to = '';
+
+        var m_id_to= $.map(table_routes.rows('.selected').data(), function (item) {
+            id_tp = item[6]
+        });
+        var filtros = {};
+        filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+        filtros.id_ruta=id_tp;
+        {% if activa_revision %}
+           filtros.todas = 1;
+        {% else %}
+            filtros.todas = 2;
+        {% endif %}
+
+        $.ajax({
+            url: "{% url 'qorder:lista_suministros' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+
+                    $("#_table_ordenes").html(data);
+
+                },
+                301: function() {
+
+                },
+                500: function() {
+
+                }
+
+            }
+        });
+
+    });
+
+
+
+}
+
+$('#semana').on('input', function() {
+  if( $(this).val().length === 0 ) {
+      $('#semana').val('');
+      toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+      $("#_table_rutas").html('');
+      return false;
+    }
+  else
+  {
+    if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+    {
+      var centro = $('#id_oficina').val();
+      var semana = $('#semana').val();
+      incluirExp = $('#chkRexportar').prop('checked')
+        
+    if (centro==""||semana=="")
+    {
+      $("#tabla_export").html('');
+      return;
+    }
+    $.ajax({
+       url: "{% url 'qorder:consulta_route' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,semana:semana},
+        statusCode: {
+          200: function(data) {
+
+            $("#_table_rutas").html(data);
+            refreshtr();
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+
+  }
+
+});
+
+
+
+</script>

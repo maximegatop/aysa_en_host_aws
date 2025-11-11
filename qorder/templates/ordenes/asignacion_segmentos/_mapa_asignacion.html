@@ -1,0 +1,627 @@
+{% load qorder_tags %}
+{% load i18n %}
+<div id="map_container_asign_seg">
+    <div class="mr-3" id="map_asign_seg" style="height: 377px;">
+    </div>
+</div>
+
+<script>
+    /*
+    ------------------------------------
+     Este template arma el mapa y tiene
+     funciones respectivas a este
+    ------------------------------------
+    */
+    var setEyeIcon = false;
+    /*
+    ------------------------------------
+    Render de mapa
+    ------------------------------------ 
+    */ 
+   var greyIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'cadetblue'
+   });
+
+   var orangeIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'orange'
+   });
+
+   var greenIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'green',
+   });
+
+   var redIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'red',
+   });
+
+   var yellowIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'yellow',
+   });
+
+   var skyBlueIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'blue',
+   });
+
+   var blueIcon = L.AwesomeMarkers.icon({
+       icon: 'fas fa-circle',
+       markerColor: 'cadetblue',
+   });
+
+   
+    var tile1 = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }); 
+
+    var mapAsignOds = L.map('map_asign_seg').setView(['-34.62993667131655', '-58.44298675413234'], 12);
+    
+    tile1.addTo(mapAsignOds)
+
+
+    var mapCollapsibleIsActive = false;
+    // setInterval(function () {
+    //     var mapCollapsible = $("#map_collapsible")
+    //     if (mapCollapsible.hasClass("active") && !mapCollapsibleIsActive) {
+    //         mapCollapsibleIsActive = true;
+    //         mapAsignOds.invalidateSize();
+    //     } else {    
+    //         mapCollapsibleIsActive = false;
+    //     }
+    // }, 250)    
+    
+     var lstLatLog = [];
+    
+
+    // /* Botones que se generan en el Mapa */
+
+    const fullScreenControl = L.control.fullscreen({
+        position: 'topleft',
+        title: 'Pantalla Completa',
+        titleCancel: 'Quitar Pantalla Completa', 
+        forceSeparateButton: true,
+        forcePseudoFullscreen: true,
+        fullscreenElement: false,
+        content: '<i class="fa fa-expand"></i>'
+    }).addTo(mapAsignOds);
+
+    $('.leaflet-control-zoom-fullscreen').on('click', function() {
+        if(this.children[0].classList.contains('fa-expand'))
+        {
+            this.children[0].classList = []
+            this.children[0].classList.add("fa");
+            this.children[0].classList.add("fa-compress");
+        }
+        else if(this.children[0].classList.contains('fa-compress'))
+        {
+            this.children[0].classList = []
+            this.children[0].classList.add("fa");
+            this.children[0].classList.add("fa-expand");
+        }
+    });
+
+    /*var provider = new GeoSearch.OpenStreetMapProvider()
+    const searchControl  = new GeoSearch.GeoSearchControl({
+    style: 'bar',
+    provider: provider,
+    showMarker: true,
+    marker: () => {
+            marcador = L.marker({
+                draggable: false,
+                autoPan: true
+            })
+
+            return marcador
+        }, // use custom marker, not working?
+    });
+    mapAsignOds.addControl(searchControl);
+
+    mapAsignOds.on('geosearch/showlocation', () => {
+        if (marker) {
+            mapAsignOds.removeControl(marker);
+        }
+    });
+
+    provider.search({ query: 'Pringles 435, Cordoba' }).then(function (result) {
+        console.log(result)
+    });*/
+
+    
+    // Capturamos el evento despues de haber dibujado con cuadrado, o pligono
+    mapAsignOds.on('draw:created', function(event) {
+        try{
+            var layer = event.layer;
+            // Agregar la capa dibujada al grupo de capas
+            drawnItems.addLayer(layer);
+            //agregamos la capa de L.Control.draw a la capa de selectareafeature xD
+            mapAsignOds.selectAreaFeature._area_pologon_layers.push(layer)
+            
+            // if (_flag_btn_asignar) {
+            //     toastr.warning('Primero haga clic en Asignar para guardar el área dibujada.', ' ', {timeOut: 2000})
+            //     mapAsignOds.selectAreaFeature.removeLastArea();
+            //     return
+            // }
+            
+            if (getAreaPuntos()) {
+                $("#btnNuevoSegmento").removeAttr("disabled");
+                _flag_btn_asignar=true
+            }else{
+                toastr.warning('Seleccione un área con marcadores', {timeOut: 2000})
+                mapAsignOds.selectAreaFeature.removeLastArea();
+            }
+        }catch(error){
+
+        }
+    }); 
+    /////////////////////end otras herramientas
+
+
+    // _sc  => sin coordenadas
+
+    var _sc_punto_sum=""
+    
+
+
+    //capturamos el evento despues de haber hecho un dibujo con area libre
+    mapAsignOds.selectAreaFeature._map.on('lasso.finished', function(event) {
+        try{        
+            if (_flag_btn_asignar) {
+                toastr.warning('Primero haga clic en Asignar para guardar el área dibujada.', ' ', {timeOut: 2000})
+                mapAsignOds.selectAreaFeature.removeLastArea();
+                return
+            }
+            
+            //Comprobar si hay areas con coordenadas dentro 
+            if (getAreaPuntos()) {
+                $("#btnNuevoSegmento").removeAttr("disabled");
+                _flag_btn_asignar=true
+            }else{
+                toastr.warning('Seleccione un área con marcadores', {timeOut: 2000})
+                mapAsignOds.selectAreaFeature.removeLastArea();
+            }
+            btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-pencil\"></span></span>"
+            btnDraw.button.title = 'Dibujar área'
+            mapAsignOds.selectAreaFeature.disable();
+            booleanColorChange = !booleanColorChange   
+            //Aca no necesitamos agregar a la capa nada porque el control
+            // de dibujo libre ya viene por defecto en la capa selectareafeature
+        }catch(error){
+
+        }
+    });
+
+
+    
+    //BOTÓN LÁPIZ
+    var btnDraw = L.easyButton({
+        id: 'btnDraw',  
+        position: 'topleft',      
+        type: 'replace',          
+        leafletClasses: true,     
+        states:[{                 
+            stateName: 'get-center',
+            onClick: function(button, map){
+
+                if(booleanColorChange){
+                    btnDraw.button.style.backgroundColor = 'white';
+                    btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-hand-paper-o\"></span></span>"
+                    btnDraw.button.title = 'Arrastrar'
+                    
+                    booleanColorChange = !booleanColorChange
+
+                    mapAsignOds.selectAreaFeature.enable();
+
+                    // mapAsignOds.removeControl(drawControl);
+
+                    //para el boton de eliminado
+                    //eliminarHabilitado=false
+                    booleanIcon = false //icono de eliminar
+                    btnDeleteArea.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-trash\"></span></span>"
+
+
+
+                    // <a class="leaflet-draw-draw-polygon leaflet-draw-toolbar-button-enabled" href="#" title="Dibujar un polígono"></a>
+
+
+
+                }else{
+                    btnDraw.button.style.backgroundColor = 'white';
+                    btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-pencil\"></span></span>"
+                    btnDraw.button.title = 'Dibujar área'
+                    
+                    booleanColorChange = !booleanColorChange
+
+                    mapAsignOds.selectAreaFeature.disable();
+
+                    // mapAsignOds.addControl(drawControl);
+                    
+                    
+                }
+
+            },
+            title: 'Dibujar área',
+            icon: 'fa fa-pencil'
+        }]
+    })
+    
+    btnDraw.button.style.backgroundColor = 'white';
+    btnDraw.addTo(mapAsignOds);
+    //termina boton lapiz
+
+
+ 
+    var drawnItems = new L.FeatureGroup().addTo(mapAsignOds);
+    var booleanColorChange = true
+
+    
+    //AGREGA BOTONES O CONTROLES CUADRADO, POLÍGONO
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polygon: true,
+            rectangle: true, 
+                shapeOptions: {
+                    color: 'green', // Color del borde (rojo en este ejemplo)
+                    fillColor: '#00FF00', // Color de fondo (verde en este ejemplo)
+                    fillOpacity: 0.5 // Opacidad del fondo
+                    }
+            ,
+            circle: false,
+            marker:false,
+            polyline:false
+        },
+        edit: false,
+    });
+
+    mapAsignOds.addControl(drawControl);
+
+
+
+    $('.leaflet-draw-draw-rectangle').on('click', function() {
+        btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-pencil\"></span></span>"
+        btnDraw.button.title = 'Dibujar área'
+        mapAsignOds.selectAreaFeature.disable();
+    });
+
+    $('.leaflet-draw-draw-polygon').on('click', function() {
+        btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-pencil\"></span></span>"
+        btnDraw.button.title = 'Dibujar área'
+        mapAsignOds.selectAreaFeature.disable(); 
+    });
+    
+
+    //boton eliminar áreas
+    // var btnDeleteAll = L.easyButton({
+    //     id: 'btnDeleteAll',  
+    //     position: 'topleft',      
+    //     type: 'replace',          
+    //     leafletClasses: true,     
+    //     states:[{                 
+    //             stateName: 'get-center',
+    //             onClick: function(button, map){
+    //                 mapAsignOds.selectAreaFeature.removeAllArea();
+    //                 //cleanTableCanvas();
+    //                 selectedOds = undefined
+    //             },
+    //             title: 'Borrar todas las áreas',
+    //             icon: 'fa-trash'
+    //         }]
+    // })
+    // btnDeleteAll.button.style.backgroundColor = 'white';
+    // btnDeleteAll.addTo(mapAsignOds);
+
+    //AGREGA BOTÓN ELIMINAR AREA PREVIA DIBUJADA
+    var btnDeletePrevious = L.easyButton({
+        id: 'btnDeletePrevious',  
+        position: 'topleft',      
+        type: 'replace',          
+        leafletClasses: true,     
+        states:[{                 
+            stateName: 'get-center',
+            onClick: function(button, map){
+                mapAsignOds.selectAreaFeature.removeLastArea();
+                _flag_btn_asignar=false
+                selectedOds = undefined
+                
+                if(!getAreaPuntos()){
+                    $("#btnNuevoSegmento").attr('disabled', true)
+                }
+
+            },
+            title: 'Borrar área anterior',
+            icon: 'fa-solid fa-rotate-left'
+        }]
+    })
+    btnDeletePrevious.button.style.backgroundColor = 'white';
+    btnDeletePrevious.addTo(mapAsignOds);
+
+
+
+     //BOTÓN PARA ELIMINAR ÁREA CON PUNTOS DE SUMINISTROS EN LA BD
+    var booleanIcon = false
+    var btnDeleteArea = L.easyButton({
+        id: 'btnDeleteArea',  
+        position: 'topleft',      
+        type: 'replace',          
+        leafletClasses: true,     
+        states:[{                 
+            stateName: 'get-center',
+            onClick: function(button, map){
+                mapAsignOds.selectAreaFeature.disable();
+                btnDraw.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-pencil\"></span></span>"
+                btnDraw.button.title = 'Dibujar área'
+                if (booleanIcon) { //si es true listo para eliminar area
+                    booleanIcon = !booleanIcon
+                    btnDeleteArea.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-trash\"></span></span>"
+                }else{//si es falso no eliminar área
+                    btnDeleteArea.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-minus\"></span></span>"
+                    booleanIcon = !booleanIcon
+                }
+
+                if(!getAreaPuntos()){
+                    $("#btnNuevoSegmento").attr('disabled', true)
+                }
+
+            },
+            title: 'Eliminar un área',
+            icon: 'fa-trash'
+        }]
+    })
+    btnDeleteArea.button.style.backgroundColor = 'white';
+    btnDeleteArea.addTo(mapAsignOds);
+
+      
+
+    //BOTÓN MUESTRA DETALLE DE LAS ASIGNACIONES DE ÁREAS (LOCAL STORAGE)
+    var btnDetails = L.easyButton({
+        id: 'btnDetails',  
+        position: 'topleft',      
+        type: 'replace',          
+        leafletClasses: true,     
+        states:[{                 
+            stateName: 'get-center',
+            onClick: function(button, map){
+                jQuery(document).ready(function($){
+
+                    if(!mapAsignOds._isFullscreen){
+                        
+                        ActualizaTablaAsignaciones()
+                        
+                        //setTimeout(function(){adjust(selectedOrderDetailsTable);}, 250);
+
+                    }else{
+
+                        toastr.warning('Salga de la pantalla completa para ver las órdenes seleccionadas.', {timeOut: 2000})
+
+                    }
+                    
+                });
+            },
+            title: 'Ver Asignaciones',
+            icon: 'fa-eye'
+        }]
+    })
+
+    btnDetails.button.style.backgroundColor = 'white';
+
+    if(setEyeIcon){
+
+        btnDetails.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-eye\"></span></span>"
+    
+    }else{
+
+        btnDetails.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-eye-slash\"></span></span>"
+
+    }
+
+    btnDetails.addTo(mapAsignOds);
+
+
+    var btnClean = L.easyButton({
+        id: 'btnClean',  
+        position: 'topleft',      
+        type: 'replace',          
+        leafletClasses: true,     
+        states:[{                 
+            stateName: 'get-center',
+            onClick: function(button, map){
+                        
+                LimpiarTodo()
+                //setTimeout(function(){adjust(selectedOrderDetailsTable);}, 250);
+            },
+            title: 'Limpiar Mapa y Tabla',
+            icon: 'fa fa-eraser'
+        }]
+    })
+    
+    btnClean.addTo(mapAsignOds);
+
+
+
+    //OBTIENE MARCADORES DEL ÁREA DIBUJADO
+    function getAreaPuntos(){
+
+        let res = []
+
+        try {
+
+            /* Dibujo área correctamente */
+
+            res = mapAsignOds.selectAreaFeature.getFeaturesSelected('marker');
+
+            /* El siguiente .filter hace que cuando la lista de órdenes marcadas no existan repetidos */
+            
+
+            if(res){
+
+                res = res.filter((x, i, a) => a.indexOf(x) == i)
+
+            }
+            
+        } catch (error) {
+
+            /* Dibujo un pixel con un click selectedAreaFeature se rompe */
+
+            let indexDelete = []
+
+            mapAsignOds.selectAreaFeature._area_pologon_layers.map((e)=>{
+
+                if (e._latlngs[0].length === 0){
+
+                    indexDelete.push(mapAsignOds.selectAreaFeature._area_pologon_layers.indexOf(e)) 
+                }
+
+                /* Push a la lista de indexs a borrar, se van ingresando si la lat y long son vacias */
+
+            })
+
+            for (var i = indexDelete.length -1; i >= 0; i--){
+
+                /* Borro todas las areas sin lat y lng*/
+
+                mapAsignOds.selectAreaFeature._area_pologon_layers.splice(indexDelete[i],1);
+            }
+
+            /* El resultado es dejar solo los las áreas que tengan lat y lng > 0*/
+
+            res = mapAsignOds.selectAreaFeature.getFeaturesSelected('marker');
+
+            /* El siguiente .filter hace que cuando la lista de órdenes marcadas no existan repetidos */
+
+            if(res){
+                res = res.filter((x, i, a) => a.indexOf(x) == i)
+            }
+            
+        }
+
+
+        return res;
+
+    }
+   
+    //OBTIENE EL GEOJSON DEL ÁREA Y MARACADORES DEL MAPA
+    function obtenerGeoJSONAreasDibujadas() {
+        try {
+            var geoJSONFeatures = [];
+
+            
+            // Obtiene todas las capas dibujadas
+            var capasDibujadas = mapAsignOds.selectAreaFeature._area_pologon_layers;
+
+            // Iterar sobre cada capa y convertirla a GeoJSON
+            capasDibujadas.forEach(function (capa) {
+                // Obtener las coordenadas de la capa
+                var coordenadas = capa.getLatLngs();
+
+                // Verificar si hay coordenadas válidas
+                if (coordenadas && coordenadas.length > 0) {
+                    // Convertir las coordenadas a un formato GeoJSON válido
+                    var coordenadasGeoJSON = coordenadas.map(function (latlng) {
+                        return [latlng.lng, latlng.lat];
+                    });
+
+                    // Cerrar el polígono si no está cerrado
+                    if (coordenadas.length > 2 && !coordenadas[0].equals(coordenadas[coordenadas.length - 1])) {
+                        coordenadasGeoJSON.push([coordenadas[0].lng, coordenadas[0].lat]);
+                    }
+
+                    // Crear un objeto GeoJSON Feature
+                    var feature = {
+                        type: "Feature",
+                        properties: {}, // Puedes agregar propiedades según sea necesario
+                        geometry: {
+                            type: "Polygon",
+                            coordinates: [coordenadasGeoJSON],
+                        },
+                    };
+
+                    // Agregar el Feature al array de Features
+                    geoJSONFeatures.push(feature);
+                }
+            });
+
+            // Crear el objeto GeoJSON
+            var geoJSONObj = {
+                type: "FeatureCollection",
+                features: geoJSONFeatures,
+            };
+
+            // Imprimir en consola para verificar
+            //console.log('GeoJSON de áreas dibujadas:', geoJSONObj);
+
+            return geoJSONObj;
+        } catch (error) {
+        
+        }
+    }
+
+    var geosearchProvider = new GeoSearch.OpenStreetMapProvider();
+
+    var geoSearch = new GeoSearch.GeoSearchControl({
+        notFoundMessage: 'No se encontraron resultados.',
+        provider: geosearchProvider,
+        style: 'bar',
+        showMarker: false, // optional: true|false  - default true
+        showPopup: false, // optional: true|false  - default false
+        /*marker: () => {
+            marcador = L.marker({
+                draggable: false,
+                autoPan: true
+            })
+
+            return marcador
+        },*/
+        popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
+        resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
+        maxMarkers: 1, // optional: number      - default 1
+        retainZoomLevel: false, // optional: true|false  - default false
+        animateZoom: true, // optional: true|false  - default true
+        autoClose: false, // optional: true|false  - default false
+        searchLabel: 'Ingrese una dirección', // optional: string      - default 'Enter address'
+        keepResult: false, // optional: true|false  - default false
+        updateMap: true, // optional: true|false  - default true
+    });
+    
+    
+    mapAsignOds.addControl(geoSearch);
+
+    $(".leaflet-control-geosearch").css("display", "none");
+
+    mapAsignOds.on('geosearch/showlocation', (e) => {
+
+        gps_latitud = e.location.y.toString();
+        gps_longitud = e.location.x.toString();
+
+        limpiarMarcadoresArrastrables();
+        poner_marcadores(true,_punto_suministro,gps_latitud,gps_longitud)
+        mapAsignOds.setView([gps_latitud,gps_longitud], mapAsignOds.getZoom());
+        toastr.success('Se agregó un marcador con dirección aproximada, arrastre el marcador y luego haga click en el botón Guardar Ubicación', ' ', {timeOut: 2500})   
+        actualizarCoordsMarcador(gps_latitud, gps_longitud, _punto_suministro, true)
+
+      });
+
+
+    // $(mapAsignOds).on('click drag',()=>{
+
+    // })
+
+    /* Fin Accion al clickear o arrastrar mapa */
+
+    /* Init map*/
+
+    if (lstLatLog.length>1)
+    {
+        setTimeout(function() { mapAsignOds.invalidateSize();mapAsignOds.fitBounds(lstLatLog);}, 250);
+    }
+    else
+    {    
+        setTimeout(function() { mapAsignOds.invalidateSize()}, 250);
+    }
+
+
+
+</script>

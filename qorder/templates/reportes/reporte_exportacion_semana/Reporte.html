@@ -1,0 +1,181 @@
+{% load qorder_tags %}
+  {% load i18n %} 
+  <div id='reporte'>
+    <row>
+     <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">Reporte rutas exportadas</h2>
+            </div>
+                                                    <div class="input-field col-xs-3 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input style="width: 70%;" class="select form-control" value="{{semana}}" list="semanas" id="semana" name="semana"  autocomplete="off">
+                            <datalist id="semanas" name="semanas" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+            <div class="input-field col-xs-3 text-right">
+              <div class="form-inline">
+                <label>{% trans "Contratista" %}</label>
+                <select class="select form-control" id="id_oficina"
+                name="oficina" onchange="searchRutasum()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+                {% endif %} 
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <row>
+          <div class="col-md-12">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                 Resultado
+               </h4>
+             </div>
+             <div class="row">
+              <div class="panel-body">
+                <div id="_tabla_resultado" >
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </row>
+      </div>
+    </div>
+  </div>
+</row>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body" >
+        <div id="contenido"  >
+
+          <!-- Change image source for large popup-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+
+
+  function adjust(controlname)
+  {
+    controlname.columns.adjust();
+
+  }
+
+
+  var centro = "";
+
+
+  {% if user.work_units.all|length_is:'1' %}
+
+  searchRutasum();
+  {% endif %}
+
+  function searchRutasum(){
+
+    centro = $('#id_oficina').val();
+
+    if (centro=="")
+    {
+      $("#tabla_rutasum").html("");
+
+      return;
+    }
+    $('#id_oficinah').val(centro);
+
+    var semana = $('#semana').val();
+    //console.log(aver);
+
+    $.ajax({
+      url: "{% url 'qorder:rpt_exportadas_rutas_getreporte' %}",
+      type: 'post',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      datatype: 'json',
+      data: {id_oficina:centro,semana:semana},
+      statusCode: {
+        200: function(data) {
+          //console.log('data')
+          $("#_tabla_resultado").html(data);
+
+        },
+        301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+  }
+
+
+
+
+  $("#filter_collapse").on("click",function(){
+    $("#filter_collapsible").collapse('hide');
+  });
+
+
+$('#semana').on('input', function() {
+  if( $(this).val().length === 0 ) {
+      $('#semana').val('');
+      toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+      $("#_tabla_resultado").html('');
+      return false;
+    }
+  else
+  {
+    if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+    {
+      var centro = $('#id_oficina').val();
+      var semana = $('#semana').val();
+      incluirExp = $('#chkRexportar').prop('checked')
+        
+    if (centro==""||semana=="")
+    {
+      $("#_tabla_resultado").html('');
+      return;
+    }
+    searchRutasum()();
+    }
+
+
+  }
+
+});
+
+
+</script>

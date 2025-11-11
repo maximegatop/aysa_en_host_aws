@@ -1,0 +1,187 @@
+{% load qorder_tags %}
+{% load i18n %}
+<row>
+  <div class="col-md-12">
+    <div class="panel-group" id="accordion">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">
+                <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+                href="#filter_collapsible">Reportes</a>
+              </h2>
+            </div>
+            <div class="input-field col-xs-6 text-right">
+              <div class="form-inline">
+                <label>{% trans "lblOffice" %}</label>
+                <select class="select form-control" id="id_oficina"
+                name="oficina" onchange="searchRoutes()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "lblOffice" %}</option>
+                {% endif %}
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <row>
+        <div class="panel panel-default col-xs-6">
+          <div class="panel-heading col-xs-12">
+            <h4 class="panel-title">
+              <a >Rutas</a>
+            </h4>
+          </div>
+          <div class="row">
+           
+            <div id="_tabla_rutasuministro" class="col-xs-12">
+             
+            </div>
+
+
+            
+          </div>
+        </div>
+
+        <div class="panel panel-default col-xs-6 ">
+          <div class="panel-heading col-xs-12" >
+            <h4 class="panel-title">
+              <a >Rango de Fecha</a>
+            </h4>
+          </div>
+          <div class="col-md-12">
+            <h4>Desde</h4>
+            <div id="sandbox-container">
+              
+              <div class="input-group date">
+                <input id="fecha" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                <div class="input-group-addon">
+                  <span class="glyphicon glyphicon-th"></span>
+                </div>
+              </div>
+            </div>
+
+
+
+            <h4>Hasta</h4>
+            <div id="sandbox-container">
+              
+              <div class="input-group date">
+                <input id="fecha" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                <div class="input-group-addon">
+                  <span class="glyphicon glyphicon-th"></span>
+                </div>
+              </div>
+            </div>
+          </div>  
+
+        </div>
+        <row>
+          <p>
+           <button data-target="modal1" id="btnAplicar" class="btn btn-primary" style="float:right" >
+            Aplicar Filtros</button>
+          </p> 
+
+        </row>  
+      </row>
+    </div>
+
+  </div>
+</div>
+
+</row>
+<row>
+  <div class="col-md-12">
+    <div class="panel-group" id="accordion">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading col-xs-12">
+          <h4 class="panel-title">
+           <a id="filter_collapseResultado" data-toggle="collapse" data-parent="#accordion"
+           href="#filter_collapsible">Resultado</a>
+         </h4>
+       </div>
+       <div class="row">
+         
+        <div id="_tabla_resultado" class="col-xs-12">
+          {% include 'data_admin/Reportes/tabla_resultado.html'  with feedback_form=feedback_form  %}
+        </div>
+
+
+        
+      </div>
+    </div>  
+  </div>
+</div>    
+</row>
+
+
+
+
+
+<script>
+
+
+$("#btnAddRutasum").prop("disabled",true);
+{% if user.work_units.all|length_is:'1' %}
+
+searchRutasum();
+{% endif %}
+
+function searchRutasum(){
+
+  var centro = $('#id_oficina').val();
+  
+  if (centro=="")
+  {
+    $("#tabla_rutasum").html("");
+    $("#btnAddRutasum").prop("disabled",true);
+    return;
+  }
+  $('#id_oficinah').val(centro);
+  
+  var aver = $('#id_oficinah').val();
+  
+  
+  $.ajax({
+    url: "{% url 'qorder:tabla_rutasuministro' %}",
+    type: 'post',
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    datatype: 'json',
+    data: {id_oficina:centro},
+    statusCode: {
+      200: function(data) {
+        
+        $("#_tabla_rutasuministro").html(data);
+        $("#btnAddRutasum").prop("disabled",false);
+
+      },
+      301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+}
+
+
+$("#btnAplicar").on("click",function(){
+  $('#filter_collapseResultado').collapse('show');
+  $('#filter_collapse').collapse('hide');
+});
+
+
+
+$("#filter_collapse").on("click",function(){
+  $("#filter_collapsible").collapse('hide');
+});
+
+
+
+</script>

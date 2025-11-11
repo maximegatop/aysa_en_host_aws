@@ -1,0 +1,109 @@
+      {% load i18n %} 
+    <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">{% trans "Datos de clientes" %}</h2>
+            </div>
+           
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-body">
+          <form class="form-inline" role="form">
+            <div class="form-group">
+               
+              <label for="inputEmail3" class="col-sm-2 control-label">
+               {% trans "NIS" %}
+              </label>
+              <div class="col-sm-2">
+               <input class="form-control" id="inputNis" type="text" />
+              </div>
+            </div>
+            <div class="form-group">
+               
+              <label for="inputEmail3" class="col-sm-2 control-label">
+               {% trans "NIC" %}
+              </label>
+              <div class="col-sm-2">
+               <input class="form-control" id="inputNic" type="text" />
+              </div>
+            </div>   
+           <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-2">
+                                     
+                    <button id="btnSave" class="btn btn-primary" type="button" onclick="searchCliente()">
+                      Buscar
+                    </button>
+
+              </div>
+            </div>        
+         </form>
+         <br>
+         
+        <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container ">
+            <div class="col-xs-6">
+              <h2 class="panel-title">{% trans "Datos del cliente" %}</h2>
+            </div>
+          </div>
+        </div>
+        <div id="_datoscliente">
+
+       </div> 
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+     function searchCliente(){
+
+   
+      var nis = $('#inputNis').val(); 
+      var nic = $('#inputNic').val(); 
+      if (nis=='' && nic=='')
+      {
+
+        toastr.error("Indique al menos un valor para buscar", ' ', {timeOut: 2000});
+        return;
+      }   
+
+      $.ajax({
+        url: "{% url 'qorder:buscar_cliente' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {nis:nis,nic:nic},
+        statusCode: {
+          200: function(data) {
+           
+            
+          },
+          301: function() {
+            toastr.error("Cliente no encontrado", ' ', {timeOut: 2000});
+                      },
+                   302: function() {
+            toastr.error("Datos del cliente no encontrados", ' ', {timeOut: 2000});
+                      },             
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    },
+        success: function (xhr, ajaxOptions, thrownError) {
+          $("#_datoscliente").html(xhr);
+        }
+                  });
+    }
+
+
+</script>
+
+

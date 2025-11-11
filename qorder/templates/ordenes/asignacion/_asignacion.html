@@ -1,0 +1,66 @@
+{% load core_tags %}
+{% load qorder_tags %}
+{% load i18n %}
+<row>
+  <div class="col-md-12">
+    <div id="tabs">
+      <ul id="myTab" class="nav nav-tabs">
+          <li class="active"><a href="#asignacion_ruta" data-toggle="tab" onclick="cambiarTab(this)">Asignación Ruta</a></li>
+          {% if user.username|if_page_by_user:'ordenes_segmentacion_rutas' %}
+            <li class=""><a href="#asignacion_segmento" data-toggle="tab" onclick="cambiarTab(this)">Asignación Segmento</a> </li>
+          {% endif %}
+      </ul>
+
+      <div id="myTabContent" class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active fade in" id="asignacion_ruta">
+          {% include "ordenes/asignacion/rutas/_asignacion_rutas.html" %}
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="asignacion_segmento">
+          {% include "ordenes/asignacion/segmentos/_asignacion_segmentos.html" %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</row>
+
+
+<script>
+ 
+  function cambiarTab(elemento) {
+    $(".tab-pane").addClass("fade");
+    $(".tab-pane").removeClass("show");
+    $(".tab-pane").css("display", "none");
+
+    $(elemento.hash).removeClass("fade");
+    $(elemento.hash).addClass("show");
+    $(elemento.hash).css("display", "");
+
+    if(table_seg && table_seg != undefined){
+      table_seg.columns.adjust();
+    }
+
+    if(table_routes && table_routes != undefined){
+      table_routes.columns.adjust();
+    }
+
+    if(table_tecnico_seg && table_tecnico_seg != undefined){
+      table_tecnico_seg.columns.adjust();
+    }
+
+    if(table_tecnico && table_tecnico != undefined){
+      table_tecnico.columns.adjust();
+    }
+  }
+
+  var table_seg;
+  var table_routes;
+  var table_tecnicos_seg
+
+  {% if user.work_units.all|length_is:'1' %}
+    search();
+    searchSeg();
+  {% endif %}
+
+</script>

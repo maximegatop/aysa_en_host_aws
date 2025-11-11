@@ -1,0 +1,447 @@
+{% load qorder_tags %}
+{% load i18n %}
+<div id='reporte'>
+    <row>
+        <div class="col-md-12">
+            <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+                <div class="panel-heading">
+                    <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+                        <div class="col-xs-6">
+                            <h2 class="panel-title">Reporte Auditoría de Lecturas</h2>
+                        </div>
+                        <div class="input-field col-xs-6 text-right">
+                            <div class="form-inline">
+                                <label>{% trans "Contratista" %}</label>
+                                <select class="select form-control" id="id_oficina" name="oficina"
+                                    onchange="searchTecnico()">
+                                    {% if not user.work_units.all|length_is:'1' %}
+                                    <option value="">{% trans "Contratista" %}</option>
+                                    {% endif %}
+                                    {% for ct in user.work_units.all %}
+                                    <option value="{{ct.id_workunit}}">{{ct}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <row>
+                        <div class="col-md-6">
+                            <div class="panel panel-default" style="height: auto;">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <span>
+                                        </span> Fecha
+                                    </h4>
+                                </div>
+                                <div class="panel-body">
+                                    <h4><b>Desde</b></h4>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="input-group date">
+                                                <input id="fecha_desde" type="text" class="form-control"
+                                                    data-provide="datepicker" data-date-format="dd/mm/yyyy" readonly>
+                                                <div class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-th"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h4><b>Hasta</b></h4>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="input-group date">
+                                                <input id="fecha_hasta" type="text" class="form-control"
+                                                    data-provide="datepicker" data-date-format="dd/mm/yyyy" readonly>
+                                                <div class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-th"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                  
+                                    <h4><b>Porción</b></h4>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <select class="js-example-basic-multiple" multiple="multiple"
+                                                style="width: 100%;" id="rutas">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="checkbox" name="" id="get_todas_rutas"> Todas las porciones
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6" style="margin-top: 10px;">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="">Cantidad</label>
+                                                    <input class="form-control" type="text" name=""
+                                                        id="txtfiltrocantidad" style="width: 70%;"
+                                                        onkeypress="return isNumber(event)">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="">Porcentaje</label>
+                                                    <input class="form-control" type="text" name=""
+                                                        id="txtfiltroporcentaje" style="width: 70%;"
+                                                        onkeypress="return isNumber(event)">
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6" style="margin-top: 10px;">
+                                            <label for="txttec">Acción de lectura</label>
+                                                <select class="select form-control" id="id_cfg" name="id_cfg">
+                                                    <option value=''>Seleccione una Acción</option>
+                                                    {% for cfg in configs %}
+                                                    <option value="{{cfg.id_config}}">{{cfg.id_config}}</option>
+                                                    {% endfor %}
+                                                </select>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <span>
+                                        </span> {% trans "Técnico" %}
+                                    </h4>
+                                </div>
+                                <div class="panel-body">
+                                    <label for="txttec">Técnico</label>
+                                    <select class="select form-control" id="id_tecnico" name="tecnico"
+                                        style="width: 50%;">
+                                        <option value=0>Seleccione un Técnico</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <span>
+                                        </span> {% trans "Punto de suministro" %}
+                                    </h4>
+                                </div>
+                                <div class="panel-body">
+                                    <label for="">Punto de Suministro</label>
+                                    <input class="form-control" type="text" name="ptosuministro" id="ptosuministro"
+                                        style="width: 50%;">
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <span>
+                                        </span> {% trans "Órdenes no trabajadas" %}
+                                    </h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-8">
+                                        <input type="checkbox" name="" id="get_ods_no_trabajadas"> Incluir Órdenes no trabajadas
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="btnAplicar" class="btn btn-primary" style="float:left">Aplicar Filtros
+                            </button>
+
+                        </div>
+                    </row>
+                    <row>
+                        <div class="col-md-12">
+                            <br>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <span>
+                                        </span> Resultado
+                                    </h4>
+                                </div>
+                                <div class="row">
+                                    <div class="panel-body">
+                                        <div id="_tabla_resultado">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </row>
+                </div>
+            </div>
+        </div>
+    </row>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <div id="contenido">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    //SET VARIABLES INIC COMPONENTES
+    var ids_ordenes = "";
+    var fecha1 = "";
+    var fecha2 = "";
+    var todayDate = new Date();
+    var ciclo = todayDate.getMonth();
+    var today = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+    var centro = ""
+    var rutas_temp = null
+    var fecha_desde = $('#fecha_desde').datepicker(
+        {
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true,
+            language: 'es',
+            defaultDate: new Date()
+        });
+    $("#fecha_desde").datepicker().datepicker("setDate", new Date());
+    var fecha_hasta = $('#fecha_hasta').datepicker(
+        {
+            format: "dd/mm/yyyy",
+            autoclose: true,
+            todayHighlight: true,
+            language: 'es',
+            defaultDate: new Date()
+        });
+    $("#fecha_hasta").datepicker().datepicker("setDate", new Date());
+    //METODOS 
+    //APLICAR FILTROS PARA QUE GENERE LA TABLA CON SUS CORRESPONDIENTES CAMPOS
+    function AplicarFiltros() {
+        centro = $('#id_oficina').val();
+        if (centro == "") {
+            toastr.warning("Debe seleccionar una oficina", ' ', { timeOut: 2000 })
+            $("#_tabla_resultado").html('');
+            return;
+        }
+        return true;
+    }
+    //Cambiar fecha en datapicker dependiendo de la selección del otro componente con los mismos atributos.
+    $("#fecha_desde").on('change', function () {
+        var fecha = $("#fecha_desde").datepicker("getDate");
+        fecha.setDate(fecha.getDate() + 30);
+        $("#fecha_hasta").datepicker("setDate", fecha);
+    })
+    $("#fecha_hasta").on('change', function () { //verifico q la fecha hasta no sea menor
+        var fecha = $("#fecha_hasta").datepicker("getDate");
+        var fecha2 = $("#fecha_desde").datepicker("getDate");
+        if (fecha < fecha2) {
+            toastr.warning("Debe seleccionar una fecha hasta, correcta.", ' ', { timeOut: 2000 })
+            $("#fecha_hasta").datepicker("setDate", fecha2);
+        }
+    })
+    //validar campos
+    function ValidarCampos() {
+        fecha1 = $("#fecha_desde").data('datepicker').getFormattedDate('yyyy-mm-dd');
+        fecha2 = $("#fecha_hasta").data('datepicker').getFormattedDate('yyyy-mm-dd');
+
+        var date1 = new Date(fecha1);
+        var date2 = new Date(fecha2);
+        var Difference_In_Time = date2.getTime() - date1.getTime();
+        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+
+        if (Difference_In_Days > 30) {
+            toastr.warning("Error, el rango de fecha debe ser de 30 dias", ' ', { timeOut: 2000 })
+            return false;
+        }
+        if (date2 < date1) {
+            toastr.warning("Error, debe seleccionar una fecha hasta, correcta.", ' ', { timeOut: 2000 })
+            return false;
+        }
+        var $pto_sum = $("#ptosuministro").val()
+        if ($pto_sum != '')
+            if (isNaN($pto_sum)) {
+                toastr.warning("Error, el Punto de suministro solo lleva caracteres de tipo Entero", ' ', { timeOut: 2000 })
+                return false
+            }
+        return true;
+    }
+
+    //btn generador d tabla ajax+
+    $("#btnAplicar").on("click", function () {
+        if (AplicarFiltros() && ValidarCampos()) {
+            let url = document.URL;
+            var $tecnico = $("#id_tecnico").val()
+            var $pto_sum = $("#ptosuministro").val()
+            var ods_no_trabajadas = $('#get_ods_no_trabajadas').is(":checked")
+            var _ruta = ''
+            if ($("#rutas").val() != null) //obtengo TODAS Las rutas que posiblemnete se pueden seleccionar
+                for (let index = 0; index < $("#rutas").val().length; index++) {
+                    _ruta += $("#rutas").val()[index] + ','
+                }
+            var cantidad = $("#txtfiltrocantidad").val()
+            var porcentaje = $("#txtfiltroporcentaje").val()
+            var cfg = $("#id_cfg").val()
+            $.ajax({
+                url: "{% url 'qorder:reporte_auditoria_lect_getreporte' %}",
+                type: 'post',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                datatype: 'json',
+                data: {
+                    id_oficina: centro,
+                    ptosum: $pto_sum,
+                    tecnico: $tecnico,
+                    ods_no_trab: ods_no_trabajadas,
+                    fh_desde: fecha1,
+                    fh_hasta: fecha2,
+                    rutasum_id: _ruta,
+                    filtros: { cant: cantidad, porc: porcentaje },
+                    cfg : cfg,
+                    url : url
+                },
+                statusCode: {
+                    200: function (data) {
+                        $("#_tabla_resultado").html(data);
+                    },
+                    301: function (data) {
+
+                        toastr.warning('No se han encontrado resultados con los filtros aplicados', 'Atención!', { timeOut: 2000 });
+                        $("#_tabla_resultado").html("");
+                    },
+                    500: function () {
+                        toastr.error('Atención: Server error, contact an administrator.', ' ', { timeOut: 2000 });
+                    }
+                }
+            });
+        }
+        else {
+
+        }
+    });
+    //filtrar clientes
+    function searchTecnico() {
+        $("#_tabla_resultado").html('');
+        if (AplicarFiltros()) {
+
+            $.ajax({
+                url: "{% url 'qorder:get_tecnicos_from_oficina' %}",
+                type: 'post',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                datatype: 'json',
+                data: {
+                    id_oficina: centro,
+                },
+                statusCode: {
+                    200: function (data) {
+                        var string = "<option value=0>Seleccione un Tecnico</option>"
+                        data.forEach(element => {
+                            string += "<option value=" + element['codigo'] + ">" + element['nombre'] + "</option>"
+                        });
+                        $("#id_tecnico").html(string);
+                    },
+                    301: function (data) {
+
+                        toastr.warning(data.responseText, ' ', { timeOut: 2000 });
+                        $("#id_tecnico").html("");
+                    },
+                    500: function () {
+                        toastr.error(data.responseText, ' ', { timeOut: 2000 });
+                    }
+                }
+            });
+        }
+    }
+    $(document).ready(function () {
+        $('.js-example-basic-multiple').select2();
+    })
+    //TRAER RUTAS AL CAMBIAR D OF
+    $("#id_oficina").on("change", function () {
+        cod_oficina = $('#id_oficina').val()
+        $.ajax({
+            url: "{% url 'qorder:get_rutas_per_oficina' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_of: cod_oficina,
+            },
+            statusCode: {
+                200: function (data) {
+                    rutas_temp = null
+                    rutas_temp = data
+                    var html = ""
+                    $("#rutas").html(html)
+                    $('#rutas').find('option').remove()
+                    for (let index = 0; index < data.length; index++) {
+                        html += '<option value=' + data[index].itinerario + '>Porción: '+data[index].itinerario + '</option>'
+                    }
+                    $("#rutas").html(html) //CARGAR RUTAS
+                    $("#rutas").focus() //focus select
+                    $('#rutas').select2('open');
+                },
+                300: function () {
+                    toastr.error('Error en cargar rutas', 'Atención!!!', { timeOut: 2000 })
+                },
+                500: function () {
+                    toastr.error('Error en cargar rutas', 'Atención!!!', { timeOut: 2000 })
+                }
+            }
+        });
+    })
+    //solo numeros en el input text
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+    //entradas de texto para filtrado
+    var inp1 = document.getElementById("txtfiltrocantidad");
+    var inp2 = document.getElementById("txtfiltroporcentaje");
+    var inp3 = document.getElementById("ptosuministro");
+    inp1.addEventListener("input", function () {
+        document.getElementById("txtfiltroporcentaje").disabled = this.value != "";
+    });
+    inp2.addEventListener("input", function () {
+        document.getElementById("txtfiltrocantidad").disabled = this.value != "";
+    });
+    inp3.addEventListener("input", function () {
+        document.getElementById("txtfiltrocantidad").disabled = this.value != "";
+        document.getElementById("txtfiltrocantidad").value = "";
+        document.getElementById("txtfiltroporcentaje").disabled = this.value != "";
+        document.getElementById("txtfiltroporcentaje").value = "";
+    });
+
+    $("#rutas").select2();
+    $("#get_todas_rutas").click(function () {
+        if ($("#get_todas_rutas").is(':checked')) {
+            //$("#rutas > option").prop("selected","selected");
+            $("#rutas").html('<option value="all">Todas las porciones</option>')
+            $("#rutas").val('all')
+            $("#rutas").trigger("change");
+        } else {
+            get_rutas_temp()
+        }
+    });
+    function get_rutas_temp() {
+        var html = ""
+        $("#rutas").html(html)
+        $('#rutas').find('option').remove()
+        for (let index = 0; index < rutas_temp.length; index++) {
+            html += '<option value=' + rutas_temp[index].itinerario + '>Porción: '+rutas_temp[index].itinerario + '</option>'
+        }
+        $("#rutas").html(html) //CARGAR RUTAS
+        $("#rutas").focus() //focus select
+        $('#rutas').select2('open');
+    }
+
+
+</script>

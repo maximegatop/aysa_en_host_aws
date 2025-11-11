@@ -1,0 +1,124 @@
+  <div class="col-md-12">
+    <table id="table_params" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Descripción</th>
+                      <th>Valor 1</th>
+                      <th>Valor 2</th>
+                      <th>Editar</th>
+                      <th>Eliminar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                            {% for t in parametros %}
+                            <tr>
+                                <td>{{t.parametro|default_if_none:'--'}}</td>
+                                <td>{{t.descripcion|default_if_none:'--'}}</td>
+                                <td>{{t.valor_1|default_if_none:'--'}}</td>
+                                <td>{{t.valor_2|default_if_none:'--'}}</td>                        
+  <td><i class="fa fa-fw fa-lg fa-pencil text-primary"></i></td>
+   <td><i class="fa fa-fw fa-lg fa-remove text-danger"></i></td>
+   
+                                
+                             </tr>
+                            {% endfor %}
+                  
+                  </tbody>
+                </table>
+          
+   </div>
+                              <script> 
+$.fn.dataTable.render.ellipsis = function () {
+    return function ( data, type, row ) {
+       
+        return type === 'display' && data.length > 30 ?
+            data.substr( 0, 30 ) +'…' :
+            data;
+    }
+};
+          var table_params = $('#table_params').DataTable( {
+            language: datetable_languaje,
+           
+
+            "columnDefs": [
+            {
+              "width": "5%",
+              "targets": [ 4 ,5],
+              "visible": true,
+              "sorting" : false,
+              "searchable": false
+            },
+                {
+        targets: [ 2 ,3],
+        "width": "20%",
+        render: $.fn.dataTable.render.ellipsis()
+    },
+                {
+        targets: [ 0 ,1],
+        "width": "20%"
+    }
+    
+            ],
+            pageLength:6,
+
+           
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+         
+
+         $('#table_params tbody').on( 'click', 'td', function () {
+
+    var rowIdx = table_params.cell( this ).index().row;
+    var colIdx = table_params.cell(this).index().column;
+    var codigo = table_params.cell(rowIdx,0).data() ;
+    
+    if (colIdx==4)
+    {
+             var modal = $("new");
+        
+             $.ajax({
+              url: "{% url 'qorder:configuracion_edit' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id:codigo,form:'None'},
+              context: document.body
+            }).done(function(response) 
+            {
+              
+              $('#new').html(response);
+              $('#new').modal('toggle');
+            });
+    }
+    if (colIdx==5)
+    {
+                 $.ajax({
+              url: "{% url 'qorder:configuracion_delete' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+              data: {id:codigo,form:'None'},
+              context: document.body
+            }).done(function(response) 
+            {
+              $("#container" ).html(response);
+              toastr.success('Parámetro borrado', ' ', {timeOut: 2000})
+            });
+    }
+  
+} );
+                    </script>

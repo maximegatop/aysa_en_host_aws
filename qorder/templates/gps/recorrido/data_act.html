@@ -1,0 +1,128 @@
+ {% load crispy_forms_tags %}
+   {% load i18n %} 
+
+   <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">×</button>
+    
+     <h3>{% trans "Datos de la orden" %} </h3>
+   
+   </div>     
+   <div id="form-modal-body" class="modal-body" style="padding-left:10px;">
+   <row>
+    <div class="row">
+        <div class="col-sm-6">
+          <table>
+            <tr>
+              <td ><b>Num. OS: </b></td>
+              <td > {{actividad.ref_actividad}}</td>
+            </tr> 
+            <tr> 
+              <td><b>Secuencia: </b></td>
+              <td> {{secuencia}}</td>
+            </tr>
+            <tr> 
+              <td><b>NIS: </b></td>
+              <td> {{actividad.get_orden.punto_suministro.punto_suministro}}</td>
+            </tr>
+            <tr> 
+              <td><b>NIF: </b></td>
+              <td> {{actividad.get_orden.punto_suministro.nif}}</td>
+            </tr>
+            <tr>
+              <td><b>Fecha Inicio: </b></td>
+              <td> {{orden.fh_inicio|date:"d/m/Y H:i"}}</td>
+            </tr>
+            <tr>
+              <td><b>Fecha Fin: </b></td>
+              <td> {{orden.fh_fin|date:"d/m/Y H:i"}}</td>
+            </tr>            
+          </table>
+      </div>
+      <div class="col-sm-5 offset-s1">
+          <table>
+          <tr>
+            <td><b>Coordenadas: </b></td>
+            <td> {{actividad.position}}</td>
+          </tr>
+          <tr>
+            <td ><b>Personal: </b></td>
+            <td > {{actividad.tecnico.nombre_1}},{{actividad.tecnico.apellido_1}}</td>
+          </tr>                                            
+          <tr>
+            <td ><b>Tipo de orden: </b></td>
+            <td > {{actividad.get_orden.tipo_orden}}</td>
+          </tr>  
+          <tr>
+            <td ><b>Cliente: </b></td>
+            <td > {{actividad.get_orden.punto_suministro.cliente}}</td>
+          </tr> 
+          <tr>
+             <td ><b>Dirección Aprox.: </b></td>
+             <td > {{aprox}}</td>
+           </tr> 
+        </table>
+      </div>
+    </div>
+   </row>
+   <row>
+    {% if lecturas %}
+      <br>
+      <br>
+        <table id="table_lecturas" class="table table-condensed table-striped table-bordered" cellspacing="0" width="100%">
+      <thead>
+          <tr>
+              <th>{% trans "Marca" %}</th>    
+              <th>{% trans "lblNumSerie" %}</th>                        
+              <th>{% trans "lblLectura" %}</th>
+              <th>{% trans "Consumo" %}</th>
+              <th>{% trans "Anomalía" %}</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for t in lecturas %}
+          <tr> 
+              <td>{{t.marca}}</td>
+              <td>{{t.numero_serie}}</td>
+              <td>{{t.lectura}}</td>
+              <td>{{t.consumo}}</td>       
+              <td>{{t.anomalia.id_anomalia}} {{t.anomalia.descripcion}}</td> 
+
+           </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+    {% endif %}
+   </row>
+    
+  </div>
+  <div class="modal-footer">
+
+ </div>
+
+ 
+
+
+
+
+<script>
+    
+    $('#table_reads').DataTable( {
+        lengthChange: false,
+        language: datetable_languaje,
+        autoWidth: false,
+        paging:   false,
+        ordering: false,
+        info:     false,
+        searching: false
+    });
+
+    $('#table_reads1').DataTable( {
+        lengthChange: false,
+        language: datetable_languaje,
+        autoWidth: false,
+        paging:   false,
+        ordering: false,
+        info:     false,
+        searching: false
+    });
+</script>

@@ -1,0 +1,284 @@
+{% load i18n %}
+<div class="col-md-3">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title"> {% trans "Filtros de Suministros"%}
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div style="height:auto;">
+                <div>
+                    <label for="cmbtipofiltro">Tipo de Filtro</label>
+                      <select class="form-control" id="cmbtipofiltro">
+                        <option value="0">Filtrar por cliente</option>
+                        <option value="1">Asignación Masiva</option>
+                      </select>
+                      <hr>
+                </div> 
+                <!-- FORMS -->
+                <form class="hide" id="frm1"> 
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="rutas">Contratista</label>
+                                <select class="js-example-basic-multiple js-" multiple="multiple" style="width: 100%" id="contratistas">
+                                    {% for of in oficinas %}
+                                        <option value="{{of.contratista_id}}">{{of.contratista_nombre|default_if_none:'--'}}</option>
+                                    {% endfor %}
+                                  </select>
+                            </div>
+                        </div>
+                        <div class="row table-bordered">
+                            <div class="container" style="padding-top: 2%;"><p> <small class="fa fa-warning"></small> <b> <small>Asignación Aleatoria</small></b></p></div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtnombreape"><small>Porcentaje </small> </label>
+                                    <input type="text" class="form-control" id="txtporcentaje1" aria-describedby="Nombre o apellido"
+                                        autocomplete="off" onkeypress="return isNumber(event)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtnombreape"><small>Cantidad </small> </label>
+                                    <input type="text" class="form-control" id="txtcantidad1" aria-describedby="Nombre o apellido"
+                                        autocomplete="off" onkeypress="return isNumber(event)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-block btn-primary" id="btnAsignarMasivoAleatorio" onclick="showModalAsignMasivoAleatorio()" disabled style="margin-top: 8%;">
+                        <small>Asignar suministros aleatoriamente</small></button>
+                    <!-- <div class="btn btn-block btn-primary" id="btnAsignarMasivo">
+                        <small>Asignar suministros a la configuración</small> 
+                    </div> -->
+                </form>
+                <form class="show" id="frm2">
+                    <div class="form-group">
+                        <label for="rutas">Contratista</label>
+                        <select class="form-control" id="oficinas">
+                            <option value="0">
+                                 Seleccionar Contratista
+                            </option>
+                            {% for of in oficinas %}
+                                        <option value="{{of.contratista_id}}">{{of.contratista_nombre|default_if_none:'--'}}</option>
+                                    {% endfor %}
+                        </select>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                <label for="txtnis">NIS</label>
+                                <input type="text" class="form-control" id="txtnis" aria-describedby="Contratista"
+                                    autocomplete="off">
+                                </div>
+                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtnic">NIC</label>
+                                    <input type="text" class="form-control" id="txtnic" aria-describedby="Número de contrato"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row table-bordered">
+                            <div class="container" style="padding-top: 2%;"><p> <b> <small>Asignación Aleatoria</small></b></p></div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtnombreape"><small>Porcentaje </small> </label>
+                                    <input type="text" class="form-control" id="txtnombreape" aria-describedby="Nombre o apellido"
+                                        autocomplete="off" onkeypress="return isNumber(event)">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtnombreape"><small>Cantidad </small> </label>
+                                    <input type="text" class="form-control" id="txtcantidad" aria-describedby="Nombre o apellido"
+                                        autocomplete="off" onkeypress="return isNumber(event)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <!-- <div class="form-group">
+                        <label for="rutas">Rutas</label>
+                        <select class="form-control" id="rutas">
+                        </select>
+                    </div> -->
+                    <div class="form-group" style="margin-top: 8%;">
+                        <label for="rutas">Porciones</label>
+                        <select class="js-example-basic-multiple js-" multiple="multiple" style="width: 100%" id="rutas">
+                          </select>
+                    </div>
+                    <div class="btn btn-block btn-primary" id="btnAplicarFiltro">
+                        Aplicar Filtros
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-9">
+    <div class="panel panel-default" style="height: 597px;">
+        <div class="panel-heading">
+            <h4 class="panel-title"> {% trans "Resultados" %}
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-12">
+                <div>
+                    <div id="tablaclientesresultado">
+                    </div>
+
+                    <div class="container hide" id="asigmasiva">
+                        <h1 class="h3"><strong>{% trans "Asignación Masiva" %}</strong></h1>
+                        <p>La Asignación Masiva consiste en asignar esta acción a todos los clientes de un/os contratista/s</p>
+                    </div>
+                    <div style="margin-bottom: 445px;">
+                        <button class="btn btn-primary pull-right" onclick="confirmAsignarClientes()"  id="btnAsignarClSelect">
+     
+                            Asignar suministros
+                            seleccionados</button>
+                        <button type="button" class="hide btn btn-default pull-left" id="btnAsignarAleatorio" disabled>
+                            
+                            Asignar aleatorio</button>
+                    </div>
+                    
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+
+    
+</div>
+<div class="col-md-9" style="padding-top: 11px;">
+    <!-- <div class="pull-left">
+        <div class="form-group">
+            <label for="txtnombreape"><small>Porcentaje </small> </label>
+            <input type="text" class="form-control" id="txtnombreape" aria-describedby="Nombre o apellido"
+                autocomplete="off" style="width: 50%;">
+        </div>
+    </div>
+    <div class="pull-left">
+        <div class="form-group">
+            <label for="txtnombreape"><small>Cantidad </small> </label>
+            <input type="text" class="form-control" id="txtcantidad" aria-describedby="Nombre o apellido"
+                autocomplete="off" style="width: 50%;">
+        </div>
+    </div> -->
+    <!-- <button class="btn btn-primary pull-right" onclick="confirmAsignarClientes()"  id="btnAsignarClSelect">
+     
+        Asignar clientes
+        seleccionados</button>
+    <button type="button" class="btn btn-default pull-left" id="btnAsignarAleatorio" disabled>
+        
+        Asignar aleatorio</button> -->
+</div>
+
+<script>
+    let cod_oficina = ""
+    $(function () {
+        $("#txtnis").text("");
+        $("#txtnic").text("");
+        $("#txtnombreape").text("")
+    });
+    //TRAER RUTAS DEPENDIENDO DE QUE CONTRATISTA(OFICINAS) SE ELIGIO
+    $("#oficinas").on("change", function () {
+        cod_oficina = $(this).val()
+        $.ajax({
+            url: "{% url 'qorder:get_rutas_per_oficina' %}",
+            type: 'post',
+            datatype: 'json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            data: {
+                codigo_of: cod_oficina,
+            },
+            statusCode: {
+                200: function (data) {
+                    var html = ""
+                    $("#rutas").html(html)
+                    $('#rutas').find('option').remove()
+                    //html += '<option value="0">< Seleccionar ruta ></option>'
+                    for (let index = 0; index < data.length; index++) {
+                        html += '<option value=' + data[index].itinerario + '>Porción: ' + data[index].itinerario + '</option>'
+                    }
+                    $("#rutas").html(html) //CARGAR RUTAS
+                    $("#rutas").focus() //focus select
+                    $('#rutas').select2('open');
+                },
+                300: function () {
+                    //toastr.error("El código de configuración ya se encuentra registrado", "Atención!!", 1500);
+                    toastr.error('Error en cargar rutas', 'Atención!!!', { timeOut: 2000 })
+                },
+                500: function () {
+                    //toastr.error('Ocurrio un error al registrar el código de configuración.', '', { timeOut: 2000 })
+                    toastr.error('Error en cargar rutas', 'Atención!!!', { timeOut: 2000 })
+                }
+            }
+        });
+    })
+    //HIDE FORMS - 1 = FILTRAR CLIENTE INDIV 2 = ASIGN MASIVO------>
+    $("#cmbtipofiltro").on("change",function (){
+        hide_frm($(this).val(),$("#frm1"),$("#frm2"))
+    })
+    function hide_frm(form,frm1,frm2){
+        if(form ==0){
+            e(true)
+        }else{
+            e(false)
+            cleanfilters(true)
+            ocultar_Asig_Mas(false)
+            $("#btnAsignarAleatorio").toggleClass('disabled',true)
+        }
+        function e (b){
+            frm1.toggleClass('hide',b)
+            frm1.toggleClass('show',!b)
+            frm2.toggleClass('show',b)
+            frm2.toggleClass('hide',!b)
+            ocultar_Asig_Mas(true)
+        }
+    }
+    //-------------------------------------------------------------->
+    //ALTERNAR INPUTS CANTIDAD PORCENTAJE (DESHABILITAR EL INPUT DEPENDIENDO EN CUAL SE INGRESA NUMERO)
+    $("#txtnombreape").on("input",function(){ //PORCENTAJE
+        inputs('txtnombreape','txtcantidad',"btnAsignarAleatorio")
+    })
+    $("#txtcantidad").on("input",function(){
+        inputs('txtcantidad','txtnombreape',"btnAsignarAleatorio")
+    })
+    $("#txtporcentaje1").on('input',function(){
+        inputs('txtporcentaje1','txtcantidad1',"btnAsignarMasivoAleatorio")
+    })
+    $("#txtcantidad1").on('input',function(){
+        inputs('txtcantidad1','txtporcentaje1',"btnAsignarMasivoAleatorio")
+    })
+    function inputs(txt1,txt2,btn){
+        $txt1 = document.getElementById(txt1)
+        $txt2 = document.getElementById(txt2)
+        desactivar_inputs($txt1,$txt2,btn)
+    }
+    function desactivar_inputs(text,anothertext,btn){
+        if(text.value != ''){
+            anothertext.disabled = true;
+            $("#"+btn).attr('disabled',false)
+        }else{
+            anothertext.disabled = false;
+            $("#"+btn).attr('disabled',true)
+        }
+    }
+    //ONLY NUMEROS EN TXT FIELDS
+    function isNumber(evt) {
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+    }
+</script>

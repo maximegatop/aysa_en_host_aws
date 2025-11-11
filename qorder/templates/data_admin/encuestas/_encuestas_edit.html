@@ -1,0 +1,45 @@
+{% load crispy_forms_tags %}
+   {% load i18n %} 
+<div id="edit1" class="modal-dialog">
+ <div id="edit2" class="modal-content">
+   <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal">×</button>
+     {% if encuesta.id %}
+     <h3>{% trans "Editar encuesta" %} {{ encuesta.nombre}}</h3>
+     {% else %}
+
+     <h3>{% trans "Nueva encuesta" %} </h3>
+
+     {% endif %}  
+   </div>     
+   <div id="form-modal-body" class="modal-body" style="padding-left:10px;">
+     <form  id="formencuesta" class="form-horizontal" action="" method="post">
+      <input type="hidden" name="id_encuesta" id="id_encuesta" value="{{ encuesta.id }}">
+      {% if encuesta.id %}
+      <input type="hidden" name="accion" id="accion" value="edit">
+      {% else %}
+      <input type="hidden" name="accion" id="accion" value="new">
+      {% endif %}
+      
+
+      {% crispy form %}
+
+
+
+
+    </form>
+  </div>
+  <div class="modal-footer">
+
+   <button id="btnSave" style="width:210px" class="btn btn-primary" type="button" onclick="btnSaveOnClick('{{ encuesta.id }}')">
+    Grabar
+  </button>
+
+   <button name="cancel" style="width:210px" data-dismiss="modal" class="btn btn-default" type="button">
+    Cancelar
+  </button>
+
+
+ </div>
+</div>
+</div>

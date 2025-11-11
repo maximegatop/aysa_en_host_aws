@@ -1,0 +1,397 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+    <row>
+      <div class="col-md-12">
+        <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+          <div class="panel-heading">
+            <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+              <div class="col-xs-6">
+                <h2 class="panel-title">{% trans "Forzado de rutas" %}</h2>
+              </div>
+                                  <div class="input-field col-xs-3 text-right">
+                        <div class="form-inline">
+                            <label>{% trans "Semana" %}</label>
+                            <input style="width: 70%;" class="select form-control" value="{{semana}}" list="semanas" id="semana" name="semana" onchange="searchRutasum();" autocomplete="off">
+                            <datalist id="semanas" name="semanas" >
+                                <option value="{{semana}}"></option>
+                                <option value="TODAS"></option>
+                            </datalist>
+                        </div>
+                    </div>
+              <div class="input-field col-xs-3 text-right">
+                <div class="form-inline">
+                  <label>{% trans "Contratista" %}</label>
+                  <select class="select form-control" id="id_oficina"
+                  name="oficina" onchange="searchRoutes()">
+                  {% if not user.work_units.all|length_is:'1' %}
+                    <option value="">{% trans "Contratista" %}</option>
+                  {% endif %} 
+                  {% for ct in user.work_units.all %}
+                    <option value="{{ct.id_workunit}}">{{ct}}</option>
+                  {% endfor %}</select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <row>
+              <div class="col-md-12">
+                <br>
+                <div class="panel panel-default">
+                  <div class="panel-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li role="presentation" class="active">
+                        <a href="#leidos" aria-controls="leidos" role="tab" data-toggle="tab">Itinerarios leídos parcialmente</a>
+                      </li>
+                      <li role="presentation">
+                        <a href="#noleidos" aria-controls="noleidos" role="tab" data-toggle="tab">Itinerarios no leídos</a>
+                      </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                      <div role="tabpanel" class="tab-pane active" id="leidos">
+                          <div id="_table_routes_leida">
+                          </div>
+
+                      </div>
+                      <div role="tabpanel" class="tab-pane " id="noleidos">
+                          <div id="_table_routes_no_leida">
+                          </div>
+
+                      </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <row>
+ 
+                  </row>
+                </div>
+              </div>
+            </row>
+          </div>
+        </div>
+      </div>
+    </row>
+
+
+ 
+<script>
+ 
+    {% if user.work_units.all|length_is:'1' %}
+
+     searchRoutes();
+
+//agragar cartel de confirmacion en el boton de forzado
+    {% endif %}
+ $('btnGuardarAsignacion').prop('disabled', true);
+    function searchRoutes()
+    {
+          var centro = $('#id_oficina').val();
+          if (centro=="")
+          {
+             $("#_table_routes_no_leida").html("");
+             $("#_table_routes_leida").html("");
+             return;
+          }
+         
+          searchRoutesNoLeida();
+          searchRoutesLeida();
+
+    }
+
+
+    function adjust(controlname)
+    {
+        controlname.columns.adjust();
+
+    }
+
+    function searchRoutesNoLeida(){
+
+      var centro = $('#id_oficina').val();
+      
+      $('#id_oficinah').val(centro);
+    
+      var semana = $('#semana').val();
+     
+      $.ajax({
+        url: "{% url 'qorder:forzar_ruta_no_leida' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: {id_oficina:centro,semana:semana},
+        statusCode: {
+          200: function(data) {
+
+            $("#_table_routes_no_leida").html(data);
+           setTimeout(function() { adjust(table_routes_no_leida); }, 100);
+       //$('#table_routes_no_leida').DataTable().search( '' ).draw();
+       //$('#table_routes_leida').DataTable().search( '' ).draw();
+         
+          // $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+    function searchRoutesLeida(){
+      var centro = $('#id_oficina').val();
+      $('#id_oficinah').val(centro);
+      var semana = $('#semana').val();
+      $.ajax({
+        url: "{% url 'qorder:forzar_ruta_leida' %}",
+        type: 'post',
+        datatype: 'json',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        data: {id_oficina:centro,semana:semana},
+        statusCode: {
+          200: function(data) {
+
+            $("#_table_routes_leida").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+   
+     
+   
+
+          function btnSaveOnClick()
+          {
+            var ids_ordenes ="[";
+            if (table_routes.rows('.selected').data().count()>0)
+            {
+
+                var m_ids_ordenes = $.map(table_routes.rows('.selected').data(), function (item) {
+                return item[6];
+                 });
+                m_ids_ordenes.forEach(function(entry) {
+                ids_ordenes += "'" + entry + "',";
+                 });
+             
+                }
+            else
+            {
+              toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+              return;
+            }
+            ids_ordenes +=  "]";
+            
+            
+            var id_tecnico ="";
+            if (table_tecnico.rows('.selected').data().count()>0)
+            {
+
+                var m_id_tecnico = $.map(table_tecnico.rows('.selected').data(), function (item) {
+                return item[3];
+                 });
+                m_id_tecnico.forEach(function(entry) {
+                id_tecnico += "'" + entry + "'";
+                 });
+             
+                }
+            else
+            {
+              toastr.error("Seleccione al menos un lecturista","Atención!!",1500);
+              return;
+            }
+            
+            
+    
+             var filtros = {};
+
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.ids_rutas = ids_ordenes;
+            filtros.id_tecnico = id_tecnico;
+
+            $.ajax({
+              url: "{% url 'qorder:asignar_route' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: filtros,
+              statusCode: {
+                200: function(data) {
+                  toastr.success(data,' ', 2000);
+               
+                  searchTechnicians(); searchRoutes();searchAsignaciones();
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {}
+
+             });
+
+          }
+
+    function adjust(controlname)
+    {
+
+        controlname.columns.adjust();
+
+    }
+
+  
+
+  // ---------------------------------------------------------- Generic Confirm  
+
+    function confirm(heading, question, cancelButtonTxt, okButtonTxt, callback) {
+
+    var confirmModal = 
+      $('<div class="modal fade">' +        
+          '<div class="modal-dialog">' +
+          '<div class="modal-content">' +
+          '<div class="modal-header">' +
+            '<a class="close" data-dismiss="modal" >&times;</a>' +
+            '<h3>' + heading +'</h3>' +
+          '</div>' +
+
+          '<div class="modal-body">' +
+            '<p>' + question + '</p>' +
+          '</div>' +
+
+          '<div class="modal-footer">' +
+            '<a href="#!" class="btn" data-dismiss="modal">' + 
+              cancelButtonTxt + 
+            '</a>' +
+            '<a href="#!" id="okButton" class="btn btn-primary">' + 
+              okButtonTxt + 
+            '</a>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+        '</div>');
+
+    confirmModal.find('#okButton').click(function(event) {
+      callback();
+      confirmModal.modal('hide');
+    }); 
+
+    confirmModal.modal('show');    
+  };  
+
+  
+  function forzar() {
+    var heading = 'Forzado de rutas'; 
+    var question ='{% trans "Confirma forzado" %}.'; 
+    var cancelButtonTxt = '{% trans "btnCancel" %}'; 
+    var okButtonTxt = '{% trans "btnConfirm" %}'; 
+    if (table_routes_no_leida.rows( '.selected' ).count() ==0 && table_routes_leida.rows( '.selected' ).count() ==0)
+    {
+      toastr.error('Seleccione una ruta a forzar',' ', 2000);
+      return;
+    }
+
+    var callback = function() {
+        var ids_rutas = "[";
+        var m_ids = $.map(table_routes_leida.rows('.selected').data(), function (item) {
+                      return item[6];
+                   });
+        m_ids.forEach(function(entry) {
+           if(entry)
+                  ids_rutas += "'" + entry + "',";
+           });
+        m_ids = $.map(table_routes_no_leida.rows('.selected').data(), function (item) {
+                     
+                        return item[6];
+                   });
+        m_ids.forEach(function(entry) {
+           if(entry)
+                  ids_rutas += "'" + entry + "',";
+           });        
+        ids_rutas +=  "]";
+
+            var filtros = {};
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.ids_rutas = ids_rutas;
+               
+            $.ajax({
+              url: "{% url 'qorder:forzar_rutas' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: filtros,
+              statusCode: {
+                200: function(data) {
+                   toastr.success(data, ' ', {timeOut: 2000});
+                   searchRoutesNoLeida();
+                   searchRoutesLeida();
+                },
+                301: function() {
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function(data) {
+                   toastr.error("Error forzando rutas", ' ', {timeOut: 2000});
+                }
+
+              }
+               
+             });
+
+    
+    };
+    confirm(heading, question, cancelButtonTxt, okButtonTxt, callback);
+  }
+
+
+$('#semana').on('input', function() {
+  if( $(this).val().length === 0 ) {
+      $('#semana').val('');
+      toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+      $("#_table_routes_leida").html('');
+      $("#_table_routes_no_leida").html('');
+      return false;
+    }
+  else
+  {
+    if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+    {
+      var centro = $('#id_oficina').val();
+      var semana = $('#semana').val();
+      incluirExp = $('#chkRexportar').prop('checked')
+        
+    if (centro==""||semana=="")
+    {
+      $("#tabla_export").html('');
+      return;
+    }
+    searchRoutes();
+    }
+
+
+  }
+
+});
+
+
+
+</script>

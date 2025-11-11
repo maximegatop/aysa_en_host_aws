@@ -1,0 +1,1222 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-09 20:00-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: config/settings.py:173
+msgid "English"
+msgstr ""
+
+#: config/settings.py:174
+msgid "Portuguese"
+msgstr ""
+
+#: config/settings.py:175
+msgid "Spanish"
+msgstr ""
+
+#: config/settings.py:186
+msgid "Administración QOrder Web"
+msgstr ""
+
+#: core/templates/login.html:52
+msgid "lblUser"
+msgstr ""
+
+#: core/templates/login.html:60
+msgid "lblPassword"
+msgstr ""
+
+#: core/templates/login.html:66
+msgid "btnLogin"
+msgstr ""
+
+#: core/templates/menu.html:23
+msgid "mnuInterfaz"
+msgstr ""
+
+#: core/templates/menu.html:27
+msgid "mnuImportar"
+msgstr ""
+
+#: core/templates/menu.html:34
+msgid "mnuExportar"
+msgstr ""
+
+#: core/templates/menu.html:40
+msgid "mnuOrdenes"
+msgstr ""
+
+#: core/templates/menu.html:44
+msgid "mnuAsignacion"
+msgstr ""
+
+#: core/templates/menu.html:67
+msgid "mnuSegmentacionRutas"
+msgstr ""
+
+#: core/templates/menu.html:51
+msgid "mnuMonitor"
+msgstr ""
+
+#: core/templates/menu.html:58
+msgid "mnuConsulta"
+msgstr ""
+
+#: core/templates/menu.html:63
+msgid "mnuMonitorRutas"
+msgstr ""
+
+#: core/templates/menu.html:71
+msgid "mnuForzado"
+msgstr ""
+
+#: core/templates/menu.html:76
+msgid "mnuReorganizacion"
+msgstr ""
+
+#: core/templates/menu.html:83
+msgid "mnuGPS"
+msgstr ""
+
+#: core/templates/menu.html:87
+msgid "mnuUltimaPosicion"
+msgstr ""
+
+#: core/templates/menu.html:94
+msgid "mnuRecorrido"
+msgstr ""
+
+#: core/templates/menu.html:100
+msgid "mnuListadoRecorrido"
+msgstr ""
+
+#: core/templates/menu.html:106 core/templates/menu.html.py:168
+msgid "mnuAdmin"
+msgstr ""
+
+#: core/templates/menu.html:110
+msgid "mnuClientes"
+msgstr ""
+
+#: core/templates/menu.html:116
+msgid "mnuEquipos"
+msgstr ""
+
+#: core/templates/menu.html:121
+msgid "mnuTecnicos"
+msgstr ""
+
+#: core/templates/menu.html:126
+msgid "mnuAnomalias"
+msgstr ""
+
+#: core/templates/menu.html:131
+msgid "mnuProblemas"
+msgstr ""
+
+#: core/templates/menu.html:136
+msgid "mnuTiposOrdenes"
+msgstr ""
+
+#: core/templates/menu.html:141
+#: qorder/templates/data_admin/codigos/_codigos.html:7
+msgid "Códigos"
+msgstr ""
+
+#: core/templates/menu.html:146
+#: qorder/templates/data_admin/encuestas/_encuestas.html:7
+msgid "Encuestas"
+msgstr ""
+
+#: core/templates/menu.html:151
+msgid "mnuGeofencing"
+msgstr ""
+
+#: core/templates/menu.html:165
+msgid "mnuSettings"
+msgstr ""
+
+#: core/templates/menu.html:178
+msgid "mnuLogout"
+msgstr ""
+
+#: qorder/models.py:250
+msgid "número_serie"
+msgstr ""
+
+#: qorder/models.py:251
+msgid "alias"
+msgstr ""
+
+#: qorder/models.py:827
+#: qorder/templates/data_admin/problemas/_table_problemas.html:6
+#: qorder/templates/data_admin/tipo_orden/_table_tipo_ordenes.html:6
+msgid "Código problema"
+msgstr ""
+
+#: qorder/models.py:828 qorder/models.py:846
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:7
+#: qorder/templates/data_admin/anomalias/_table_codigos.html:13
+#: qorder/templates/data_admin/anomalias/_table_observaciones.html:13
+#: qorder/templates/data_admin/codigos/_table_codigos.html:7
+#: qorder/templates/data_admin/encuestas/_encuestas.html:31
+#: qorder/templates/data_admin/problemas/_table_problemas.html:7
+#: qorder/templates/data_admin/tipo_orden/_table_tipo_ordenes.html:7
+#: qorder/templates/ordenes/consulta/_table_anomalias.html:6
+#: qorder/templates/ordenes/revision/_revision.html:126
+#: qorder/templates/ordenes/revision/_revision.html:332
+msgid "Descripción"
+msgstr ""
+
+#: qorder/models.py:845
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:6
+msgid "Código anomalía"
+msgstr ""
+
+#: qorder/models.py:848
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:8
+msgid "Prioridad"
+msgstr ""
+
+#: qorder/templates/config/_config.html:7
+msgid "tituloParametros"
+msgstr ""
+
+#: qorder/templates/config/_config.html:17
+#: qorder/templates/data_admin/anomalias/_anomalias.html:17
+#: qorder/templates/data_admin/codigos/_codigos.html:36
+#: qorder/templates/data_admin/encuestas/_encuestas.html:75
+#: qorder/templates/data_admin/encuestas/_encuestas.html:107
+#: qorder/templates/data_admin/problemas/_problemas.html:17
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:40
+msgid "lblAdd"
+msgstr ""
+
+#: qorder/templates/config/_param_edit.html:16
+msgid "Editar párametro"
+msgstr ""
+
+#: qorder/templates/config/_param_edit.html:19
+msgid "Nuevo párametro"
+msgstr ""
+
+#: qorder/templates/config/_param_edit.html:32
+#: qorder/templates/data_admin/anomalias/_anomalias_edit.html:33
+#: qorder/templates/data_admin/anomalias/_anomalias_obs.html:15
+#: qorder/templates/data_admin/codigos/_codigos_edit.html:33
+#: qorder/templates/data_admin/encuestas/_encuestas_edit.html:33
+#: qorder/templates/data_admin/encuestas/_pregunta_edit.html:33
+#: qorder/templates/data_admin/geofencing/_geofencing_edit.html:34
+#: qorder/templates/data_admin/problemas/_problemas_edit.html:33
+#: qorder/templates/data_admin/tecnicos/_tech_edit.html:27
+msgid "Grabar"
+msgstr ""
+
+#: qorder/templates/config/_param_edit.html:33
+#: qorder/templates/data_admin/anomalias/_anomalias_edit.html:34
+#: qorder/templates/data_admin/anomalias/_anomalias_obs.html:16
+#: qorder/templates/data_admin/codigos/_codigos_edit.html:34
+#: qorder/templates/data_admin/encuestas/_encuestas_edit.html:34
+#: qorder/templates/data_admin/encuestas/_pregunta_edit.html:34
+#: qorder/templates/data_admin/geofencing/_geofencing_edit.html:35
+#: qorder/templates/data_admin/problemas/_problemas_edit.html:34
+#: qorder/templates/data_admin/tecnicos/_tech_edit.html:28
+msgid "Cancelar"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:7
+msgid "tituloAnomalias"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:211
+#: qorder/templates/data_admin/codigos/_codigos.html:217
+#: qorder/templates/data_admin/encuestas/_encuestas.html:457
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:213
+#: qorder/templates/data_admin/problemas/_problemas.html:167
+#: qorder/templates/ordenes/asignacion/_asignacion.html:358
+#: qorder/templates/ordenes/forzado/_forzado.html:267
+msgid "lblConfirmEnableOn"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:212
+#: qorder/templates/data_admin/codigos/_codigos.html:218
+#: qorder/templates/data_admin/encuestas/_encuestas.html:458
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:214
+#: qorder/templates/data_admin/problemas/_problemas.html:168
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:238
+#: qorder/templates/data_admin/tp/_terminales.html:280
+#: qorder/templates/ordenes/asignacion/_asignacion.html:359
+#: qorder/templates/ordenes/forzado/_forzado.html:268
+msgid "btnCancel"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:213
+#: qorder/templates/data_admin/codigos/_codigos.html:219
+#: qorder/templates/data_admin/encuestas/_encuestas.html:459
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:215
+#: qorder/templates/data_admin/problemas/_problemas.html:169
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:239
+#: qorder/templates/data_admin/tp/_terminales.html:281
+#: qorder/templates/ordenes/asignacion/_asignacion.html:360
+#: qorder/templates/ordenes/forzado/_forzado.html:269
+msgid "btnConfirm"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:217
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:27
+#: qorder/templates/data_admin/codigos/_codigos.html:223
+#: qorder/templates/data_admin/codigos/_codigos.html:261
+#: qorder/templates/data_admin/codigos/_table_codigos.html:24
+#: qorder/templates/data_admin/encuestas/_encuestas.html:49
+#: qorder/templates/data_admin/encuestas/_encuestas.html:463
+#: qorder/templates/data_admin/encuestas/_encuestas.html:501
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:22
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:219
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:257
+#: qorder/templates/data_admin/problemas/_problemas.html:173
+#: qorder/templates/data_admin/problemas/_problemas.html:211
+#: qorder/templates/data_admin/problemas/_table_problemas.html:24
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:37
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:279
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:338
+#: qorder/templates/data_admin/tp/_terminales.html:44
+#: qorder/templates/data_admin/tp/_terminales.html:285
+#: qorder/templates/data_admin/tp/_terminales.html:320
+#: qorder/templates/ordenes/asignacion/_asignacion.html:364
+#: qorder/templates/ordenes/asignacion/_asignacion.html:402
+#: qorder/templates/ordenes/forzado/_forzado.html:273
+#: qorder/templates/ordenes/forzado/_forzado.html:311
+msgid "lblEnable"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:218
+#: qorder/templates/data_admin/codigos/_codigos.html:224
+#: qorder/templates/data_admin/encuestas/_encuestas.html:464
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:220
+#: qorder/templates/data_admin/problemas/_problemas.html:174
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:280
+#: qorder/templates/data_admin/tp/_terminales.html:286
+#: qorder/templates/ordenes/asignacion/_asignacion.html:365
+#: qorder/templates/ordenes/forzado/_forzado.html:274
+msgid "lblConfirmEnable"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:222
+#: qorder/templates/data_admin/anomalias/_anomalias.html:248
+#: qorder/templates/data_admin/anomalias/_anomalias.html:255
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:23
+#: qorder/templates/data_admin/codigos/_codigos.html:228
+#: qorder/templates/data_admin/codigos/_codigos.html:254
+#: qorder/templates/data_admin/codigos/_table_codigos.html:20
+#: qorder/templates/data_admin/encuestas/_encuestas.html:45
+#: qorder/templates/data_admin/encuestas/_encuestas.html:468
+#: qorder/templates/data_admin/encuestas/_encuestas.html:494
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:18
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:224
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:250
+#: qorder/templates/data_admin/problemas/_problemas.html:178
+#: qorder/templates/data_admin/problemas/_problemas.html:204
+#: qorder/templates/data_admin/problemas/_table_problemas.html:20
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:33
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:285
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:286
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:342
+#: qorder/templates/data_admin/tp/_terminales.html:40
+#: qorder/templates/data_admin/tp/_terminales.html:291
+#: qorder/templates/data_admin/tp/_terminales.html:292
+#: qorder/templates/data_admin/tp/_terminales.html:324
+#: qorder/templates/ordenes/asignacion/_asignacion.html:369
+#: qorder/templates/ordenes/asignacion/_asignacion.html:395
+#: qorder/templates/ordenes/forzado/_forzado.html:278
+#: qorder/templates/ordenes/forzado/_forzado.html:304
+msgid "lblDisable"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:223
+#: qorder/templates/data_admin/codigos/_codigos.html:229
+#: qorder/templates/data_admin/encuestas/_encuestas.html:469
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:225
+#: qorder/templates/data_admin/problemas/_problemas.html:179
+#: qorder/templates/ordenes/asignacion/_asignacion.html:370
+#: qorder/templates/ordenes/forzado/_forzado.html:279
+msgid "lblConfirmDisable"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias.html:273
+#: qorder/templates/data_admin/codigos/_codigos.html:279
+#: qorder/templates/data_admin/encuestas/_encuestas.html:519
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:275
+#: qorder/templates/data_admin/problemas/_problemas.html:229
+#: qorder/templates/ordenes/asignacion/_asignacion.html:420
+#: qorder/templates/ordenes/forzado/_forzado.html:329
+msgid "lblCompleteMandatoryField"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias_edit.html:8
+msgid "Editar anomalia"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias_edit.html:11
+msgid "Nueva anomalia"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_anomalias_obs.html:7
+msgid "Observaciones para anomalia"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:9
+#: qorder/templates/data_admin/codigos/_table_codigos.html:8
+#: qorder/templates/data_admin/encuestas/_encuestas.html:32
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:7
+#: qorder/templates/data_admin/problemas/_table_problemas.html:9
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:13
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:22
+#: qorder/templates/data_admin/tp/_terminales.html:23
+msgid "lblEnableDisable"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:10
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:30
+msgid "Observaciones"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:11
+#: qorder/templates/data_admin/anomalias/_table_anomalias.html:40
+#: qorder/templates/data_admin/codigos/_table_codigos.html:9
+#: qorder/templates/data_admin/codigos/_table_codigos.html:28
+#: qorder/templates/data_admin/encuestas/_encuestas.html:33
+#: qorder/templates/data_admin/encuestas/_encuestas.html:53
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:12
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:26
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:8
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:26
+#: qorder/templates/data_admin/problemas/_table_problemas.html:10
+#: qorder/templates/data_admin/problemas/_table_problemas.html:28
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:17
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:74
+#: qorder/templates/data_admin/tp/_terminales.html:24
+#: qorder/templates/data_admin/tp/_terminales.html:51
+msgid "lblEdit"
+msgstr ""
+
+#: qorder/templates/data_admin/anomalias/_table_codigos.html:12
+#: qorder/templates/data_admin/anomalias/_table_observaciones.html:12
+#: qorder/templates/data_admin/codigos/_table_codigos.html:6
+#: qorder/templates/ordenes/consulta/_table_anomalias.html:5
+#: qorder/templates/ordenes/revision/_revision.html:125
+#: qorder/templates/ordenes/revision/_revision.html:331
+msgid "Código"
+msgstr ""
+
+#: qorder/templates/data_admin/clientes/_clientes.html:7
+#: qorder/templates/data_admin/clientes/_clientes.html:49
+msgid "Datos de clientes"
+msgstr ""
+
+#: qorder/templates/data_admin/clientes/_clientes.html:19
+#: qorder/templates/ordenes/consulta/_table_sum.html:5
+#: qorder/templates/ordenes/division/_table_suministros_division.html:12
+#: qorder/templates/ordenes/division/_table_suministros_ruta.html:12
+msgid "NIS"
+msgstr ""
+
+#: qorder/templates/data_admin/clientes/_clientes.html:28
+#: qorder/templates/ordenes/consulta/_table_sum.html:6
+#: qorder/templates/ordenes/division/_table_suministros_division.html:13
+#: qorder/templates/ordenes/division/_table_suministros_ruta.html:13
+msgid "NIC"
+msgstr ""
+
+#: qorder/templates/data_admin/codigos/_codigos.html:16
+msgid "Prefijos"
+msgstr ""
+
+#: qorder/templates/data_admin/codigos/_codigos.html:19
+msgid "Sin prefijos"
+msgstr ""
+
+#: qorder/templates/data_admin/codigos/_codigos_edit.html:8
+msgid "Editar código"
+msgstr ""
+
+#: qorder/templates/data_admin/codigos/_codigos_edit.html:11
+msgid "Nuevo código"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_encuestas.html:30
+msgid "Nombre"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_encuestas_edit.html:8
+msgid "Editar encuesta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_encuestas_edit.html:11
+msgid "Nueva encuesta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_pregunta_edit.html:8
+msgid "Editar pregunta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_pregunta_edit.html:11
+msgid "Nueva pregunta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:6
+msgid "Id"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:7
+msgid "Tipo pregunta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:8
+msgid "Titulo"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:9
+msgid "Pregunta"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:10
+msgid "Opciones"
+msgstr ""
+
+#: qorder/templates/data_admin/encuestas/_table_detalle.html:11
+msgid "Orden"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:33
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:6
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:16
+#: qorder/templates/ordenes/asignacion/_table_techs.html:7
+#: qorder/templates/ordenes/monitor/_table_techs.html:6
+#: qorder/templates/ordenes/monitor_rutas/_table_techs.html:6
+msgid "lblCode"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:34
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:7
+#: qorder/templates/ordenes/asignacion/_table_techs.html:8
+#: qorder/templates/ordenes/monitor/_table_techs.html:7
+#: qorder/templates/ordenes/monitor_rutas/_table_techs.html:7
+msgid "lblFirstName"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:35
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:8
+msgid "lblLastName"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:36
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:10
+#: qorder/templates/ordenes/asignacion/_table_techs.html:9
+msgid "lblTP"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:37
+#: qorder/templates/data_admin/geofencing/_configgeo.html:70
+msgid "lblAsignar"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:66
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:7
+#: qorder/templates/ordenes/asignacion/_table_routes.html:7
+#: qorder/templates/ordenes/consulta/_table_routes.html:7
+#: qorder/templates/ordenes/division/_table_routes.html:7
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:7
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:7
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:7
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:7
+msgid "lblOficina"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:67
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:8
+#: qorder/templates/ordenes/asignacion/_table_routes.html:8
+#: qorder/templates/ordenes/consulta/_table_routes.html:8
+#: qorder/templates/ordenes/division/_table_divisiones.html:13
+#: qorder/templates/ordenes/division/_table_routes.html:8
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:8
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:8
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:8
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:8
+msgid "lblCiclo"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:68
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:9
+#: qorder/templates/ordenes/asignacion/_table_routes.html:9
+#: qorder/templates/ordenes/consulta/_table_routes.html:9
+#: qorder/templates/ordenes/division/_table_divisiones.html:14
+#: qorder/templates/ordenes/division/_table_routes.html:9
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:9
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:9
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:9
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:9
+msgid "lblRuta"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_configgeo.html:69
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:11
+#: qorder/templates/ordenes/asignacion/_table_routes.html:11
+#: qorder/templates/ordenes/consulta/_table_routes.html:11
+#: qorder/templates/ordenes/division/_table_divisiones.html:15
+#: qorder/templates/ordenes/division/_table_routes.html:11
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:11
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:11
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:11
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:11
+msgid "lblItinerario"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_geofencing.html:9
+msgid "tituloGeofencing"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_geofencing.html:13
+#: qorder/templates/data_admin/geofencing/_geofencing.html:17
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:17
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:20
+#: qorder/templates/data_admin/tp/_terminales.html:21
+#: qorder/templates/gps/listadorecorrido/_listadorecorrido.html:13
+#: qorder/templates/gps/listadorecorrido/_listadorecorrido.html:17
+#: qorder/templates/gps/recorrido/_route_monitor.html:13
+#: qorder/templates/gps/recorrido/_route_monitor.html:17
+#: qorder/templates/gps/ultima/_lp_monitor.html:15
+#: qorder/templates/gps/ultima/_lp_monitor.html:18
+#: qorder/templates/interfaz/importar/_import.html:15
+#: qorder/templates/interfaz/importar/_import.html:18
+#: qorder/templates/ordenes/asignacion/_asignacion.html:15
+#: qorder/templates/ordenes/asignacion/_asignacion.html:18
+#: qorder/templates/ordenes/consulta/_consulta.html:13
+#: qorder/templates/ordenes/consulta/_consulta.html:17
+#: qorder/templates/ordenes/division/_division.html:15
+#: qorder/templates/ordenes/division/_division.html:18
+#: qorder/templates/ordenes/forzado/_forzado.html:13
+#: qorder/templates/ordenes/forzado/_forzado.html:17
+#: qorder/templates/ordenes/monitor/_monitor.html:15
+#: qorder/templates/ordenes/monitor/_monitor.html:18
+#: qorder/templates/ordenes/monitor_rutas/_monitor.html:15
+#: qorder/templates/ordenes/monitor_rutas/_monitor.html:18
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:15
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:18
+msgid "lblOffice"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_geofencing.html:46
+msgid "AgregarArea"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_geofencing_edit.html:8
+msgid "Editar geofencing"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_geofencing_edit.html:11
+msgid "Nueva geofencing"
+msgstr ""
+
+#: qorder/templates/data_admin/geofencing/_table_geofencing.html:6
+msgid "lblDescripcion"
+msgstr ""
+
+#: qorder/templates/data_admin/problemas/_problemas.html:7
+msgid "tituloProblemas"
+msgstr ""
+
+#: qorder/templates/data_admin/problemas/_problemas_edit.html:8
+msgid "Editar problema"
+msgstr ""
+
+#: qorder/templates/data_admin/problemas/_problemas_edit.html:11
+msgid "Nuevo problema"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:11
+msgid "lblType"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:12
+msgid "lblTypeWork"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:14
+msgid "lblPasswordReset"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:15
+msgid "lblDownloadAll"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:16
+msgid "lblFreeData"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:44
+msgid "Quitar reset"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:47
+msgid "Activar_Reset"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:54
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:325
+msgid "Quitar descarga total"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:58
+msgid "Activar_descarga_total"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:66
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:334
+msgid "Quitar liberar datos"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_table_techs.html:69
+msgid "Activar_liberar_datos"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tech_edit.html:12
+msgid "Editar técnico"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tech_edit.html:15
+msgid "Nuevo técnico"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:11
+msgid "lblTechAdmin"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:243
+msgid "lblResetOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:244
+msgid "lblConfirmResetOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:249
+msgid "lblResetOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:250
+msgid "lblConfirmResetOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:255
+msgid "lblDescargaOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:256
+msgid "lblConfirmDescargaOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:261
+msgid "lblDescargaOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:262
+msgid "lblConfirmDescargaOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:267
+msgid "lblLiberarOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:268
+msgid "lblConfirmLiberarOn"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:273
+msgid "lblLiberarOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:274
+msgid "lblConfirmLiberarOff"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:312
+msgid "Activar Reset"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:316
+msgid "Quitar Reset"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:320
+msgid "Activar descarga total"
+msgstr ""
+
+#: qorder/templates/data_admin/tecnicos/_tecnicos.html:330
+msgid "Activar liberar datos"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:17
+msgid "lblDescription"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:18
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:79
+msgid "lblFoto"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:19
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:85
+msgid "lblObservacion"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:20
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:91
+msgid "lblObservacionTabulada"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:21
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:97
+msgid "lblDatosMedidor"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:32
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:34
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:37
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:39
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:42
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:44
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:47
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:49
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:55
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:385
+msgid "Habilitar"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:53
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:389
+msgid "Deshabilitar"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:101
+msgid "btnGrabar"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:346
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:350
+msgid "Foto"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:354
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:359
+msgid "Obs."
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:367
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:371
+msgid "Obs.Tabulada"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:376
+#: qorder/templates/data_admin/tipo_orden/_propiedades.html:380
+msgid "Datos medidor"
+msgstr ""
+
+#: qorder/templates/data_admin/tipo_orden/_tipos_orden.html:8
+msgid "tituloTipoOrdenes"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:8
+msgid "lblAdminTP"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:16
+msgid "lblSerial"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:17
+msgid "lblAlias"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:18
+msgid "lblEmail"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:19
+msgid "lblAndroidID"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_terminales.html:20
+msgid "lblLastConection"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_tp_disable.html:10
+msgid "Inactivar dispositivo móvil"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_tp_disable.html:16
+msgid "Desea activar este dispositivo móvil?"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_tp_disable.html:21
+msgid "btnYes"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_tp_disable.html:22
+msgid "btnNo"
+msgstr ""
+
+#: qorder/templates/data_admin/tp/_tp_edit.html:10
+msgid "Editar dispositivo móvil"
+msgstr ""
+
+#: qorder/templates/gps/listadorecorrido/_listadorecorrido.html:9
+msgid "Listado de Actividades"
+msgstr ""
+
+#: qorder/templates/gps/listadorecorrido/_listadorecorrido.html:92
+msgid "Ver listado"
+msgstr ""
+
+#: qorder/templates/gps/recorrido/_route_monitor.html:9
+msgid "tituloRoute"
+msgstr ""
+
+#: qorder/templates/gps/recorrido/_route_monitor.html:86
+#: qorder/templates/gps/ultima/_lp_monitor.html:64
+msgid "VerPersonal"
+msgstr ""
+
+#: qorder/templates/gps/ultima/_lp_monitor.html:10
+msgid "tituloUltimaPosicion"
+msgstr ""
+
+#: qorder/templates/interfaz/importar/_import.html:8
+msgid "Importación"
+msgstr ""
+
+#: qorder/templates/interfaz/importar/_import.html:38
+msgid "Log de Importación"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_asignacion.html:10
+msgid "tituloAsignacion"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_asignacion.html:58
+msgid "Asignar"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_asignacion.html:79
+msgid "Guardar Asignaciones"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:12
+#: qorder/templates/ordenes/consulta/_table_routes.html:12
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:12
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:12
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:12
+msgid "lblAño"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:13
+#: qorder/templates/ordenes/asignacion/_table_routes.html:13
+#: qorder/templates/ordenes/consulta/_table_routes.html:13
+#: qorder/templates/ordenes/division/_table_divisiones.html:17
+#: qorder/templates/ordenes/division/_table_routes.html:13
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:13
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:13
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:45
+#: qorder/templates/ordenes/monitor/_table_estado.html:8
+#: qorder/templates/ordenes/monitor/_table_techs.html:8
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:13
+#: qorder/templates/ordenes/monitor_rutas/_table_techs.html:8
+msgid "lblCantidad"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:14
+msgid "lblLecturista"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:15
+msgid "lblAsignadoPor"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:16
+#: qorder/templates/ordenes/consulta/_table_routes.html:14
+#: qorder/templates/ordenes/division/_table_divisiones.html:19
+#: qorder/templates/ordenes/division/_table_routes.html:14
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:14
+#: qorder/templates/ordenes/forzado/_table_ruta_no_leida.html:14
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:14
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:17
+msgid "lblId"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:17
+#: qorder/templates/ordenes/asignacion/_table_asignados.html:32
+msgid "lblDesasignar"
+msgstr ""
+
+#: qorder/templates/ordenes/asignacion/_table_routes.html:12
+#: qorder/templates/ordenes/division/_table_divisiones.html:16
+msgid "División"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_consulta.html:9
+msgid "Consulta Rutas"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_consulta.html:31
+msgid "Rutas"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_consulta.html:42
+msgid "Suministros"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_consulta.html:57
+msgid "Lecturas en revisión"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_consulta.html:61
+msgid "Todos los suministros"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:4
+msgid "Datos del suministro"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:11
+msgid "Cliente"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:19
+msgid "Calle"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:25
+msgid "# Puerta"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:33
+msgid "Dirección"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:41
+msgid "Tarifa"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:47
+msgid "Secuencia"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:57
+msgid "Datos del medidor"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:64
+msgid "Marca"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:70
+msgid "# Medidor"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:78
+msgid "Tipo Medidor"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:84
+msgid "# Ruedas"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:92
+msgid "Fecha instalación"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:99
+msgid "Ver histórico de consumos"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:106
+msgid "Resultado de la lectura"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:113
+msgid "Lecturista"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:119
+msgid "Secuencia real"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_datos_sum.html:127
+msgid "Fecha lectura"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_table_anomalias.html:7
+#: qorder/templates/ordenes/revision/_revision.html:127
+#: qorder/templates/ordenes/revision/_revision.html:333
+msgid "Observación"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_table_sum.html:7
+#: qorder/templates/ordenes/division/_table_suministros_division.html:14
+#: qorder/templates/ordenes/division/_table_suministros_ruta.html:14
+msgid "# Serie"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_table_sum.html:8
+#: qorder/templates/ordenes/division/_table_suministros_division.html:15
+#: qorder/templates/ordenes/division/_table_suministros_ruta.html:15
+msgid "Resultado"
+msgstr ""
+
+#: qorder/templates/ordenes/consulta/_table_sum.html:9
+#: qorder/templates/ordenes/division/_table_suministros_division.html:16
+#: qorder/templates/ordenes/division/_table_suministros_ruta.html:16
+msgid "Nro.Orden"
+msgstr ""
+
+#: qorder/templates/ordenes/division/_division.html:10
+msgid "tituloDivision"
+msgstr ""
+
+#: qorder/templates/ordenes/division/_table_routes.html:12
+#: qorder/templates/ordenes/monitor_rutas/_table_routes.html:12
+msgid "Division"
+msgstr ""
+
+#: qorder/templates/ordenes/forzado/_forzado.html:9
+msgid "Forzado de rutas"
+msgstr ""
+
+#: qorder/templates/ordenes/forzado/_forzado.html:46
+#: qorder/templates/ordenes/forzado/_forzado.html:52
+msgid "Forzar rutas seleccionadas"
+msgstr ""
+
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:15
+msgid "Cant.Leidos"
+msgstr ""
+
+#: qorder/templates/ordenes/forzado/_table_ruta_leida.html:16
+msgid "Cant.a Forzar"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:20
+msgid "lblNumSerie"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:21
+msgid "lblTipoConsumo"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:22
+msgid "lblLectura"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:23
+msgid "lblResultado"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_detalle_orden.html:44
+#: qorder/templates/ordenes/monitor/_table_estado.html:7
+msgid "lblEstado"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_monitor.html:10
+#: qorder/templates/ordenes/monitor_rutas/_monitor.html:10
+msgid "Monitor"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_estado.html:9
+msgid "lblPorcentaje"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_ordenes.html:6
+msgid "lblNroOrden"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_ordenes.html:7
+msgid "lblPuntoSuministro"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_ordenes.html:8
+msgid "lblNombre"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_ordenes.html:10
+msgid "lblCalle"
+msgstr ""
+
+#: qorder/templates/ordenes/monitor/_table_ordenes.html:11
+msgid "lblNumeroPuerta"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:10
+msgid "Reorganización"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:37
+msgid " Solicitudes pendientes"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:41
+msgid " Solicitudes autorizadas"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:45
+msgid " Solicitudes denegadas"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:54
+msgid "Solicitudes"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:68
+msgid "Autorizar solicitud"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:69
+msgid "Denegar solicitud"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_reorganizacion.html:70
+msgid "Ver mapa"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:13
+msgid "lblsolicitadopor"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:14
+msgid "lblfechasolicitud"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:15
+msgid "lblautorizadopor"
+msgstr ""
+
+#: qorder/templates/ordenes/reorganizacion/_table_routes.html:16
+msgid "lblfechaautorizacion"
+msgstr ""
+
+#: qorder/templates/ordenes/revision/_revision.html:7
+msgid "Revisión de lectura"
+msgstr ""

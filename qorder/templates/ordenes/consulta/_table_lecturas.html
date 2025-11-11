@@ -1,0 +1,58 @@
+          <table class="table table-striped table-bordered table-condensed" >
+              <thead>
+                <tr>
+                  <th>Lectura</th>
+                  <th>Consumo</th>
+                  <th>Tipo Csmo.</th>
+                  <th>Revisar</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for t in lecturas %}
+                            <tr>
+                                <td>{{t.lectura|default_if_none:'--'}}</td>
+                                <td>{{t.consumo|default_if_none:'--'}}</td>
+                                <td>{{t.tipo_consumo.descripcion}}</td>
+                                <td><i class="fa fa-eye fa-fw"   onclick="revision_lectura('{{t.orden_trabajo}}');"></i></td>
+                                
+                             </tr>
+                            {% endfor %}
+                 </tbody>
+            </table>
+
+
+            <script>
+           function revision_lectura(data){
+             
+             
+      $.ajax({
+        url: "{% url 'qorder:revision_main' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: {numero_orden:data},
+        statusCode: {
+          200: function(data) {
+               
+               $('#consulta').hide();
+               $("#revision").html(data); 
+               $("#revision").show(); 
+               LoadChart();           
+               window.scrollTo(0, 0); 
+            
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+                
+    }
+
+       
+
+            </script>

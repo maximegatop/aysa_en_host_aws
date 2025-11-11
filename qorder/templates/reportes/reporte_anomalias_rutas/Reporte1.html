@@ -1,0 +1,326 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+  <div id='reporte'>
+    <row>
+     <div class="col-md-12">
+      <div class="panel panel-default" style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+        <div class="panel-heading">
+          <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+              <h2 class="panel-title">Reporte: Anomalías de la ruta</h2>
+            </div>
+            <div class="input-field col-xs-6 text-right">
+              <div class="form-inline">
+                <label>{% trans "lblOffice" %}</label>
+                <select class="select form-control" id="id_oficina"
+                name="oficina" onchange="searchRutasum()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "lblOffice" %}</option>
+                {% endif %} 
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <row>
+          <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">{% trans "Rutas" %}</h4>
+              </div>
+
+              <div class="panel-body">
+                <input id="chkIncluirExportadas" type="checkbox" name="Incluir exportadas" checked> Sólo exportadas
+                <div id="_tabla_rutasuministro">
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-md-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">Fecha exportación</h4>
+              </div>
+
+
+              <div class="panel-body">
+               <h4>Desde</h4>
+               <div id="sandbox-container">
+
+                <div class="input-group date">
+                  <input id="fecha_desde" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                  <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <h4>Hasta</h4>
+              <div id="sandbox-container">
+
+                <div class="input-group date">
+                  <input id="fecha_hasta" type="text" class="form-control" data-provide="datepicker" data-date-format="dd/mm/yyyy">
+                  <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <br/>
+                <button  id="btnAplicar" class="btn btn-primary" style="float:left" >
+                  Aplicar Filtros</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </row>
+        <row>
+          <div class="col-md-12">
+
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                 Resultado
+               </h4>
+             </div>
+             <div class="row">
+              <div class="panel-body">
+                <div id="_tabla_resultado" >
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </row>
+      </div>
+    </div>
+  </div>
+</row>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel"></h4>
+      </div>
+      <div class="modal-body" >
+        <div id="contenido"  >
+
+          <!-- Change image source for large popup-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  var fecha_desde = $('#fecha_desde').datepicker(
+  {
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true,
+    language: 'es',
+    defaultDate: new Date()
+  });
+  $("#fecha_desde").datepicker().datepicker("setDate", new Date());
+
+
+
+  var fecha_hasta = $('#fecha_hasta').datepicker(
+  {
+    format: "dd/mm/yyyy",
+    autoclose: true,
+    todayHighlight: true,
+    language: 'es',
+    defaultDate: new Date()
+  });
+  $("#fecha_hasta").datepicker().datepicker("setDate", new Date());      
+
+
+
+  function adjust(controlname)
+  {
+    controlname.columns.adjust();
+
+  }
+
+
+  var centro = "";
+
+  $("#btnAddRutasum").prop("disabled",true);
+  {% if user.work_units.all|length_is:'1' %}
+
+  searchRutasum();
+  {% endif %}
+
+  function searchRutasum(){
+
+    centro = $('#id_oficina').val();
+    incluirExp = $('#chkIncluirExportadas').prop('checked')
+    var _sincluirExp ="1";
+
+    if(incluirExp) _sincluirExp="1"; else _sincluirExp="0";
+
+    
+
+    if (centro=="")
+    {
+      $("#tabla_rutasum").html("");
+      $("#btnAddRutasum").prop("disabled",true);
+      return;
+    }
+    $('#id_oficinah').val(centro);
+
+    var aver = $('#id_oficinah').val();
+    //console.log(aver);
+
+    $.ajax({
+      url: "{% url 'qorder:rpt_anomalias_rutas_getrutassum' %}",
+      type: 'post',
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      datatype: 'json',
+      data: {id_oficina:centro,exportadas:_sincluirExp},
+      statusCode: {
+        200: function(data) {
+          //console.log('data')
+          $("#_tabla_rutasuministro").html(data);
+          $("#btnAddRutasum").prop("disabled",false);
+
+        },
+        301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+
+  }
+
+  var ids_ordenes = "";
+  var fecha1 ="";
+  var fecha2 ="";
+
+  function AplicarFiltros(){
+    //console.log('aplicar filtros');
+
+    
+    
+    fecha1 =  $("#fecha_desde").data('datepicker').getFormattedDate('yyyymmdd');
+    fecha2 =  $("#fecha_hasta").data('datepicker').getFormattedDate('yyyymmdd');
+
+    
+    
+
+    if ( fecha2 >= fecha1)
+    {
+      
+    }
+    else
+    {
+      
+      toastr.error("La fecha hasta no puede ser mayor a la fecha desde","Atención!!",1500);
+      return false;
+    }
+
+
+
+    ids_ordenes ="[";
+    if (table_rutasum.rows('.selected').data().count()>0)
+    {
+
+      var m_ids_ordenes = $.map(table_rutasum.rows('.selected').data(), function (item) {
+        return item[0];
+      });
+      m_ids_ordenes.forEach(function(entry) {
+        ids_ordenes += "'" + entry + "',";
+      });
+
+    }
+    else
+    {
+      toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+      return false;
+    }
+    ids_ordenes +=  "]";
+    
+
+    return true;
+  }
+
+  $("#btnAplicar").on("click",function(){
+
+
+    if (AplicarFiltros() == true )
+    {
+
+      var _sincluirExp ="0";
+      var incluirExp = $('#chkIncluirExportadas').prop('checked')
+      if(incluirExp) _sincluirExp="1"; else _sincluirExp="0";
+
+      $.ajax({
+        url: "{% url 'qorder:rpt_anomalias_rutas_getreporte' %}",
+        type: 'post',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        datatype: 'json',
+        data: { id_oficina:centro, 
+          id_rutasum: ids_ordenes,
+          f_desde: fecha1,
+          f_hasta: fecha2,
+          exportadas: _sincluirExp
+        },
+
+        statusCode: {
+          200: function(data) {
+              //console.log('llego')
+              //onsole.log(data)
+              $("#_tabla_resultado").html(data);
+            },
+            301: function() {
+                            //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                          },
+                          500: function() {
+
+                            toastr.error(gettext('Server error, contact an administrator.'), ' ', {timeOut: 2000})
+                          }
+                        }
+                      });
+
+
+    }
+    else
+    {
+
+    }
+
+  });
+
+
+
+  $("#filter_collapse").on("click",function(){
+    $("#filter_collapsible").collapse('hide');
+  });
+
+
+
+</script>

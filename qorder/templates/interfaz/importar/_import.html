@@ -1,0 +1,513 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+     <row>
+    <div class="col-md-12">
+        <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+                <h2 class="panel-title">
+                    {% trans "Importación" %}
+                </h2>
+          </div>
+          <div class="panel-body">
+          <div class="row">
+            <div class="input-field col-md-3">
+            <div class="form-inline" >
+             <label>{% trans "Contratista" %}</label>
+               <select class="select form-control" id="id_oficina" name="oficina"  onchange="searchoficina()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+                {% endif %}
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select> 
+             </div>
+           </div>
+
+          
+        <div class="col-md-2 ">
+            <button data-target="modal1" id="btnImport" class="btn btn-primary" >
+                Importar Rutas</button>
+        </div>
+
+        </div>
+        <div id="resultadoslogs" class="row col-md-12" >
+
+        </div>
+
+</div>
+</div>
+</row>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel"><i class="fa fa-clock-o"></i> Por favor esperar </h4>
+      </div>
+      <div class="modal-body center-block">
+        <p>Proceso de Importación</p>
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0"
+          aria-valuemin="0" aria-valuemax="100" style="width:70%">
+        </div>
+        </div>
+        <button id="btnok" type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div id="modal1" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h1 class="modal-title">Atención!</h1>
+      </div>
+      <div class="modal-body">
+
+        <br>
+        <p>Está por iniciar el proceso de importación de rutas. Por favor no interrumpa la operación una vez iniciada y aguarde a que la misma se complete.</p>
+        <h3>¿Desea comenzar la Importación?</h3>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCancelar" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button id="btnImport1" type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+
+ <div id="modaldeletefile" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+        <h1 class="modal-title">Atención!</h1>
+      </div>
+      <div class="modal-body">
+
+        <br>
+        <p >Los siguientes archivos se encuentran en el directorio de importación:</p>
+          <div style="overflow-x: auto;" id="parrafodiv">
+            <p id="parrafo"> </p>
+          </div>
+
+        <h3>Acciones a realizar:</h3>
+      </div>
+      <div class="modal-footer">
+        <div class="col-md-1 ">
+                <button data-target="modal1" id="btnDelete" class="btn btn-primary" >
+                Eliminar archivos</button>
+        </div>
+        <form  method="POST" enctype="multipart/form-data" id="modal_form_id">
+              {% csrf_token %}
+                <div class="col-md-3 ">
+              <button type="submit" class="btn btn-primary" id="btnsubir" name="button">Subir archivos</button>
+                </div>
+                <div class="col-md-4 ">
+              <input type="file"  name="files[]" id="files" multiple/>
+                    <input type="hidden" id="oficina" name="oficina_val" value="" />
+                </div>
+
+
+            </form>
+
+                <div class="col-md-1 ">
+            <button data-target="modal1" id="btnImportar" class="btn btn-primary" >
+                Importar </button>
+        </div>
+
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+
+
+
+
+
+
+
+
+  <script>
+
+
+
+
+
+
+
+$("#btnImportar").on("click",function(){
+    $('#modaldeletefile').modal('hide');
+    $('#modal1').modal('show');
+
+
+});
+$(document).ready(function () {
+
+    $("#btnsubir").click(function (event) {
+
+        //stop submit the form, we will post it manually.
+        event.preventDefault();
+
+        // Get form
+        var form = $('#modal_form_id')[0];
+
+		// Create an FormData object
+        var data = new FormData(form);
+
+		// If you want to add an extra field for the FormData
+
+        $.ajax({
+            type: "POST",
+            senctype: 'multipart/form-data',
+            url: "{% url 'qorder:Savefiles' %}",
+            data: data,
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 600000,
+            statusCode: {
+                 200: function(data) {
+                    $(".modal-body #parrafo").text(data.archivos);
+                    toastr.success('Archivos subidos correctamente', ' ', {timeOut: 2000});
+                    $("#btnDelete").show();
+                    $("#btnImportar").show();
+
+                 },
+                 201: function(data) {
+
+                 },
+                 300: function(mensaje) {
+
+                    // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                     toastr.error(mensaje.responseText,' ', {timeOut: 2000});
+                 },
+                 301: function() {
+                    //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                     toastr.error('El proceso de importación se encuentra en ejecución.',' ', 2000);
+                 },
+                 500: function(data) {
+                    
+                    // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                     $('#textarea1').html(data);
+                 }
+
+             }
+        });
+
+    });
+
+});
+
+$("#btnDelete").on("click",function(){
+
+    var id_centro = $('#id_oficina').val();
+
+    $.ajax({
+         url: "{% url 'qorder:delete_files' %}",
+         type: 'post',
+         datatype: 'json',
+         data: {oficina:id_centro},
+         statusCode: {
+                 200: function(data) {
+                    $("#parrafo").load(location.href + " #parrafo");
+                    $(".modal-body #parrafo").text(data.archivos);
+                    toastr.success('Archvios eliminados correctamente', ' ', {timeOut: 2000});
+                    $("#btnDelete").hide();
+                    $("#btnImportar").hide();
+                     // $.toaster({ priority : 'success', title : ' ', message : 'Importación Finalizada'});
+                 },
+                 201: function(data) {
+
+                 },
+                 300: function() {
+                    $('#modaldeletefile').modal('hide');
+                    // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                     toastr.error('No se pudieron eliminar los archivos.',' ', 2000);
+                 },
+                 301: function() {
+                    //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                     toastr.error('El proceso de importación se encuentra en ejecución.',' ', 2000);
+                 },
+                 500: function(data) {
+                    
+                    // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                     $('#textarea1').html(data);
+                 }
+
+             }
+     });
+
+
+
+
+});
+
+
+document.getElementById('oficina').value = $('#id_oficina').val();
+
+
+
+function searchoficina(){
+
+      var centro = $('#id_oficina').val();
+      document.getElementById('oficina').value = centro;
+      if(centro==''){
+        document.getElementById("modal_form_id").style.visibility="hidden"
+        $("#btnDelete").hide();
+
+
+      }
+      else
+      {
+        document.getElementById("modal_form_id").style.visibility="initial"
+        $("#btnDelete").show();
+      }
+
+
+      //alert(centro);
+    }
+
+
+
+$("#formmail").submit(function(e){
+    e.preventDefault(); //prevent default action
+    proceed = true;
+    
+    $(this.elements['files[]'].files).each(function(i, ifile)
+    {
+        
+        
+    if(ifile.value !== "")
+    {
+        adjuntos += "\n"+ifile.name;
+    }
+
+    // total_files_size = total_files_size + ifile.size; //add file size to total size
+
+
+    });
+    });
+
+
+
+
+$("#btnok").prop("disabled",true);
+
+$("#btnImport").on("click",function(){
+
+    var id_centro = $('#id_oficina').val();
+  if (id_centro=='')
+  {
+     toastr.error('Seleccione un contratista', ' ', {timeOut: 2000})
+     return;
+  }
+  else{
+    $.ajax({
+         url: "{% url 'qorder:mostrar_archivos' %}",
+         type: 'post',
+         datatype: 'json',
+         data: {oficina:id_centro},
+         statusCode: {
+                 200: function(data) {
+                    
+                    if(jQuery.isEmptyObject(data.archivos)){
+                        document.getElementById("files").value = "";
+                      $(".modal-body #parrafo").text(data.archivos);
+                      $("#btnDelete").hide();
+                      $("#btnImportar").hide();
+                      $('#modaldeletefile').modal('show');
+                    }
+                    else{
+                        document.getElementById("files").value = "";
+                        $(".modal-body #parrafo").text(data.archivos);
+                        $("#btnDelete").show();
+                        $("#btnImportar").show();
+                        $('#modaldeletefile').modal('show');
+                     }   
+                     // $.toaster({ priority : 'success', title : ' ', message : 'Importación Finalizada'});
+                 },
+                 201: function(data) {
+
+                 },
+                 300: function() {
+                    $('#modaldeletefile').modal('hide');
+                    // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                     toastr.error('No se pudieron eliminar los archivos.',' ', 2000);
+                 },
+                 301: function() {
+                    //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                     toastr.error('El proceso de importación se encuentra en ejecución.',' ', 2000);
+                 },
+                 500: function(data) {
+                    
+                    // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                     $('#textarea1').html(data);
+                 }
+
+             }
+     });
+
+  }
+
+});
+
+    $('#btnImport1').on('click', function(){
+     $('#modal1').modal('hide');
+
+
+     var filtros = {};
+     filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+     filtros.id_centro = $('#id_oficina').val();
+     filtros.tipo = 'i';
+
+     if (filtros.id_centro.length==0){
+         //Materialize.toast('Seleccione un Oficina Comercial por favor.', 2000, 'red');
+         return false;
+     }
+
+     
+     $.ajax({
+         url: "{% url 'qorder:make_import' %}",
+         type: 'post',
+         datatype: 'json',
+         data: filtros,
+         statusCode: {
+                 200: function(data) {
+                    $('#resultadoslogs').html(data);
+
+                    //$('#myModal').modal('show');
+                     //refresh();
+                     // $.toaster({ priority : 'success', title : ' ', message : 'Importación Finalizada'});
+                 },
+                 201: function(data) {
+                    $('#resultadoslogs').html(data);
+                 },
+                 300: function() {
+                    // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                     toastr.error('El proceso de importación ya se realizó.',' ', 2000);
+                 },
+                 301: function() {
+                    //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                     toastr.error('El proceso de importación se encuentra en ejecución.',' ', 2000);
+                 },
+                 500: function(data) {
+                    
+                    // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                     $('#textarea1').html(data);
+                 }
+
+             }
+     });
+
+});
+
+
+  function refresh(){
+      id_centro = $('#id_oficina').val();
+    $.ajax(
+       {
+         url: "{% url 'qorder:obtener_avance' %}",
+         type: 'post',
+         datatype: 'json',
+         data:{oficina:id_centro},
+        statusCode: {
+            200: function(_jsonres) {
+
+              
+              if (_jsonres.porcentaje<100)
+              {
+
+                setTimeout(refresh, 2000);
+                $('.progress-bar').css('width',_jsonres.porcentaje +'%').attr('aria-valuenow',_jsonres.porcentaje);
+                $('#progress_bar').css('width',_jsonres.porcentaje  + "%");
+              }
+              else
+              {
+                $('.progress-bar').css('width',_jsonres.porcentaje +'%').attr('aria-valuenow',_jsonres.porcentaje);
+                $('#progress_bar').css('width',_jsonres.porcentaje  + "%");
+                clearTimeout(setTimeout);
+                $("#btnok").prop("disabled",false);
+              }
+
+                // $.toaster({ priority : 'success', title : ' ', message : 'Importación Finalizada'});
+            },
+            300: function() {
+              // Materialize.toast('El proceso no pudo ser iniciado.', 2000, 'red');
+
+            },
+            301: function() {
+                // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+
+             },
+             302: function() {
+                //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+
+             },
+             500: function() {
+                // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+             }
+
+             }
+    });
+};
+
+
+$('#btnok').on('click', function(){
+
+$('#myModal').modal('hide');
+var filtros = {};
+     filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+     filtros.id_centro = $('#id_oficina').val();
+     filtros.tipo = 'i';
+
+     if (filtros.id_centro.length==0){
+         //Materialize.toast('Seleccione un Oficina Comercial por favor.', 2000, 'red');
+         return false;
+     }
+
+     
+     $.ajax({
+         url: "{% url 'qorder:log_import' %}",
+         type: 'post',
+         datatype: 'json',
+         data: filtros,
+         statusCode: {
+                 200: function(data) {
+                     $('#textarea1').html(data);
+
+                     // $.toaster({ priority : 'success', title : ' ', message : 'Importación Finalizada'});
+                 },
+                 300: function() {
+                    toastr.error('El proceso de importación ya se encuentra iniciado .',' ', 2000);
+                 },
+                 301: function() {
+                    // Materialize.toast('El proceso demora demasiado.', 2000, 'red');
+                     $('#textarea1').html('Atención: El proceso demora demasiado.');
+                 },
+                 302: function() {
+                    //Materialize.toast('Proceso fallido, no inició el log.', 2000, 'red');
+                     $('#textarea1').html('Atención: Proceso fallido, no inició el log.');
+                 },
+                 500: function() {
+                    // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                     $('#textarea1').html('Atención: Server error, contact an administrator.');
+                 }
+
+             }
+     });
+
+
+});
+
+
+</script>

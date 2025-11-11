@@ -1,0 +1,244 @@
+{% load i18n %} 
+<style>
+.datatable-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+</style>
+<div class="col-md-12">
+  <table id="tabla_sum_asignar" class="table table-striped table-bordered" cellspacing="0" width="100%" style="font-size:11px">
+    <thead> 
+
+      <tr>
+        <th>{% trans "Secuencia" %}</th>
+        <th>{% trans "Punto de Suministro" %}</th>
+        <th>{% trans "Frecuencia" %}</th>
+        <th>{% trans "Nic" %}</th>
+        <th>{%trans "Dirección"%}</th>
+        <th>{%trans "Número de Puerta"%}</th>
+        <th>{%trans "Localidad"%}</th>
+        <th>{%trans "Barrio"%}</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for s in suministros_sinRuta %}
+      <tr>
+        <td style="white-space:nowrap;">{% widthratio forloop.counter 1 10 %}</td>
+        <td style="white-space:nowrap;">{{s.punto_suministro|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.Frecuencia|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.cliente.codigo|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.calle|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.numero_puerta|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;" >{{s.id_localidad|default_if_none:'--'}}</td>
+        <td style="white-space:nowrap;">{{s.barrio|default_if_none:'--'}}</td>
+
+      </tr> 
+
+      {%endfor%}     
+    </tbody>
+    
+  </table>
+</div>
+                    <script>
+
+
+
+
+            var table_datosum_asignar = $('#tabla_sum_asignar').DataTable( {
+              "columnDefs": [
+            { "visible": false, "targets": 0 }
+            ],
+            language:{
+              info:"Visualizando _START_ a _END_ de _TOTAL_ Suministros",
+              search:"Buscar",
+              lengthMenu: " ",
+              infoEmpty: "Visualizando 0 a _END_ de _TOTAL_ Suministros ",
+              infoFiltered:'',
+              zeroRecords: "No se encontraron resultados",
+              emptyTable:"No hay resultados ",
+              paginate:{
+                previous:"Anterior.",
+                next:"Siguiente.",
+
+              }
+            },
+            scrollY: 600,
+            autoWidth: false,
+            scrollX: true,
+            pageLength:20,  
+            
+            select: 'multi',
+            
+            preDrawCallback: function (settings) {
+              var api = new $.fn.dataTable.Api(settings);
+              var pagination = $(this)
+              .closest('.dataTables_wrapper')
+              .find('.dataTables_paginate');
+
+              if (api.page.info().pages <= 1) {
+                pagination.hide();
+              }
+              else {
+                pagination.show();
+              }
+
+            }
+          });
+ 
+            table_datosum_asignar.on( 'click', 'td', function () {
+              
+              getNextSec();
+            var rowIdx = table_datosum_asignar.cell( this ).index().row;
+            //  var addRow = table_techs_cuadrilla.rows( rowIdx ).data()
+          
+            var rowNew = [valor.toString(),table_datosum_asignar.cell({row:rowIdx,column:1}).data(),table_datosum_asignar.cell({row:rowIdx,column:2}).data(),table_datosum_asignar.cell({row:rowIdx,column:3}).data(),table_datosum_asignar.cell({row:rowIdx,column:4}).data(),table_datosum_asignar.cell({row:rowIdx,column:5}).data(),table_datosum_asignar.cell({row:rowIdx,column:6}).data(),table_datosum_asignar.cell({row:rowIdx,column:7}).data(),'ruta'];
+
+            table_datosum_asignar.rows(rowIdx).remove().draw();                          
+            var row = table_datosum.row.add(rowNew).draw();
+            $("#btnTransferir").prop("disabled",false);
+            $("selected", table_datosum_asignar).remove();
+            $("#btnDelete").prop("disabled",true);            
+  });
+function getNextSec()
+{
+            
+            table_datosum
+             .rows(  )
+             .invalidate('data')
+             .draw();
+           if (table_datosum.rows('.selected').count()>0)
+            {
+
+              var rows = table_datosum.rows( '.selected' ).indexes();
+              
+              var data = table_datosum.rows( rows ).data();
+              
+              var valorsig = -1;             
+              var valor1=parseInt(data[0]);
+             
+            table_datosum.rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                 if (valorsig==-1)
+                 {
+                   var data1 = this.data()[0];
+                   var data2 = parseInt(data1);
+                   if (valorsig==-1 && data2>valor1 )
+                   {
+                     valorsig = data2;
+                   }
+                 }
+             } );
+             
+             
+
+               if (valorsig>-1)
+               {
+                valor=parseInt((valorsig + valor1)/2);
+               }
+            
+            else
+            {
+                valor=valor1 + 5;
+            } 
+            
+           
+            return true;
+            }
+           else
+           {
+           
+            if (table_datosum.rows().count()==0)
+            {
+              valor=10;
+              return true;
+            }
+            else
+            {
+             valor=5;
+             return true;
+           }
+}
+            
+     
+ }       
+
+            /*
+           table_datosum_asignar.on( 'select', function ( e, dt, type, indexes ) {
+           var ids_ordenes ="[";
+           ids_suministros;
+           if (table_datosum_asignar.rows('.selected').data().count()>0)
+            {
+               var m_ids_ordenes = $.map(table_datosum_asignar.rows('.selected').data(), function (item) {
+               return item[0];
+                });
+               m_ids_ordenes.forEach(function(entry) {
+               ids_ordenes += "" + entry + ",";
+                });
+            
+               }
+           else
+           {
+             toastr.error("Seleccione al menos una ruta","Atención!!",1500);
+             return;
+           }
+           ids_ordenes +=  "]";
+            console.log(ids_ordenes);
+       $("#btnTransferir").on("click",function(){
+       var id_centro = $('#id_oficina').val();
+       console.log(id_centro)
+       if (id_centro=='')
+         {
+           toastr.error('Seleccione una oficina', ' ', {timeOut: 2000})
+           return;
+         }
+         var filtros = {};
+       filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+       filtros.id_suministros=ids_ordenes;
+       filtros.id_centro=id_centro;
+       filtros.id_rutasum=id_tp;
+       filtros.id_suministroRuta=ids_suministros;
+       console.log(filtros);
+       $.ajax({
+           url: "{% url 'qorder:trasferir_suministro' %}",
+           type: 'post',
+           datatype: 'json',
+           data: filtros,
+           statusCode: {
+               200: function(data) { 
+               console.log(data)               
+                     $("#_tabla_sum_asignar").html(data);
+                     UpdateSuministros();
+               },
+               301: function() {
+                   //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+               },
+               500: function() {
+                  
+                  // Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+   }
+  });
+ var rows = table_datosum_asignar
+   .rows( '.selected' )
+   .remove()
+   .draw();
+ ids_ordenes='';
+ });
+  });
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </script>

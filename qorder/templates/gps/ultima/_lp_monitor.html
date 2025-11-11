@@ -1,0 +1,215 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+<row>
+<div class="col-md-12">
+  <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">
+          {% trans "tituloUltimaPosicion" %}
+          </h2>
+        </div>
+        <div class="input-field col-xs-6 text-right">
+          <div class="form-inline" >
+            <label>{% trans "Contratista" %}</label>
+            <select class="select form-control" id="id_oficina" name="oficina"  onchange="searchTechnicians()">
+              {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+              {% endif %}
+              {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+      </div>
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion" href="#filter_collapsible">Lecturista</a>
+            </h4>
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse">
+            <div class="panel-body">
+              <div class="row" >
+                <div  id='_table_techs' class="col-xs-12" >
+                
+                </div>
+                <div class="container">
+                  <div class="col-md-6">
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="aprox_direction">Mostrar dirección aproximada</label>
+                      </div>
+                      <p></p>
+                      <p></p>
+                    </div>
+                    <div class="col-md-6">
+                      <div style="float: right;">
+                        <i class="fa fa-map-marker fa-2x" style="color:green"></i>Reciente &nbsp;
+                        <i class="fa fa-map-marker fa-2x" style="color:yellow"></i>Más de 15 Minutos &nbsp;
+                        <i class="fa fa-map-marker fa-2x" style="color:red"></i>Más de 1 hora &nbsp;
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <p></p>
+                      <p></p>
+                    </div>
+                    <button id="btnRequestTechsOnClick" style="width:210px" class="btn btn-primary pull-right" type="button" onclick="btnRequestTechsOnClick()">
+                      Ver Personal
+                    </button>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#map_collapsible">
+                Mapa</a>
+                </h4>
+              </div>
+              <div id="map_collapsible" class="panel-collapse collapse">
+                <div class="panel-body" id="push_map">
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          
+          <script>
+            $("#btnRequestTechsOnClick").prop("disabled",true);
+            function btnRequestTechsOnClick() {
+
+              var ids_tecnicos = "[";
+              var ids_tecnicos_sin_puntos = "[";
+
+
+
+              var m_ids = $.map(table_techs.rows('.selected').data(), function (item) {
+                if( item[2] )
+                  return item[0];
+                else
+                  return '';
+              });
+              var m_ids_sin_puntos = $.map(table_techs.rows('.selected').data(), function (item) {
+                if( !item[2] )
+                  return item[0];
+                else
+                  return '';
+              });
+              m_ids.forEach(function(entry) {
+                if(entry)
+                  ids_tecnicos += "'" + entry + "',";
+              });
+              m_ids_sin_puntos.forEach(function(entry) {
+                if(entry)
+                  ids_tecnicos_sin_puntos += "'" + entry + "',";
+              });
+              ids_tecnicos +=  "]";
+              ids_tecnicos_sin_puntos +=  "]";
+
+              var filtros = {};
+              filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+              filtros.ids_tecnicos = ids_tecnicos;
+              filtros.ids_tecnicos_sin_puntos = ids_tecnicos_sin_puntos;
+              filtros.aproximar = $('#aprox_direction').is(":checked");
+              filtros.id_oficina = $('#id_oficina').val();
+              
+
+              $.ajax({
+                type: "post",
+                url: "{% url 'qorder:get_map_last_p' %}",
+                data: filtros,
+                statusCode: {
+                  300: function() {
+                   toastr.error('Seleccione al menos un técnico.', ' ',2000);
+                 },
+                 301: function() {
+                  toastr.error('Seleccione al menos un técnico con punto GPS (Estado Verde, Amarillo, o Rojo).',' ', 3000);
+                },
+                500: function() {
+                  toastr.error('Se produjo un error intentando obtener los datos solicitados (Error Code 500).',' ', 2000);
+
+                }
+
+              },
+              success: function( strData ){
+                
+                $('#push_map').html(strData);
+                $('#filter_collapsible').collapse('hide');
+                $('#map_collapsible').collapse('show');
+
+              }
+            });
+            }
+
+
+
+            $(document).ready(function(){
+
+              $('#filter_collapsible').collapse('show');
+
+              var table_techs = $('#table_techs').DataTable( {
+                autoWidth: false,
+                lengthChange: false,
+                language: datetable_languaje,
+                order: [ 1, 'asc' ],
+                select: 'multi'
+              });
+
+
+            });
+
+            $("#filter_collapse").on('click', function(){  $('#map_collapsible').collapse('hide');});
+
+            $("#btnRequestTechs").on('click', function(){ btnRequestTechs(); });
+
+            function searchTechnicians(){
+              var centro = $('#id_oficina').val();
+              
+              if (centro=="")
+                {
+                  $("#_table_techs").html("");
+                  $("#btnRequestTechsOnClick").prop("disabled",true);
+                  return;
+                }
+              $.ajax({
+                url: "{% url 'qorder:maps_up_techs' %}",
+                type: 'post',
+                datatype: 'json',
+                data: {id_centro:centro},
+                statusCode: {
+                  200: function(data) {
+                    $("#_table_techs").html(data);
+                    $("#btnRequestTechsOnClick").prop("disabled",false);
+                  },
+                  301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                  },
+                  500: function() {
+                    toastr.error('Server Error.',' ', 2000);
+
+                  }
+
+                },
+                sucess: function(response){
+                }
+              });
+            }
+
+            {% if user.work_units.all|length_is:'1' %}
+            searchTechnicians();
+            {% endif %}
+
+          </script>

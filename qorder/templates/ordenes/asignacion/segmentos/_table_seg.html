@@ -1,0 +1,32 @@
+   {% load i18n %} 
+
+
+        <table id="table_seg" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>{% trans "Codigo Segmento" %}</th>
+                <th>{% trans "Descripción" %}</th>
+                <th>{% trans "Fecha Prevista" %}</th>
+                <th>{% trans "Total / Pendiente" %}</th>
+                <th class="hidden">{% trans "idSegmento" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in segmentos %}
+            <tr>
+                <td>{{s.punto_suministro__segmentosum_id__codigo_segmento|default_if_none:'--'}}</td>
+                <td>{{s.punto_suministro__segmentosum_id__descripcion_segmento}}</td>
+                <td>{{s.ruta__fecha_estimada_resolucion|date:"d/m/Y"}}</td>
+                <td>{{s.cantidad|default_if_none:'--'}} / {{s.pendiente|default_if_none:'--'}}</td>
+                <td>{{s.punto_suministro__segmentosum_id}}</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+
+
+    </table>
+  
+    <script> 
+
+
+    </script>

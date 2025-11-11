@@ -1,0 +1,92 @@
+   {% load i18n %} 
+        <table id="table_puntossum_sincoor" class="table table-striped table-bordered table-condensed" cellspacing="0" width="100%" >
+            <thead>
+                <tr>
+                    <th>{% trans "lblPuntoSuministro" %}</th>
+                    <th>{% trans "latitud" %}</th>
+                    <th>{% trans "longitud" %}</th>
+                    <th>{% trans "Dirección" %}</th>
+                    <th>{% trans "Número de puerta" %}</th>
+                    <th>{% trans "Ruta" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in puntossum_sincoor %}
+                <tr>
+                    <td>{{t.punto_suministro_id|default_if_none:'--'}}</td>
+                    <td>{{t.punto_suministro__gps_latitud|default_if_none:'--'}}</td>
+                    <td>{{t.punto_suministro__gps_longitud}}</td>
+                    <td>{{t.punto_suministro__calle|default_if_none:'--'}}</td>
+                    <td>{{t.punto_suministro__numero_puerta|default_if_none:'--'}}</td>
+                    <td>{{t.ruta__idruta}}</td>
+                  </tr>
+                {% endfor %}
+            </tbody>
+            
+        </table>
+
+        <div id="_table_routes_footer">
+            <h5>Cant. Puntos de Suministros sin coordenadas:</h5>
+            <h5 id="cantidad_puntos_sin_coordenadas"></h5>
+        </div>
+        
+<script>
+
+    var cantidadPuntoSinCoordenadas = '{{ puntossum_sincoor|length }}'
+
+    $("#cantidad_puntos_sin_coordenadas").text(cantidadPuntoSinCoordenadas)
+
+    $('#table_puntossum_sincoor tbody').on('click', 'tr', async function (event) {
+        var row = table_sincoor.row(this);
+
+        _punto_suministro = table_sincoor.rows(row.index()).data()[0][0];
+        direccion = table_sincoor.rows(row.index()).data()[0][3];
+        puerta = table_sincoor.rows(row.index()).data()[0][4];
+        ciudad = 'Buenos Aires'
+        pais = 'Argentina'
+        
+        if (row.nodes().to$().hasClass('selected')) {
+
+            console.log('Se ha seleccionado la fila', _punto_suministro);
+
+            direccion = `${direccion} ${puerta}, ${ciudad}, ${pais}`
+
+            limpiarMarcadoresArrastrables();
+
+            $(".leaflet-control-geosearch").css("display", "block");
+
+            setTimeout(() => {
+                // Buscar el input dentro del control GeoSearch
+                let inputField = document.querySelector('.leaflet-control-geosearch input');
+            
+                // Cambiar el valor del input
+                if (inputField) {
+                    inputField.value = direccion;
+                    inputField.focus();
+
+                    // Simula un evento keyup con la tecla espacio para llamar al buscador
+                    let event = new KeyboardEvent('keyup', {
+                        bubbles: true,
+                        cancelable: true,
+                        key: ' ',               
+                        code: 'Space',
+                        keyCode: 32,          
+                        which: 32             
+                    });
+
+                    // Dispara el evento en el input
+                    inputField.dispatchEvent(event);
+                }
+            }, 200);
+
+            colocarMarcadorDireccion(_punto_suministro,[]);
+            
+        } else {
+            quitar_marcador(_punto_suministro)
+            _ubicacion_save=false
+            $("#direccion").val('')
+            $(".leaflet-control-geosearch").css("display", "none");
+        }
+    });
+
+</script>

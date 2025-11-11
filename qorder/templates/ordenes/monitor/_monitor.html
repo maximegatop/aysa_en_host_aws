@@ -1,0 +1,128 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+<row>
+<div class="col-md-12">
+  <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+        <div class="col-xs-6">
+          <h2 class="panel-title">
+          {% trans "Monitor" %}
+          </h2>
+        </div>
+        <div class="input-field col-xs-6 text-right">
+          <div class="form-inline" >
+            <label>{% trans "Contratista" %}</label>
+            <select class="select form-control" id="id_oficina" name="oficina"  onchange="searchTechnicians()">
+              {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+              {% endif %}
+              {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+      </div>
+      
+      <row>
+      <div class="col-md-12">
+        <div  class="panel panel-default">
+          <div class="panel-heading"> <h4 class="panel-title">Lecturistas</h4> </div>
+          <div class="panel-body">
+            <button class="btn btn-default" id="btnActualizarTabla"
+                style="display: inline-block;" onclick="ActualizarTabla();"> 
+                <span class="fa fa-refresh"></span>  Actualizar técnicos
+            </button>
+            <br><br>
+            <div  id='_table_techs' >
+              {% include 'ordenes/monitor/_table_techs.html'  with feedback_form=feedback_form  %}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      </row>
+      <row>
+      
+      
+      <div  class="panel panel-default" >
+        <div class="panel-heading"> <h4 class="panel-title">Órdenes</h4> </div>
+        <div class="panel-body">
+          <div id="_table_ordenes" >
+            
+          </div>
+        </div>
+      </div>
+      
+      </row>
+      
+    </div>
+  </div>
+</div>
+</row>
+</div>
+<script>
+   
+    var id_tecnico = "";
+    {% if user.work_units.all|length_is:'1' %}
+
+    searchTechnicians();
+   
+    {% endif %}
+
+
+    function ActualizarTabla()
+    {
+        searchTechnicians();
+    }
+    
+
+    function searchTechnicians(){
+
+      var centro = $('#id_oficina').val();
+      
+      $('#id_oficinah').val(centro);
+    
+      var aver = $('#id_oficinah').val();
+     
+      $.ajax({
+        url: "{% url 'qorder:monitor_tech' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro},
+        statusCode: {
+          200: function(data) {
+        
+            $("#_table_techs").html(data);
+
+            if (typeof table_ordenes1 !== 'undefined')
+            {
+              table_ordenes1.clear().draw();
+            }
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', 2000)
+                      }
+                    }
+                  });
+    }
+
+
+ 
+
+
+
+
+
+
+
+</script>

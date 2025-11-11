@@ -1,0 +1,417 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+     <row>
+    <div class="col-md-12">
+        <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+           <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+                <h2 class="panel-title">
+                    {% trans "Reorganización" %}
+                </h2>
+</div>
+                            <div class="input-field col-xs-6 text-right">
+            <div class="form-inline" >
+             <label>{% trans "Contratista" %}</label>
+               <select class="select form-control" id="id_oficina" name="oficina"  onchange="searchoffice()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+                {% endif %}
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select> 
+             </div>
+           </div>
+           </div>
+          </div>
+          <div class="panel-body">
+           <div class="container">
+          <div class="row">
+
+
+          </div>
+                  <div class="row">
+          <div class="col-md-4">
+            <label>
+              <input checked="checked" type="radio" name="todos" value="1" >{% trans " Solicitudes pendientes" %}</label>
+          </div>
+          <div class="col-md-4">
+            <label>
+              <input  type="radio" name="todos" value="2">{% trans " Solicitudes autorizadas" %}</label>
+          </div>
+          <div class="col-md-4">
+          <label>
+            <input type="radio" name="todos" value="3">{% trans " Solicitudes denegadas" %}</label>
+         </div>
+         <br>
+         <br>
+        </div>
+         </div>
+ <row>
+       <div class="col-md-12">
+       <div  class="panel panel-default" >
+       <div class="panel-heading">             
+        <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Solicitudes</a>
+          </h4>
+          </div>
+          <div id="filter_collapsible1" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+          <div class="panel-body">
+            <div id='_table_routes'>
+            
+               {% include 'ordenes/reorganizacion/_table_routes.html'  with feedback_form=feedback_form  %}
+             </div>
+           </div>
+        </div>
+
+      <br><br>
+</row> 
+
+<row>
+<div class="container">  
+  <p><button id="btnAutorizar" class="btn btn-default pull-left" type="button">Autorizar solicitud</button>&nbsp;
+    <button id="btnDenegar" class="btn btn-default" type="button">Denegar solicitud</button>
+    <button id="btnexportar" class="btn btn-default pull-right" type="button">Exportar</button></p>
+    <button id="btnvermapa" class="btn btn-default pull-right" type="button">Ver Mapa</button></p>
+</div>
+</div>
+</row>
+  <row >
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+            <a id="filter_collapse" data-toggle="collapse" data-parent="#accordion"
+            href="#filter_collapsible">Rutas</a>
+            </h4>
+          </div>
+          <div id="filter_collapsible" class="panel-collapse collapse in">
+            <div id="filterContainer" class="panel-body">
+            <button id="btncerrar" class="btn btn-default pull-right" type="button">Cerrar</button>
+            
+              <div class="row">
+                <div id="_mapa" class="col-xs-12">
+               
+                </div>
+
+
+          
+              </div>
+            </div>
+          </div>
+
+
+
+ </row>   
+  <script>
+
+   
+    var id_tecnico = "";
+    {% if user.work_units.all|length_is:'1' %}
+
+    searchoffice();
+   
+    {% endif %}
+
+
+      var solicitud='';
+    function searchoffice(){
+
+      var solicitud = $('input[name="todos"]:checked').val();
+      var centro = $('#id_oficina').val();
+      if (centro=="")
+      {
+      $("#_table_routes").html("");
+      return;
+      }
+
+      
+      $.ajax({
+        url: "{% url 'qorder:reorganizacion_list' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,solicitar:solicitud},
+        statusCode: {
+          200: function(data) {
+        
+            $("#_table_routes").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', 2000)
+                      }
+                    }
+                  });
+    }
+
+    $('input:radio').change(function(){
+        $('#filter_collapsible').collapse('hide');
+        $('#filter_collapsible1').collapse('show');
+      
+    var solicitud = $('input[name="todos"]:checked').val();
+      var centro = $('#id_oficina').val();
+      if (centro=="")
+      {
+      $("#_table_routes").html("");
+      toastr.error('Seleccione un contratista.', ' ', 2000)
+      return;
+      }
+        
+
+      $.ajax({
+        url: "{% url 'qorder:reorganizacion_list' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,solicitar:solicitud},
+        statusCode: {
+          200: function(data) {
+            $("#_table_routes").html(data);
+
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', 2000)
+                      }
+                    }
+                  });
+      if (solicitud=="2")
+      {
+        btnDenegar.disabled=true;
+        btnAutorizar.disabled=true;
+      return;
+      }
+      if (solicitud=="3")
+      {
+        btnDenegar.disabled=true;
+        btnAutorizar.disabled=true;
+      return;
+      }
+      if (solicitud=="1")
+      {
+        btnDenegar.disabled=false;
+        btnAutorizar.disabled=false;
+      return;
+      }
+                  });
+
+
+
+           $("#btnAutorizar").on("click",function(){
+           var filtros={};
+           var id_oficina=$('#id_oficina').val();
+           var solicitud = $('input[name="todos"]:checked').val();
+           var rutas=id_rutas
+
+           if (id_oficina=='')
+           {
+            toastr.error('Seleccione un Contratista.',' ', 2000);
+            return false;
+           }
+
+           if (rutas=='[')
+           {
+            toastr.error('Seleccione al menos una ruta.',' ', 2000);
+            return false;
+           }
+           filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+           filtros.oficina=id_oficina;
+           filtros.solicitud=solicitud;
+           filtros.rutas=rutas;
+
+           $.ajax({
+            url: "{% url 'qorder:autorizar' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                    $("#_table_routes").html(data);
+
+                },
+                300: function() {
+                    
+                },
+                500: function() {
+                  toastr.error('La ruta no se puede autorizar porque no esta leída al 100% .',' ', 2000);
+
+                                 }
+
+            }
+            });
+
+
+           });
+
+           $("#btnDenegar").on("click",function(){
+           var filtros={};
+           var id_oficina=$('#id_oficina').val();
+           var solicitud = $('input[name="todos"]:checked').val();
+           var rutas=id_rutas
+
+           if (id_oficina=='')
+           {
+            toastr.error('Seleccione al menos un Contratista.',' ', 2000);
+            return false;
+           }
+
+           if (rutas=='[')
+           {
+            toastr.error('Seleccione al menos una ruta.',' ', 2000);
+            return false;
+           }
+
+
+           filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+           filtros.oficina=id_oficina;
+           filtros.solicitud=solicitud;
+           filtros.rutas=rutas;
+
+
+           $.ajax({
+            url: "{% url 'qorder:denegar' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                    $("#_table_routes").html(data);
+
+                },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+
+                                 }
+
+            }
+            });
+
+
+           });
+
+
+
+          $("#btnvermapa").on("click",function(){
+
+           var filtros={};
+           var id_oficina=$('#id_oficina').val();
+           var solicitud = $('input[name="todos"]:checked').val();
+           var rutas=id_rutas
+           if (id_oficina=='')
+           {
+            toastr.error('Seleccione un Contratista.',' ', 2000);
+            return false;
+           }
+
+           if (rutas=='[')
+           {
+            toastr.error('Seleccione al menos una ruta.',' ', 2000);
+            return false;
+           }
+           filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+           filtros.oficina=id_oficina;
+           filtros.solicitud=solicitud;
+           filtros.rutas=rutas;
+
+           $.ajax({
+            url: "{% url 'qorder:posicionmapa' %}",
+            type: 'post',
+            datatype: 'json',
+            data: filtros,
+            statusCode: {
+                200: function(data) {
+                    $("#_mapa").html(data);
+                    $('#filter_collapsible').collapse('show');
+                    $('#filter_collapsible1').collapse('hide');
+              },
+                301: function() {
+                    //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                },
+                500: function() {
+                        toastr.error('La ruta no se puede autorizar porque no esta leída al 100% .',' ', 2000);
+                                 }
+
+            }
+            });
+
+
+});
+
+$("#btncerrar").on("click",function(){
+
+  $('#filter_collapsible').collapse('hide');
+  $('#filter_collapsible1').collapse('show');
+});
+
+$("#btnexportar").on("click",function(){
+  var filtros={};
+  var id_oficina=$('#id_oficina').val();
+  var solicitud = $('input[name="todos"]:checked').val();
+  var rutas=id_rutas
+  
+  
+  if (id_oficina=='')
+  {
+    toastr.error('Seleccione un Contratista',' ', 2000);
+    return false;
+  }
+  if (rutas=='[')
+  {
+    toastr.error('Seleccione al menos una Ruta',' ', 2000);
+    return false;
+  }
+
+  if (solicitud=='1')
+  {
+    toastr.error('La ruta debe estar autorizada para ser exportada',' ', 2000);
+    return false;
+  }
+  if (solicitud=='3')
+  {
+    toastr.error('La ruta debe estar autorizada para ser exportada',' ', 2000);
+    return false;
+  }
+
+  filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+  filtros.oficina=id_oficina;
+  filtros.solicitud=solicitud;
+  filtros.rutas=rutas;
+
+  $.ajax({
+   url: "{% url 'qorder:export_reorganizar' %}",
+   type: 'post',
+   datatype: 'json',
+   data: filtros,
+   statusCode: {
+       200: function(data) {
+           
+            toastr.succes('Archivo de secuencia generado ',' ', 2000);
+       },
+       300: function() {
+           
+       },
+       500: function() {
+         toastr.error('La ruta no se puede autorizar porque no esta leída al 100% ',' ', 2000);
+
+                        }
+
+   }
+   });
+
+
+  });
+
+
+
+</script>

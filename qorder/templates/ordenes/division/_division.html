@@ -1,0 +1,147 @@
+  {% load qorder_tags %}
+  {% load i18n %} 
+    <input type="hidden" id="rutaseleccionada" value=""> 
+    <div class="col-md-12">
+        <div class="panel panel-default"  style="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+            <div class="panel-heading">
+           <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+            <div class="col-xs-6">
+                <h2 class="panel-title">
+                    {% trans "tituloDivision" %}
+                </h2>
+            </div>
+            <div class="input-field col-xs-6 text-right">
+            <div class="form-inline" >
+             <label>{% trans "Contratista" %}</label>
+               <select class="select form-control" id="id_oficina" name="oficina"  onchange="searchTechnicians()">
+                {% if not user.work_units.all|length_is:'1' %}
+                <option value="">{% trans "Contratista" %}</option>
+                {% endif %}
+                {% for ct in user.work_units.all %}
+                <option value="{{ct.id_workunit}}">{{ct}}</option>
+                {% endfor %}
+              </select> 
+             </div>
+           </div>
+                                   
+           </div>
+          </div>
+
+        <row>
+          <div class="col-md-6"> <br>
+              <div  class="panel panel-default" >
+                  <div class="panel-heading"> <h4 class="panel-title">Rutas</h4> </div>
+                  <div class="panel-body">
+                      <div id="_table_routes" >      
+        
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-1"> <br> </div>
+          <div class="col-md-5"> <br>
+          <div id="_table_divisiones">
+ 
+
+     
+                </div>
+            </div>
+          
+        </row>
+  <row>
+  <div id="_table_suministros_ruta" >  
+
+  </div>
+  <div id="_table_suministros_division" >       
+
+
+        </div>
+    </row>
+   
+  </div>
+ </div>
+ 
+<script>
+ 
+    {% if user.work_units.all|length_is:'1' %}
+
+
+    searchRoutes();
+
+    {% endif %}
+    function searchRoutes(){
+
+      var centro = $('#id_oficina').val();
+      
+      $('#id_oficinah').val(centro);
+    
+      var aver = $('#id_oficinah').val();
+     
+      $.ajax({
+        url: "{% url 'qorder:division_route' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro},
+        statusCode: {
+          200: function(data) {
+           
+            $("#_table_routes").html(data);
+          },
+          301: function() {
+                        //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                      },
+                      500: function() {
+
+                        toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                      }
+                    }
+                  });
+    }
+
+
+    
+
+     function generarDivision()
+     {
+          var value = $("#sel1").val();
+          
+           
+           var filtros = {};
+
+            filtros.csrfmiddlewaretoken = '{{csrf_token}}';
+            filtros.cantidad = value;
+            filtros.id_ruta = $("#rutaseleccionada").val();
+
+            $.ajax({
+              url: "{% url 'qorder:generar_division' %}",
+              type: 'post',
+              headers: {'X-CSRFToken': '{{ csrf_token }}'},
+              datatype: 'json',
+
+              data: filtros,
+              statusCode: {
+                200: function(data) {
+                  $("#_table_divisiones").html(data);
+                },
+                301: function() {
+                   toastr.error('Se pueden realizar hasta 10 divisiones por itinerario.', ' ', {timeOut: 2000})
+                  //  Materialize.toast('No hay &oacute;rdenes en este estado.', 2000, 'red');
+                },
+                302: function() {
+                  //  Materialize.toast('Debe seleccionar un técnico.', 2000, 'red');
+                },
+                500: function() {
+                  //  Materialize.toast('Server error, contact an administrator.', 2000, 'red');
+                }
+
+              },
+              success:  function (xhr, ajaxOptions, thrownError) {}
+
+             });
+
+
+
+     }
+
+
+</script>

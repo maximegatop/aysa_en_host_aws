@@ -1,0 +1,1522 @@
+{% load qorder_tags %}
+{% load i18n %}
+  <div class="panel panel-default" modal="box-shadow: 0px 2px 25px rgba(0, 0, 0, .25);">
+<!-- Encabezados filtros Semana y Oficina  -->
+
+    <div class="panel-heading">
+      <div class="container-fluid panel-container style='padding-right:0px; padding-left:0px;'">
+          <div class="col-xs-6">
+              <h2 class="panel-title">
+                  {% trans "Segmentación Rutas" %}
+              </h2>
+          </div>
+          <div class="input-field col-xs-3 ">
+              <div class="form-inline">
+                  <label>{% trans "Semana" %}</label>
+                  <input style="width: 70%;" class="select form-control" list="semanas" id="semana" value="{{semana}}" name="semana"  autocomplete="off">
+                  <datalist id="semanas" name="semanas" >
+                      <option value="{{semana}}"></option>
+                      <option value="TODAS"></option>
+
+                  </datalist>
+              </div>
+          </div>
+            
+          <div class="input-field col-xs-3 text-right" >
+            <div class="form-inline">
+                <label>{% trans "Contratista" %}</label>
+                <select class="select form-control" id="id_oficina" name="oficina" onchange="search()">
+                    {% if not user.work_units.all|length_is:'1' %}
+                    <option value="">{% trans "Contratista" %}</option>
+                    {% endif %}
+                    {% for ct in user.work_units.all %}
+                    <option value="{{ct.id_workunit}}">{{ct}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+          </div>
+      </div>
+    </div>
+    <!-- End Encabezados filtros Semana y Oficina  -->
+
+    <div class="panel-body">
+      <row>
+        <div class="col-md-5">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h4 class="panel-title">Rutas</h4></div>
+                
+                <div class="panel-body">
+                    <div id='_table_routes'>
+                      {% include 'ordenes/asignacion_segmentos/_table_routes.html'  with feedback_form=feedback_form %}
+                    </div>
+                    <div id="_table_routes_footer">
+                      <h5>Cant. Puntos de Suministros en mapa:</h5>
+                      <h5 id="cantidad_puntos"></h5>
+                    </div>
+
+                    <div id='_table_routes_sincoor' style="position:absolute;left:-9999px;top:-9999px;">
+                    </div>
+                    
+                    <div id="_table_routes_sincoor_footer" style="display: none">
+                      <div class="row">
+                        <h5 style="padding-left:18px;">Localización en Mapa</h5>
+                        <div class="form-inline" style="padding-left:18px;">
+                          <label >{% trans "Dirección" %}</label>
+                          <input type="text" class="form-control" id="direccion" style="width: 85%" readonly>
+                        </div>
+                        <div class="form-inline" style="padding-left:18px;">
+                          <br>
+                          <button id="btnGuardarUbicacion" class="btn btn-primary" type="button">
+                            Guardar Ubicación
+                          </button>
+                          <br>
+                        </div>
+                      </div>
+        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-7">
+            <div class="panel panel-default">
+              <div class="panel-heading"><h4 class="panel-title">Mapa</h4></div>
+              <div class="panel-body">
+                <div id='resultado_mapa_ordenes'>
+                  {% include 'ordenes/asignacion_segmentos/_mapa_asignacion.html' with feedback_form=feedback_form %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3">
+                <button disabled id="btnNuevoSegmento" class="btn btn-primary pull-left" type="button">
+                    Nuevo Segmento
+                </button>
+              </div>
+              <div class="col-md-3">
+                <button id="btnAsignar" class="btn btn-primary pull-left" type="button">
+                  Asignar Segmento
+                </button>
+              </div>
+              <div class="col-md-6">
+                <select class="select form-control" id="segmento" name="segmento">
+                  <option value="">Seleccione Segmento</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="row">
+              <br>
+              <div class="col-md-3">
+                <button id="btnEditarSegmento" style="width: 135px;" class="btn btn-primary pull-left" type="button">
+                  Editar Segmento
+                </button>
+              </div>
+
+              <div class="col-md-3">
+                <button id="btnGuardarAsignacion" style="width: 140px;" class="btn btn-primary pull-left" type="button">
+                  Guardar Segmento
+                </button>
+              </div>
+              
+                <div class="col-sm-6">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <button id="btnVerSegmento" class="btn btn-primary pull-left"  type="button">
+                        Ver Segmento
+                      </button>
+                    </div>
+                    <div class="col-sm-6">
+                      <button id="btnRemoverSegmento" class="btn btn-danger pull-right" type="button">
+                        Remover Seg.
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+              
+            </div>
+            <br><br>
+        </div>
+      </row>
+
+    </div>
+
+
+ <!--Modal para Nuevo segmento-->
+    <div id="modalSegmento" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>
+                <div class="modal-title" id="modalTituloSegmento"></div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="">Código de Segmento</label>
+                        <input type="text" id="cod_segmento" maxlength="10" class="form-control">
+                    </div>
+                    <br>
+                    <div class="col-md-12">
+                        <label for="">Descripción de Segmento</label>
+                        <input type="text" id="desc_segmento" maxlength="50" class="form-control">
+                    </div>
+                </div>
+                <br>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelarModalSegmento" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button id="btnGuardarSegmento" type="button" class="btn btn-danger">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+    <!--Modal Nuevo segmento-->
+    
+    <!--Modal Confirmar Guardar Asignacion-->
+    <div id="modalConfirmacionGuardar" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>
+              <div class="modal-title">Guardar Asignación</div>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <label for="">Confirme por favor para poder guardar asignación</label>
+                  </div>
+                  <br>
+              </div>
+              <br>
+          </div>
+          <div class="modal-footer">
+              <button id="btnCancelarModal" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button id="btnConfirmarGuardarAsignacion" type="button" class="btn btn-primary" data-dismiss="modal">Guardar</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+    <!--End Modal Confirmar Guardar Asignacion-->          
+
+  <!--Modal Confirmar Eliminar Segmento-->
+    <div id="modalConfirmacionEliminarSegmento" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>
+              <div class="modal-title">Eliminar Segmento</div>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <label for="">Confirme por favor para poder eliminar Segmento, recuerde que esta operación es irreversible.</label>
+                  </div>
+                  <br>
+              </div>
+              <br>
+          </div>
+          <div class="modal-footer">
+              <button id="btnCancelarModal" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button id="btnConfirmarEliminarSegmento" type="button" class="btn btn-danger" data-dismiss="modal">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal-dialog -->
+  <!--End Modal Confirmar Guardar Asignacion-->
+
+  <!--Modal Confirmar Eliminar Area-->
+    <div id="modalConfirmacionEliminarArea" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>
+            <div class="modal-title">Eliminar Área</div>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <label for="">Confirme por favor para poder eliminar el área, recuerde que este proceso es irreversible.</label>
+                </div>
+                <br>
+            </div>
+            <br>
+          </div>
+          <div class="modal-footer">
+              <button id="btnCancelarModal" type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+              <button id="btnEliminarArea" type="button" class="btn btn-danger" data-dismiss="modal">Eliminar</button>
+          </div>
+        </div>
+      </div><!-- /.modal-dialog -->
+    </div>
+  <!--End Modal Confirmar Eliminar Area-->
+  
+  <!--Modal Detalle Asignaciones de Rutas con Áreas-->
+    <div id="modalAsignacionesSegmentos" class="modal fade">
+      <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                          class="sr-only">Cerrar</span></button>
+                  <h1 class="modal-title">Asignaciones Segmentos</h1>
+              </div>
+              <div class="modal-body">
+
+                  <div id="resultado_tabla_asignaciones">
+                      {% include 'ordenes/asignacion_segmentos/_table_asignaciones.html' with feedback_form=feedback_form %}
+                  </div>
+
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+              </div>
+          </div>
+      </div>
+    </div>
+  <!--End Modal Detalle Asignaciones de Rutas con Áreas-->
+
+
+
+
+
+</div>
+
+
+
+<script>
+
+$(document).ready(function () {
+  $('#cod_segmento').on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+  });
+});
+
+$("#btnRemoverSegmento").on("click",function () { 
+  $("#modalConfirmacionEliminarSegmento").modal('show');
+})
+
+$("#btnGuardarUbicacion").on("click",function () {
+  //la variable _punto_suministro es global
+  if ($("#direccion").val()==='') {
+    toastr.warning('Arrastre el marcador para obtener una dirección.', ' ', {timeOut: 3000})
+    return
+  }
+  
+  $.ajax({
+    type: "post",
+    url: "{% url 'qorder:asignacion_ubicacion_save' %}",
+    data: {
+      id_punto_suministro:_punto_suministro,
+      gps_lat:_lat_dragend,
+      gps_lng:_long_dragend,
+      csrfmiddlewaretoken : '{{csrf_token}}'
+    },
+    dataType: "json",
+    success: function (data) {
+      console.log("suministro guardado");
+      var filaSeleccionada = table_sincoor.row($('.selected')).data();
+      if (filaSeleccionada) {
+        filaSeleccionada[1] = _lat_dragend;
+        filaSeleccionada[2] = _long_dragend;
+
+      }
+    },
+    statusCode: {
+        200: function (data) {
+          toastr.success('Ubicación Registrada.', ' ', {timeOut: 2000})
+          _ubicacion_save=false;
+          $("#direccion").val('');
+
+          var filaSeleccionada = table_sincoor.row('.selected').data();
+          punto_suministro = filaSeleccionada[0];
+          ruta = filaSeleccionada[5];
+  
+          _rutas_coordenadas.push({'punto_suministro':punto_suministro,'ruta_id':ruta,'latitud':_lat_dragend,'longitud':_long_dragend})
+  
+          searchPuntosSinCoor()
+          quitar_marcador(_punto_suministro);
+          poner_marcadores(false,_punto_suministro,_lat_dragend,_long_dragend);
+          $(".leaflet-control-geosearch").css("display", "none");
+
+        },
+        500: function (data) {
+          toastr.error('Error. Contact an administrador.', {timeOut: 2000})
+        }
+      }
+  });
+
+})
+
+
+$("#btnConfirmarEliminarSegmento").on("click",function () { 
+  var _id_segmento=$("#segmento").val()
+  if (_id_segmento!=='') { 
+    $.ajax({
+      type: "post",
+      url: "{%url 'qorder:segmentacion_segmentos_delete'%}",
+      data: {id_segmento:_id_segmento,csrfmiddlewaretoken : '{{csrf_token}}'},
+      dataType: "json",
+      statusCode: {
+        200: function (data) {
+          toastr.success('Segmento Eliminado.', ' ', {timeOut: 2000})
+          limpiar_areas()
+          limpiar_areas_obtenidas()
+          limpiarMarcadores()
+          searchSegmentos("")//vacio para que deje "seleccione segmento" en el list
+        },
+        301: function (data) {
+          toastr.error('No se puede eliminar el segmento, ya se encuentra asignada o trabajada.', {timeOut: 2000})
+        },
+        500: function (data) {
+          toastr.error('Error. Contact an administrador.', {timeOut: 2000})
+        }
+      }
+    });
+  }
+  else{
+    toastr.warning('Seleccione un segmento.', ' ', {timeOut: 2000})
+  }
+})
+
+
+
+ //BOTON CONFIRMACION REGISTRA LA ASIGNACIÓN A LA BD
+$("#btnConfirmarGuardarAsignacion").on("click",function (e) { 
+  e.preventDefault()
+    RegistraAsignacion()
+})
+
+//LLAMA AL MODAL DE CONFIRMACION DE ASIGNACION A LA BD
+$("#btnGuardarAsignacion").on("click",function (e) { 
+  e.preventDefault()
+  $("#modalConfirmacionGuardar").modal('show'); 
+})
+
+//VER SEGMENTO EN EL MAPA
+$("#btnVerSegmento").on("click",function (e) { 
+  e.preventDefault();
+  contador_puntos=0
+  var id_seg=$("#segmento").val();
+  if (id_seg==='') {
+    toastr.warning('Seleccione un Segmento.', ' ', {timeOut: 2000})
+  }else{
+    $.ajax({
+      type: "post",
+      url: "{% url 'qorder:segmentacion_areas_show' %}",
+      data: {id_segmento:id_seg,csrfmiddlewaretoken : '{{csrf_token}}'},
+      dataType: "json",
+      success: function (data) {
+        limpiar_areas_obtenidas()
+        limpiarMarcadores();
+        _flag_btn_asignar=false
+        data['segmentos_areas'].forEach(element => {//recorro el obj
+          var datos_geojson = JSON.parse(element.area);//parsea para darle formato json
+
+          // Si es un polígono, usa L.geoJson
+          L.geoJson(datos_geojson, { id: element.id,}).addTo(drawnItems);
+        
+        _asignacion_estado_create=false
+
+        });
+
+        //agregamos los marcadores
+        data['marcadores_coordenadas'].forEach(element => {
+          poner_marcadores(false,element.punto_suministro,element.gps_latitud,element.gps_longitud, true)
+          
+        });
+
+        $("#cantidad_puntos").text(contador_puntos)
+      }
+    });
+  }
+})
+
+
+
+//FN REGISTRA ASIGNACION EN LA BD
+function RegistraAsignacion() {
+  
+  var keys = Object.keys(localStorage);//obtiene todas las claves de local storag
+  
+  if (keys.length<1) {
+    toastr.error('No hay datos para guardar, .', ' ', {timeOut: 2000})
+    return
+  }
+
+  if ($("#segmento").val().length===0) {
+    toastr.error('Agregue o seleccione un segmento.', ' ', {timeOut: 2000})
+  }else{
+    
+    var data_asignaciones=[]
+
+    keys.forEach(element => {
+      if (!isNaN(element)) {
+        // Obtener los puntos y todas las capas dibujadas en el mapa
+        var datos=JSON.parse(localStorage.getItem(element))
+        // var puntos=JSON.stringify(datos.puntos)
+        var areas=datos.areas
+        data_asignaciones.push({idsegmento:element,areas:areas})
+      }
+    });
+
+
+
+    $.ajax({
+      type: "post",
+      url: "{% url 'qorder:segmentacion_asignacion_save' %}",
+      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+      data: {datos_asign:JSON.stringify(data_asignaciones)
+      },
+      dataType: "json",
+      statusCode: {
+        200: function(data) {
+          toastr.success('Asignaciones guardadas con éxito.', ' ', {timeOut: 2000})
+          //eliminar del local storage los puntos del segmento registrado
+          localStorage.clear()
+          limpiar_areas()
+          limpiar_areas_obtenidas()
+          limpiarMarcadores()
+          $("#cod_segmento").val('');
+          $("#desc_segmento").val('');
+
+          var filasSeleccionadas = table_routes.rows('.selected').data();
+          var indices = table_routes.rows('.selected').indexes();
+          // Eliminar físicamente las filas del DataTable
+          searchRoutes();
+          /*for (var i = indices.length - 1; i >= 0; i--) {
+              table_routes.row(indices[i]).remove().draw(false);
+          }*/
+          
+        },
+        500: function (data) {
+          toastr.error('Error. Contact an administrador.', {timeOut: 2000})
+        }
+
+      }
+
+    });
+
+
+  }
+}
+
+
+//LIMPIA TODAS LAS AREAS RECIEN DIBUJADA
+function limpiar_areas() { 
+  mapAsignOds.selectAreaFeature.removeAllArea();//limpia las selecciones en el mapa
+}
+
+var _obj_asignaciones=""
+var _obj_areas=""
+//CARGA LOS DATOS DEL LOCAL STORAGE A LA TABLA
+function ActualizaTablaAsignaciones() { 
+  var clave = $("#segmento").val();
+  var segmento = $("#segmento option:selected").text();
+  _obj_asignaciones = JSON.parse(localStorage.getItem(clave));
+
+  
+  var area_array = {};
+  var tbody = $("#table_asignaciones tbody");
+  tbody.html('');
+  
+  if (_obj_asignaciones === null) {
+    toastr.warning('No existen asignaciones.', ' ', {timeOut: 2000})
+    $("#modalAsignacionesSegmentos").modal("show");
+    return;
+  }else{
+    _obj_asignaciones.areas.forEach(function (area, index) {
+      area_array = JSON.parse(area);
+      markers = area_array.features[0].properties.markers[0];
+
+      var cant_pumsum = markers.length;
+      var suministros = markers.map(element => element.id_pumsum).join(', ');
+
+      tbody.append('<tr>' +
+        '<td>' + index +'</td>' +
+        '<td>' + segmento +'</td>' +
+        '<td>' + cant_pumsum +'</td>' +
+        '<td>' + suministros +'</td>' +
+        '<td>' + 
+          '<p class="btnDesasignar" data-placement="top" data-toggle="tooltip" title={% trans "lblDesasignar" %} style="margin-bottom: 0px;"><span class="glyphicon glyphicon-remove" style="color:red"></span></p>' + 
+        '</td>' +
+      '</tr>');
+    });
+
+  }
+
+  $("#modalAsignacionesSegmentos").modal("show");
+
+}
+
+
+$(document).on("click",".btnDesasignar",function () {
+  var fila = $(this).closest("tr");
+  var index= (fila).find('td:eq(0)').text();
+  var puntos=(fila).find('td:eq(3)').text();
+  var clave=$("#segmento").val();
+  //Obtengo los puntos de la tabla para desasignar 
+  var arrayPuntos = puntos.split(',').map(function(item) {
+    return item.trim(); // Eliminar espacios en blanco alrededor de cada element
+  });
+
+  var datos=JSON.parse(localStorage.getItem(clave))
+  
+  arrayPuntos.forEach(puntos_reponer => {  
+    datos.puntos.forEach(puntos_lista => {
+      if (puntos_reponer===puntos_lista.id_pumsum) {
+        poner_marcadores(false,puntos_lista.id_pumsum,puntos_lista.latitud,puntos_lista.longitud)
+        actualizar_puntos(contador_puntos)
+      }
+    });
+  });
+
+  EliminarAreaLocalStorage(index);
+  ActualizaTablaAsignaciones()
+
+});
+
+
+function EliminarAreaLocalStorage(indice) { 
+  var clave=$("#segmento").val()
+  var _obj = JSON.parse(localStorage.getItem(clave))
+
+  // Acceder a la propiedad "areas"
+  _obj_areas = _obj.areas;
+  
+  _obj.areas.splice(indice, 1);
+  
+  if (_obj.areas.length === 0) {   
+    localStorage.removeItem(clave);
+  } else {
+    // Si aún hay áreas, actualizar el objeto en el Local Storage
+    localStorage.setItem(clave, JSON.stringify(_obj));
+  }
+}
+
+//OBJETO ALMACENA EL GEOJSON Y LOS MARCADORES PARA GUARDAR EN LOCAL STORAGE
+//CON EL ID_SEGMENTO COMO KEY EN LOCAL_STORAGE
+obj_puntos_geojsonareas={}
+
+//BOTON GUARDA EL OBJ_PUNTOS_GEOJSONAREAS EN LOCALSTORAGE
+$("#btnAsignar").on("click",function (e) { 
+  e.preventDefault()
+  
+  if ($("#segmento").val().length===0) {
+    toastr.warning('Agregue Nuevo segmento o seleccione de la lista.', ' ', {timeOut: 2000})
+    return 
+  }
+  if (mayordiezmil_puntos(contador_puntos)) {
+    toastr.warning('Excedió el límite de puntos en el mapa.', ' ', {timeOut: 2000})
+    return
+  }
+
+  if (getAreaPuntos()===null) {
+    toastr.warning('Dibuje un área en el mapa que contenga marcadores.', ' ', {timeOut: 2000})
+    return
+  }
+
+  if (_ubicacion_save) {
+    toastr.warning('Haga click en Guardar Ubicación de un marcador que agregó.', ' ', {timeOut: 2000})
+    return
+  }
+
+    //permite asignar
+    if (typeof(Storage) !== "undefined") {//primero pregunta si permite storage
+      selectedOds = getAreaPuntos()//obtiene los trazos en geojson
+      datos_storage=setAreaPuntos(selectedOds)//pone puntos de suministros y gps a la lista
+      
+      // Obtiene puntos y geojson areas para guardar en sotrage
+      // var geojson_areas=JSON.stringify(obtenerGeoJSONAreasDibujadas())
+      var geojson_areas=obtenerGeoJSONAreasDibujadas()
+      
+      //PROBANDO Agregamos los marcadores dentro del area al mismo geojson para guardar en la bd
+      geojson_areas.features.forEach(function (feature) {
+        feature.properties = feature.properties || {};
+        feature.properties.markers = [];
+
+        feature.properties.markers.push(datos_storage);
+      });
+
+
+      // Ahora puedes stringify el objeto
+      geojson_areas = JSON.stringify(geojson_areas);
+      ///////PROBANDO FINISH
+    
+      // Obtiene datos anteriores del almacenamiento local
+      var datosAnteriores = localStorage.getItem($("#segmento").val());
+      
+      // Si hay datos anteriores, convierte el JSON a un objeto
+      var obj_puntos_geojsonareas = datosAnteriores ? JSON.parse(datosAnteriores) : { puntos: [], areas: [] };
+      
+      // Agrega nuevos puntos y áreas
+      obj_puntos_geojsonareas.puntos.push(...datos_storage);
+      
+      obj_puntos_geojsonareas.areas.push(geojson_areas);
+
+      // //guarda el geojson y los marcadores del mapa con los trazos en storage
+      localStorage.setItem($("#segmento").val(), JSON.stringify(obj_puntos_geojsonareas));
+      
+      // elimina los marcadores del mapa
+      var cant_puntsum =0
+      datos_storage.forEach(element => {
+        quitar_marcador(element.id_pumsum)
+        cant_puntsum+=1
+      });
+      
+      //elimina los dibujos del mapa
+      limpiar_areas()
+      // // limpiarMarcadores()
+      // limpiar_areas_obtenidas()  
+      
+      _flag_btn_asignar=false
+      toastr.success('Se asignaron correctamente, '+ cant_puntsum + ' puntos de suministros.', ' ', {timeOut: 2000})
+      
+    } else {
+      toastr.error('Lo siento, tu navegador no soporta localStorage.', ' ', {timeOut: 2000})
+    }
+  
+})
+
+//GUARDA LOS MARCADORES CON INFO DE PUNTO DE SUMINISTRO/LAT Y LNG EN EL POPUP 
+function setAreaPuntos(puntosList){
+    
+    var puntosList = puntosList
+    var lstpuntos=[]
+    if (puntosList){
+        if(puntosList.length > 0){
+          puntosList.map((e)=>{
+              if(e.hasOwnProperty("puntos")){
+                  lstpuntos.push({
+                    "id_pumsum": e.puntos.id_punto_suministro,
+                    "latitud" : e.puntos.lat,
+                    "longitud" : e.puntos.lon
+                  })
+
+              }
+          })
+        }
+      }
+      return (lstpuntos)
+      
+}
+
+
+//GUARDA EL SEGMENTO EN LA BD
+$("#btnGuardarSegmento").on("click",function (e) { 
+      e.preventDefault()
+      var _id_segmento=$("#segmento").val()
+      var oficina=$("#id_oficina").val()
+      var cod_segmento=$("#cod_segmento").val()
+      var desc_segmento=$("#desc_segmento").val()
+
+      if (oficina==='') {
+        toastr.error('Seleccione un Contratista.', ' ', {timeOut: 2000})
+        return
+      }
+      
+      if (cod_segmento=='') {
+        toastr.error('Ingrese un código de segmento.', ' ', {timeOut: 2000})
+        return
+      }
+
+      if(cod_segmento.length <= 3){
+        toastr.warning('Ingrese un código de segmento válido.', ' ', {timeOut: 2000})
+        return
+      }
+
+        if (_segmento_estado_create) {//true registra
+          $.ajax({
+            type: "post",
+            url: "{% url 'qorder:segmentacion_save' %}",
+            data: {id_oficina:oficina,cod_seg:cod_segmento,desc_seg:desc_segmento,csrfmiddlewaretoken : '{{csrf_token}}'},
+            dataType: "json",
+            statusCode: {
+                200: function(data) {
+                  _segmento_estado_create=true
+                  $("#modalSegmento").modal('hide')
+                  $("#modalNuevoSegmento").modal('hide')
+                  $("#segmento").append($('<option>',{
+                    value:data.id_seg,
+                    text:data.cod_seg+"-"+data.desc_seg,
+                    selected:true
+                  }));
+                  
+                  toastr.success('Segmento Creado.', ' ', {timeOut: 2000})
+                  //limpiar_areas_obtenidas()
+                  //limpiarMarcadores()
+                },
+                300:function(data) {
+                  toastr.warning('¡Atención! Código de Segmento ya existente', ' ', {timeOut: 2000})
+                }
+            }
+
+          });
+
+        }else{//false actualiza
+          $.ajax({
+            type: "post",
+            url: "{% url 'qorder:segmentacion_segmentos_update' %}",
+            data: {_id_segmento:_id_segmento,cod_seg:cod_segmento,desc_seg:desc_segmento,csrfmiddlewaretoken : '{{csrf_token}}'},
+            dataType: "json",
+            statusCode: {
+                200: function(data) {
+                  _segmento_estado_create=true
+                  searchSegmentos(data.id_segmento)
+                  $("#modalNuevoSegmento").modal('hide')
+                  // $("#segmento").val(data.id_segmento).change()
+                  toastr.success('Segmento Actualizado.', ' ', {timeOut: 2000})
+                }
+              }
+            });         
+          
+        }
+})
+
+//ABRE LA VENTANA PARA EL REGISTRO DE UN NUEVO SEGMENTO
+$("#btnNuevoSegmento").on("click",function (e) { 
+    e.preventDefault()
+    
+    _segmento_estado_create=true
+    $("#modalTituloSegmento").text('Nuevo Segmento')
+    $("#modalSegmento").modal("show");
+    $("#desc_segmento").val('')
+    $("#desc_segmento").val('')
+});
+
+//ABRE LA VENTANA PARA EDICIÓN DE UN SEGMENTO SELECCIONADO DIRECTO DESDE LA BD 
+$("#btnEditarSegmento").on("click",function (e) { 
+    e.preventDefault()
+    if ($("#segmento").val()==='') {
+      toastr.error('Seleccione un segmento para editar.', ' ', {timeOut: 2000})
+    }else{
+      _segmento_estado_create=false
+      $("#modalTituloSegmento").text('Editar Segmento')
+      _id_segmento=$("#segmento").val()
+      $.ajax({
+        type: "post",
+        url: "{% url 'qorder:segmentacion_segmentos_edit' %}",
+        data: {id_segmento:_id_segmento,csrfmiddlewaretoken : '{{csrf_token}}'},
+        dataType: "json",
+        success: function (data) {
+          $("#cod_segmento").val(data.cod_segmento)
+          $("#desc_segmento").val(data.desc_descripcion)
+          $("#modalSegmento").modal("show");
+        }
+      });
+    }
+});
+
+
+//VARIABLES GLOBALES
+var _rutas_coordenadas=[]
+// var _rutas_sin_coordenadas=[]
+var marcadores={}
+var contador_puntos=0
+var _asignacion_estado_create=true
+var _segmento_estado_create=true
+var _punto_suministro=""
+var _lat_dragend  = ""
+var _long_dragend = ""
+var _flag_btn_asignar = false
+var _ubicacion_save = false
+var listaRutas = ''
+var procesoEnCurso = false;
+
+
+function obtener_direccion_api(lat,lng) { 
+  $.ajax({
+    url: "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+ lat +"&lon="+ lng,
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      $("#direccion").val(data.display_name)
+      
+    },
+    error: function(error) {
+      toastr.error('Error al obtener dirección.' + error, ' ', {timeOut: 2000})
+    }
+  });
+  
+}
+
+//OBTIENE LAS COORDENADAS DESDE LA BD AL HACER CLIC EN UNA RUTA DE LA TABLA
+function obtener_coordenadas(id_ruta){
+
+    $.ajax({
+    type: "post",
+    url: "{% url 'qorder:segmentacion_rutas_coordenadas' %}",
+    data: {ruta_id:id_ruta,csrfmiddlewaretoken : '{{csrf_token}}'},
+    dataType: "json",
+    statusCode: {
+          200: function(data) {
+            data.coordenada.forEach(element => {
+              //el id del marcador es el punto de suministro por que es único
+              // if (element.punto_suministro__gps_latitud==='0' || element.punto_suministro__gps_latitud===''){
+              //   _rutas_sin_coordenadas.push({'punto_suministro':element.punto_suministro_id,'ruta_id':element.ruta_id,'latitud':element.punto_suministro__gps_latitud,'longitud':element.punto_suministro__gps_longitud})
+              // }else{
+              if (mayordiezmil_puntos(contador_puntos)) {
+                toastr.error('Excedió el límite de puntos en el mapa.', ' ', {timeOut: 2000})
+              }else{
+                const existePuntoSuministro = _rutas_coordenadas.find(ruta => ruta.punto_suministro === element.punto_suministro_id)
+                _rutas_coordenadas.push({'punto_suministro':element.punto_suministro_id,'ruta_id':element.ruta_id,'latitud':element.punto_suministro__gps_latitud,'longitud':element.punto_suministro__gps_longitud})
+                poner_marcadores(false,element.punto_suministro_id,element.punto_suministro__gps_latitud,element.punto_suministro__gps_longitud)
+              }
+              // }
+            });
+            setTimeout(function() {
+                console.log('Proceso completado para id_ruta:', id_ruta);
+            }, 1000);
+          },
+          301: function() {
+            toastr.error('La ruta no tiene gps.', ' ', {timeOut: 2000})
+          },
+          500: function() {
+            toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+          }
+    }
+  });
+}
+
+//ACTUALIZA LA CANTIDAD DE MARCADORES EN EL MAPA
+function actualizar_puntos(num) { 
+  $("#cantidad_puntos").text(num)
+}
+
+  
+//AGREGA MARCADORES EN EL MAPA 
+function poner_marcadores(arrastrar,id,latitud,longitud, esSegmento){
+    // Agrega los nuevos marcadores
+    //id es el punto de suministro
+
+    var colorIcon = (arrastrar) ? orangeIcon : (esSegmento) ? skyBlueIcon : greenIcon
+
+      var marker = L.marker([latitud, longitud], {draggable: arrastrar, icon: colorIcon})
+        .addTo(mapAsignOds)
+        .bindPopup('<b>Suministro: </b>' + id + '<br>'+
+        '<b>Latitud:</b> '+ latitud + '<br>'+
+        '<b>Longitud:</b> '+ longitud + '<br>');
+        marcadores[id]=marker//guarda el marker en un array 
+        
+        marker.puntos = {
+          id_punto_suministro:id,
+          lat:latitud,
+          lon:longitud,
+          arrastrar: arrastrar
+        }
+
+        //se agrego en capa para poder capturar los marcadores a la hora de eliminar
+        drawnItems.addLayer(marker)
+        
+        //Agrego a la capa de selectAreaFeature
+
+
+
+      //preguntamos si arrastrar es true para capturar lat y long del marker arrastrado
+      //y agregar los nuevos puntos del marker
+      if (arrastrar) {
+        marker.on('dragend', function() {
+
+            lat = ((marker.getLatLng().lat).toString()).substring(0,14)
+            lng = ((marker.getLatLng().lng).toString()).substring(0,14)
+
+            actualizarCoordsMarcador(lat,lng,id,arrastrar);
+
+            // Buscar el input dentro del control GeoSearch
+            let inputField = document.querySelector('.leaflet-control-geosearch input');
+            
+            // Cambiar el valor del input
+            if (inputField) {
+                inputField.value = '';
+            }
+
+        });
+      }
+      contador_puntos+=1
+      actualizar_puntos(contador_puntos)
+
+}
+
+function quitar_marcador(id) { 
+  if (marcadores[id]) {
+      mapAsignOds.removeLayer(marcadores[id]);
+      delete marcadores[id];
+      contador_puntos-=1
+      actualizar_puntos(contador_puntos)
+    }
+}
+
+
+
+var table_routes;
+var table_sincoor;
+search();
+
+
+function search(){
+  
+  $('#chkMostrarGuardados').prop('checked', false);
+
+  if ($('#id_oficina').val()!='')
+  {
+  //searchTechnicians();
+  limpiarMarcadores()
+  limpiar_areas()
+  limpiar_areas_obtenidas()
+  searchRoutes();
+  actualizar_puntos(0)
+  //searchAsignaciones();
+  if(table_sincoor != undefined){
+    table_sincoor.rows().remove().draw()
+  }
+
+  }
+}
+
+{% if user.work_units.all|length_is:'1' %}
+search();
+{% endif %}
+
+
+  function searchRoutes(){
+      
+    var centro = $('#id_oficina').val();
+    var semana = $('#semana').val();
+    
+    var emp=""
+    //Obtiene los puntos sin coordenadas
+    //searchPuntosSinCoor()
+    searchSegmentos(emp)
+    //Obtiene las rutas
+    $.ajax({
+      url: "{% url 'qorder:asignacion_segmento_route' %}",
+      type: 'post',
+      datatype: 'json',
+      data: {id_oficina:centro,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}'},
+      statusCode: {
+        200: function(data) {
+          $("#_table_routes").html(data);
+          actualizar();
+          limpiar_areas()
+          
+        },
+        301: function() {
+              //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+            },
+            500: function() {
+
+              toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+            }
+          }
+    });
+
+  }
+      
+  function searchPuntosSinCoor(){
+    var centro = $('#id_oficina').val();
+    var semana = $('#semana').val();
+
+    const rutas = listaRutas;
+
+    $.ajax({
+        url: "{% url 'qorder:asignacion_table_puntos_sincoord' %}",
+        type: 'post',
+        datatype: 'json',
+        data: {id_oficina:centro,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}', rutas: rutas},
+        statusCode: {
+          200: function(data) {
+            $("#_table_routes_sincoor").html(data);      
+            actualizar_table()
+          },
+          304: function() {
+            toastr.error('La cantidad de punto de suministros sin coordenadas supera el\
+             limite máximo de visualización.', 'Atención', {timeOut: 2000})
+          },
+          500: function() {
+            toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+          }
+        }
+      });
+  }
+
+
+  function searchSegmentos(id) { 
+    
+    var oficina = $('#id_oficina').val();
+    var semana = $('#semana').val();
+    
+    $.ajax({
+      type: "POST",
+      url: "{% url 'qorder:segmentacion_segmentos_show' %}",
+      dataType: 'json',
+      data: {id_oficina:oficina,csrfmiddlewaretoken : '{{csrf_token}}', semana: semana},
+      success: function (data) {  // Cambiado a success
+        $('#segmento').empty();
+        $("#segmento").append($('<option>',{ value:'', text:'Seleccione segmento', selected:true }));
+        data['segmentos'].forEach(element => {
+          if (element.id===id) {
+            $("#segmento").append($('<option>',{
+                value:element.id,
+                text:element.codigo_segmento+"-"+element.descripcion_segmento,
+                selected:id
+            }));
+          }else{
+            $("#segmento").append($('<option>',{
+                value:element.id,
+                text:element.codigo_segmento+"-"+element.descripcion_segmento,
+            }));
+          }
+
+
+
+        });
+
+      },
+    });
+
+  }
+  
+  $('#semana').on('input', function() {
+    if( $(this).val().length === 0 ) {
+        $('#semana').val('');
+        toastr.error('Seleccione una semana valida', ' ', {timeOut: 1500})
+        $("#_table_routes").html('');
+        return false;
+    }
+    else
+    {
+      if ($(this).val().length > 2 || $(this).val() === 'TODAS')
+      {
+        var centro = $('#id_oficina').val();
+        var semana = $('#semana').val();
+        incluirExp = $('#chkRexportar').prop('checked')
+          
+      if (centro==""||semana=="")
+      {
+        $("#tabla_export").html('');
+        return;
+      }
+      $.ajax({
+          url: "{% url 'qorder:asignacion_segmento_route' %}",
+          type: 'post',
+          datatype: 'json',
+          data: {id_oficina:centro,semana:semana,csrfmiddlewaretoken : '{{csrf_token}}'},
+          statusCode: {
+            200: function(data) {
+              $("#_table_routes").html(data);
+              actualizar();
+            },
+            301: function() {
+                          //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+                        },
+                        500: function() {
+
+                          toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+                        }
+                      }
+                    });
+      }
+
+
+    }
+
+  });
+  
+  
+  
+  // function searchAsignaciones(){
+  //     // valuecheck='';
+  //     // if($("#chkMostrarGuardados").is(':checked')) {
+  //     //      valuecheck=1;
+  //     // } else {
+  //     //      valuecheck=0;
+  //     // }
+  //     var centro = $('#id_oficina').val();
+      
+  //     //$('#id_oficinah').val(centro);
+  //     if (centro==''){
+  //       toastr.error('Seleccione un contratista', ' ', {timeOut: 2000})
+  //       return;
+  //     }
+  //     //var aver = $('#id_oficinah').val();
+
+  //     $.ajax({
+  //       url: "{% url 'qorder:asignacion_asignaciones' %}",
+  //       type: 'post',
+  //       datatype: 'json',
+  //       data: {id_oficina:centro,csrfmiddlewaretoken : '{{csrf_token}}'},
+  //       statusCode: {
+  //         200: function(data) {
+            
+  //           $("#_table_asignados").html(data);
+  //         },
+  //         301: function() {
+  //                       //Materialize.toast('El técnico no tiene asignado un dispositivo', 2000, 'red');
+  //         },
+  //         500: function() {
+
+  //           toastr.error('Server error, contact an administrator.', ' ', {timeOut: 2000})
+  //         }
+  //       }
+  //     });
+  // }
+  
+  
+      
+  var table_routes="";
+  var _tab_activo=1
+  //ACTUALIZA LA TABLA DE RUTAS(1°TAB)
+  function actualizar(){
+    $('#_table_routes').css({'position': '','left': '','top': ''});
+
+             table_routes = $('#table_routes_coor').DataTable( {
+              language: datetable_languaje,
+              autoWidth: true,
+             info: false,
+          scrollY: 200,
+              pageLength:180,
+  
+              select: 'multi',
+          columnDefs: [
+              {
+                  "targets": [0,5,7],
+                  "visible": false,
+                  "searchable": false
+              },
+  
+          ],dom: 'Bfrtip',
+          buttons: [
+          ],
+              preDrawCallback: function (settings) {
+                var api = new $.fn.dataTable.Api(settings);
+                var pagination = $(this)
+                .closest('.dataTables_wrapper')
+                .find('.dataTables_paginate');
+  
+                if (api.page.info().pages <= 1) {
+                  pagination.hide();
+                }
+                else {
+                  pagination.show();
+                }
+  
+              }
+            });
+            
+           
+    if ($('#asignacion-tab').parent().hasClass('active')) {
+      $('#_table_routes').css({'position': 'absolute','left': '-9000px','top': '-9000px'});
+    }
+  }
+  
+  //ACTUALIZA LA TABLA DE PUNTOS SIN COORDENADAS(2°TAB)
+  function actualizar_table(){
+
+    $('#_table_routes_sincoor').css({'position': '','left': '','top': ''});
+
+
+    table_sincoor = $('#table_puntossum_sincoor').DataTable( {
+      language: datetable_languaje,
+      autoWidth: true,
+      info: false,
+      scrollY: 200,
+      pageLength:500,  
+      select: 'single',
+      columnDefs: [
+          {
+              "targets": [1, 2, 5],
+              "visible": false,
+              "searchable": false
+          },
+
+      ]
+      ,dom: 'Bfrtip',
+      buttons: [
+      ],
+      preDrawCallback: function (settings) {
+        var api = new $.fn.dataTable.Api(settings);
+        var pagination = $(this)
+        .closest('.dataTables_wrapper')
+        .find('.dataTables_paginate');
+        if (api.page.info().pages <= 1) {
+          pagination.hide();
+        }
+        else {
+          pagination.show();
+        }
+
+      }
+    });
+
+    if ($('#config-tab').parent().hasClass('active')) {
+      $('#_table_routes_sincoor').css({'position': 'absolute','left': '-9000px','top': '-9000px'});
+    }
+
+  }
+
+
+  function mayordiezmil_puntos(cant) { 
+      if (cant>10000) {
+        return true
+      }else{
+        return false
+      }
+  }
+
+  // $("#chkMostrarGuardados").click(function() {
+  //         valuecheck='';
+  //         if($("#chkMostrarGuardados").is(':checked')) {
+  //             valuecheck=1;
+  //         } else {
+  //             valuecheck=0;
+  //         }
+  //         searchAsignaciones();
+  
+  // });
+  
+  //SOLO ÁREAS OBTENIDAS DE LA BD
+  function limpiar_areas_obtenidas() { 
+    drawnItems.clearLayers();//primero limpia las capas de dibujos
+  }
+
+  function limpiarMarcadores() {
+    // Recorremos todos los marcadores en el objeto marcadores y lo quitarmos del mapa
+    for (let id in marcadores) {
+      if (marcadores.hasOwnProperty(id)) {
+        mapAsignOds.removeLayer(marcadores[id]);
+      }
+    }
+    // Limpiamos el objeto marcadores
+    marcadores = {};
+    actualizar_puntos(0)
+  }
+
+  function limpiarMarcadoresArrastrables() {
+    for (let id in marcadores) {
+      if (marcadores.hasOwnProperty(id)) {
+        if(marcadores[id].puntos.arrastrar){
+          mapAsignOds.removeLayer(marcadores[id]);
+        }
+      }
+    }
+  }
+
+  $("#segmento").on("change",function () { 
+    _asignacion_estado_create=true
+    _segmento_estado_create=true
+  })
+
+  
+  var capasEliminadas = []; // Mantén un conjunto de identificadores únicos de capas eliminadas
+  // var eliminarHabilitado = false; // Variable para rastrear el estado del modo de eliminación.
+  var _capaConId="" 
+  $('#btnDeleteArea').click(function() {
+    
+    //Testing otro codigo
+    
+    // if (booleanIcon==true) {
+      // Desvincula todos los controladores de eventos de clic antes de aplicarlos nuevamente.
+      drawnItems.eachLayer(function(layer) {
+        layer.off('click');
+        var capaId = layer.options.id;
+        
+        // Vuelve a agregar el controlador de eventos solo si el modo de eliminación está habilitado.
+        layer.on('click', function(e) {
+            if (booleanIcon) {
+              _capaConId = e.target;
+              $("#modalConfirmacionEliminarArea").modal('show');
+            }
+          });
+        });
+      
+    // }
+
+
+    });
+    
+    $("#btnEliminarArea").on("click",function () { 
+      eliminarGeoJSONEnBaseDeDatos(_capaConId)
+    })
+
+    function eliminarGeoJSONEnBaseDeDatos(capaConId){
+      var _id_area=capaConId.options.id
+      if (_id_area === undefined) {
+        toastr.warning('Haga click sobre el área dibujada, no el marcador.', ' ', {timeOut: 2000})
+        return
+      }
+      
+      var _cant_punt_sum=0
+      var _sing_plu_sum="puntos de suministros"
+      $.ajax({
+        type: "post",
+        url: "{% url 'qorder:asignacion_segmento_area_delete' %}",
+        data: {id_area:_id_area,csrfmiddlewaretoken : '{{csrf_token}}'},
+        dataType: "json",
+        statusCode: {
+          200: function(data) {
+            
+            data.forEach(element => {
+              _cant_punt_sum+=1
+              quitar_marcador(element.id_pumsum)
+            });
+            if (_cant_punt_sum==1) { _sing_plu_sum="punto de suministro"}
+            toastr.success('Se eliminó el área exitosamente con '+ _cant_punt_sum +' '+ _sing_plu_sum+'.', ' ', {timeOut: 2000})
+            // Actualiza la variable _area_pologon_layers al eliminar la capa
+            mapAsignOds.selectAreaFeature._area_pologon_layers = mapAsignOds.selectAreaFeature._area_pologon_layers.filter(l => l !== capaConId);
+            drawnItems.removeLayer(capaConId);
+          }
+         
+         
+        }
+  });
+
+
+}
+
+
+$('#modalConfirmacionEliminarArea').on('hidden.bs.modal', function () {
+  
+  btnDeleteArea.button.innerHTML = "<span class=\"button-state state-get-center get-center-active\"><span class=\"fa fa-trash\"></span></span>"
+  booleanIcon = false
+
+});
+
+function hayFormasDibujadas() {
+  return drawnItems.getLayers().length > 0;
+}
+
+
+function LimpiarTodo() {
+  limpiar_areas()
+  limpiar_areas_obtenidas()
+  limpiarMarcadores()
+  table_routes.rows().deselect();
+  table_sincoor.rows().deselect();
+  marcadores={}
+  contador_puntos=0
+  _ubicacion_save=false
+  _flag_btn_asignar=false
+}
+
+async function obtenerDireccionesRecomendadas(direccion) {
+  var nominatimEndpoint = 'https://nominatim.openstreetmap.org/search';
+  respuesta = []
+  
+  try {
+      var data = await $.ajax({
+          url: nominatimEndpoint,
+          data: {
+              format: 'json',
+              q: direccion,
+              limit: 3
+          },
+          dataType: 'json'
+      });
+
+      if (data.length > 0) {
+          respuesta = data;
+          
+      } else {
+          console.error('No se encontraron resultados para la dirección:', direccion);
+      }
+  } catch (error) {
+      console.error('Error al obtener coordenadas:', error);
+  }
+
+  return respuesta
+}
+
+
+// Función para crear y mostrar el popup con las opciones
+function mostrarPopUp(punto_sum, data) {
+  let centroMapa = mapAsignOds.getCenter();
+
+  let content = '<div id="popup-content-wrapper" style="border-radius: 5px;padding: 0px"><ul stlye="list-style-type: none;padding: 0;margin: 0;">';
+  
+  // Agrega las opciones al popup con colores alternativos
+  for (var i = 0; i < data.length; i++) {
+      let bgColor = i % 2 === 0 ? '#f2f2f2' : '#e6e6e6'; // Colores alternativos
+      content += '<li style="background-color: ' + bgColor + ';padding: 3px;cursor: pointer" data-lat="' + data[i].lat + '" data-lon="' + data[i].lon + '" data-puntosum="' + punto_sum + '">' + data[i].display_name + '</li>';
+  }
+
+  content += '<li style="background-color: #e6e6e6;padding: 3px;cursor: pointer" data-lat="' + 0 + '" data-lon="' + 0 + '" data-puntosum="' + punto_sum + '"> Buscar dirección o ubicar marcador manualmente </li>';
+
+
+  content += '</ul></div>';
+
+  // Muestra el popup en el mapa
+  L.popup({ offset: [0, -30], closeButton: false })
+      .setContent(content)
+      .setLatLng(centroMapa)
+      .openOn(mapAsignOds);
+}
+
+
+// Evento al hacer clic en un elemento del popup
+mapAsignOds.on('popupopen', function (event) {
+  $('#popup-content-wrapper li').click(function () {
+      console.log("pop up mostrado");
+      let lat = parseFloat($(this).data('lat'));
+      let lon = parseFloat($(this).data('lon'));
+      let punto_sum = $(this).data('puntosum');
+      let coordenadas = []
+
+      if(lat != 0 && lon != 0){
+        coordenadas = [lat,lon];
+      }
+
+      colocarMarcadorDireccion(punto_sum,coordenadas);
+
+      mapAsignOds.closePopup();
+
+      // Centra el mapa en el marcador
+      //mapAsignOds.setView([lat, lon], 16); // Ajusta el valor 16 según tus necesidades
+  });
+});
+
+
+function colocarMarcadorDireccion(_punto_suministro, coordenadas){
+  let centroMap = mapAsignOds.getCenter();
+
+  if(coordenadas.length > 0){
+    poner_marcadores(true,_punto_suministro,coordenadas[0],coordenadas[1])
+    mapAsignOds.setView([coordenadas[0],coordenadas[1]], mapAsignOds.getZoom());
+    toastr.success('Se agregó un marcador con dirección aproximada, arrastre el marcador y luego haga click en el botón Guardar Ubicación', ' ', {timeOut: 2500})   
+    actualizarCoordsMarcador(coordenadas[0], coordenadas[1], _punto_suministro, true)
+  }else{
+      poner_marcadores(true,_punto_suministro,centroMap.lat.toFixed(10),centroMap.lng.toFixed(10))
+      //mapAsignOds.setView(centroMap.lat.toFixed(10),centroMap.lng.toFixed(10), mapAsignOds.getZoom());
+      toastr.warning(`Se agregó un marcador en posición centrada, busque una dirección o arrastre el marcador y luego haga click en el botón Guardar Ubicación`, ' ', {timeOut: 2500})
+      $(".leaflet-control-geosearch").css("display", "block");
+  }
+  _ubicacion_save=true
+
+}
+
+function actualizarCoordsMarcador(latitud, longitud, id, arrastrar){
+  console.log("actualizar coords marcador");
+  _lat_dragend  = latitud
+  _long_dragend = longitud
+  marker = marcadores[id];
+  marker.bindPopup('<b>Suministro: </b>' + id + '<br>'+
+  '<b>Latitud:</b> '+ _lat_dragend + '<br>'+
+  '<b>Longitud:</b> '+ _long_dragend + '<br>').openPopup();
+  var nuevosPuntos = {
+      id_punto_suministro:id,
+      lat:_lat_dragend,
+      lon:_long_dragend,
+      arrastrar: arrastrar
+  }
+  //registra el nuevo punto despues de soltar el marcador
+  var marcador_existente=marcadores[id]
+  marcador_existente.puntos=nuevosPuntos
+  obtener_direccion_api(_lat_dragend,_long_dragend)
+}
+
+// Ejemplo de uso
+
+
+
+</script>
